@@ -1,0 +1,29 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://${DB_HOST}:${DB_PORT}/${DB_NAME}
+    username: ${DB_USER}
+    password: ${DB_PASSWORD}
+    driver-class-name: org.postgresql.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+    show-sql: true # sql 로그 출력
+    properties:
+      hibernate:
+        format_sql: true
+
+
+
+logging:
+  level:
+    org.hibernate.SQL: DEBUG           # Hibernate 실행 SQL
+    org.hibernate.type.descriptor.sql: TRACE   # SQL 에 바인딩되는 파라미터 값도 출력
+
+decorator: #SQL 로그 이쁘게 라이브러리
+  datasource:
+    p6spy:
+      enable-logging: true
+      multiline: true   # 줄바꿈 예쁘게
+      logging: slf4j    # 로깅 방식
