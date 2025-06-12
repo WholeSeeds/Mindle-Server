@@ -27,3 +27,9 @@ decorator: #SQL 로그 이쁘게 라이브러리
       enable-logging: true
       multiline: true   # 줄바꿈 예쁘게
       logging: slf4j    # 로깅 방식
+
+spring-doc: # swagger 설정
+  swagger-ui:
+    tags-sorter: alpha         # 태그 알파벳 정렬
+    operations-sorter: method  # 메소드 정렬
+    doc-expansion: none        # 접은 상태로 표시
