@@ -2,7 +2,9 @@ package com.wholeseeds.mindle.domain.complaint.entity;
 
 import java.time.LocalDateTime;
 
+import com.wholeseeds.mindle.domain.location.entity.Subdistrict;
 import com.wholeseeds.mindle.domain.member.entity.Member;
+import com.wholeseeds.mindle.domain.place.entity.Place;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -42,11 +44,13 @@ public class Complaint {
 	@JoinColumn(name = "member_id", nullable = false)
 	private Member member;
 
-	@Column(name = "place_id")
-	private Long placeId;
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "subdistrict_id", nullable = false)
+	private Subdistrict subdistrictId;
 
-	@Column(name = "subdistrict_id")
-	private Long subdistrictId;
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "place_id")
+	private Place placeId;
 
 	@Column(nullable = false)
 	private String title;

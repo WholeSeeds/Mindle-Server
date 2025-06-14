@@ -1,4 +1,6 @@
-package com.wholeseeds.mindle.domain.location.entity;
+package com.wholeseeds.mindle.domain.place.entity;
+
+import com.wholeseeds.mindle.domain.location.entity.Subdistrict;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -16,21 +18,34 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Entity
-@Table(name = "district")
+@Table(name = "place")
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 @Builder
-public class District {
+public class Place {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 
 	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "city_id", nullable = false)
-	private City city;
+	@JoinColumn(name = "type_id", nullable = false)
+	private PlaceType type;
 
-	@Column(length = 100, nullable = false)
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "subdistrict_id")
+	private Subdistrict subdistrict;
+
+	@Column(nullable = false)
 	private String name;
+
+	@Column(length = 500)
+	private String description;
+
+	@Column
+	private Double latitude;
+
+	@Column
+	private Double longitude;
 }
