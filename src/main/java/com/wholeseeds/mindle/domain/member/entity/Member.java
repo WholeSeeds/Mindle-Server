@@ -35,8 +35,8 @@ public class Member {
 	@Column(nullable = false, length = 50)
 	private String nickname;
 
-	@Column(name = "provider_id", nullable = false)
-	private String providerId;
+	@Column(name = "phone", length = 13)
+	private String phone;
 
 	@Column(name = "notification_push")
 	private Boolean notificationPush = false;
