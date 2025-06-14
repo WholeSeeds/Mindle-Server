@@ -2,11 +2,16 @@ package com.wholeseeds.mindle.domain.member.entity;
 
 import java.time.LocalDateTime;
 
+import com.wholeseeds.mindle.domain.location.entity.Subdistrict;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.PreUpdate;
 import jakarta.persistence.Table;
@@ -28,9 +33,9 @@ public class Member {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 
-	// 읍/면/동/리 고유 ID (외래키로 연결될 예정)
-	@Column(name = "subdistrict_id", nullable = false)
-	private Long subdistrictId;
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "subdistrict_id", nullable = false)
+	private Subdistrict subdistrictId;
 
 	@Column(nullable = false, length = 50)
 	private String nickname;
