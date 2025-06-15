@@ -1,9 +1,9 @@
 package com.wholeseeds.mindle.domain.comment.entity;
 
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.wholeseeds.mindle.common.entity.BaseEntity;
 import com.wholeseeds.mindle.domain.complaint.entity.Complaint;
 import com.wholeseeds.mindle.domain.member.entity.Member;
 
@@ -18,8 +18,6 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.OrderBy;
-import jakarta.persistence.PrePersist;
-import jakarta.persistence.PreUpdate;
 import jakarta.persistence.Table;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -33,7 +31,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 @Builder
-public class Comment {
+public class Comment extends BaseEntity {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -58,24 +56,4 @@ public class Comment {
 
 	@Column(nullable = false, columnDefinition = "TEXT")
 	private String content;
-
-	@Column(name = "created_at", nullable = false, updatable = false)
-	private LocalDateTime createdAt;
-
-	@Column(name = "updated_at")
-	private LocalDateTime updatedAt;
-
-	@Column(name = "deleted_at")
-	private LocalDateTime deletedAt;
-
-	@PrePersist
-	protected void onCreate() {
-		this.createdAt = LocalDateTime.now();
-		this.updatedAt = this.createdAt;
-	}
-
-	@PreUpdate
-	protected void onUpdate() {
-		this.updatedAt = LocalDateTime.now();
-	}
 }

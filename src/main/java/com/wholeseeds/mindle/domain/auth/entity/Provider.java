@@ -1,13 +1,12 @@
 package com.wholeseeds.mindle.domain.auth.entity;
 
-import java.time.LocalDateTime;
+import com.wholeseeds.mindle.common.entity.BaseEntity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.PrePersist;
 import jakarta.persistence.Table;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -21,7 +20,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 @Builder
-public class Provider {
+public class Provider extends BaseEntity {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -29,15 +28,4 @@ public class Provider {
 
 	@Column(length = 100)
 	private String name;
-
-	@Column(name = "created_at", nullable = false, updatable = false)
-	private LocalDateTime createdAt;
-
-	@Column(name = "deleted_at")
-	private LocalDateTime deletedAt;
-
-	@PrePersist
-	protected void onCreate() {
-		this.createdAt = LocalDateTime.now();
-	}
 }

@@ -1,6 +1,6 @@
 package com.wholeseeds.mindle.domain.location.entity;
 
-import java.time.LocalDateTime;
+import com.wholeseeds.mindle.common.entity.BaseEntity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -12,8 +12,6 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
-import jakarta.persistence.PrePersist;
-import jakarta.persistence.PreUpdate;
 import jakarta.persistence.Table;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -27,7 +25,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 @Builder
-public class Subdistrict {
+public class Subdistrict extends BaseEntity {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -43,26 +41,6 @@ public class Subdistrict {
 	@Enumerated(EnumType.STRING)
 	@Column(nullable = false)
 	private Type type;
-
-	@Column(name = "created_at", nullable = false, updatable = false)
-	private LocalDateTime createdAt;
-
-	@Column(name = "updated_at")
-	private LocalDateTime updatedAt;
-
-	@Column(name = "deleted_at")
-	private LocalDateTime deletedAt;
-
-	@PrePersist
-	protected void onCreate() {
-		this.createdAt = LocalDateTime.now();
-		this.updatedAt = this.createdAt;
-	}
-
-	@PreUpdate
-	protected void onUpdate() {
-		this.updatedAt = LocalDateTime.now();
-	}
 
 	public enum Type {
 		EUP, MYEON, DONG, RI  // 향후 변경 필요
