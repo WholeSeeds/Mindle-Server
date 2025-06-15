@@ -54,11 +54,14 @@ public class ComplaintReport {
 	@Column(nullable = false)
 	private Status status = Status.PENDING;
 
-	@Column(name = "created_at", updatable = false)
+	@Column(name = "created_at", nullable = false, updatable = false)
 	private LocalDateTime createdAt;
 
 	@Column(name = "updated_at")
 	private LocalDateTime updatedAt;
+
+	@Column(name = "deleted_at")
+	private LocalDateTime deletedAt;
 
 	@PrePersist
 	protected void onCreate() {

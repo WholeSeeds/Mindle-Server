@@ -37,11 +37,14 @@ public class ComplaintImage {
 	@Column(name = "image_url", length = 500, nullable = false)
 	private String imageUrl;
 
-	@Column(name = "uploaded_at", updatable = false)
-	private LocalDateTime uploadedAt;
+	@Column(name = "created_at", nullable = false, updatable = false)
+	private LocalDateTime createdAt;
+
+	@Column(name = "deleted_at")
+	private LocalDateTime deletedAt;
 
 	@PrePersist
 	protected void onCreate() {
-		this.uploadedAt = LocalDateTime.now();
+		this.createdAt = LocalDateTime.now();
 	}
 }
