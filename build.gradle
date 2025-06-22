@@ -54,6 +54,10 @@ dependencies {
     implementation("io.github.openfeign.querydsl:querydsl-core:${queryDslVersion}")
     implementation("io.github.openfeign.querydsl:querydsl-jpa:$queryDslVersion")
     annotationProcessor("io.github.openfeign.querydsl:querydsl-apt:$queryDslVersion:jpa")
+
+    // MapStruct
+    implementation 'org.mapstruct:mapstruct:1.5.5.Final'
+    annotationProcessor 'org.mapstruct:mapstruct-processor:1.5.5.Final'
 }
 
 tasks.named('test') {
