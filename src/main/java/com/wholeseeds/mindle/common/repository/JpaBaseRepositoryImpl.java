@@ -23,10 +23,10 @@ public class JpaBaseRepositoryImpl<T extends BaseEntity, ID extends Serializable
 	@PersistenceContext
 	private final EntityManager em;
 
-	private final JPAQueryFactory queryFactory;
-	private final EntityPath<T> entityPath;
-	private final NumberPath<Long> idPath;
-	private final DateTimePath<?> deletedAtPath;
+	protected final JPAQueryFactory queryFactory;
+	protected final EntityPath<T> entityPath;
+	protected final NumberPath<Long> idPath;
+	protected final DateTimePath<?> deletedAtPath;
 
 	public JpaBaseRepositoryImpl(Class<T> domainClass, EntityManager em, EntityPath<T> entityPath,
 		NumberPath<Long> idPath, DateTimePath<?> deletedAtPath) {
