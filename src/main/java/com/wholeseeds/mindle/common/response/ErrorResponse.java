@@ -8,6 +8,6 @@ package com.wholeseeds.mindle.common.response;
  */
 public record ErrorResponse(int status, String message) {
 	public static ErrorResponse of(ErrorCode code) {
-		return new ErrorResponse(code.getStatus(), code.getDefaultMessage());
+		return new ErrorResponse(code.getStatus(), code.getMessage());
 	}
 }
