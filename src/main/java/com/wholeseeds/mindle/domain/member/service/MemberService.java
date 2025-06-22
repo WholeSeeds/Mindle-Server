@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 
 import com.google.firebase.auth.FirebaseToken;
 import com.wholeseeds.mindle.domain.member.entity.Member;
+import com.wholeseeds.mindle.domain.member.exception.MemberNotFoundException;
 import com.wholeseeds.mindle.domain.member.repository.MemberRepository;
 
 import lombok.RequiredArgsConstructor;
@@ -31,18 +32,8 @@ public class MemberService {
 	public Member login(FirebaseToken firebaseToken) {
 		String uid = firebaseToken.getUid();
 		String email = firebaseToken.getEmail();
-
 		Map<String, Object> claims = firebaseToken.getClaims();
-
 		String phoneNumber = (String)claims.getOrDefault("phone_number", null);
-
-		String provider;
-		if (claims.containsKey("firebase")) {
-			Map<String, Object> firebaseMap = (Map<String, Object>)claims.get("firebase");
-			provider = (String)firebaseMap.getOrDefault("sign_in_provider", "unknown");
-		} else {
-			provider = "unknown";
-		}
 
 		return memberRepository.findByFirebaseUidNotDeleted(uid)
 			.orElseGet(() -> {
@@ -50,9 +41,34 @@ public class MemberService {
 					.firebaseUid(uid)
 					.email(email)
 					.phone(phoneNumber)
-					.provider(provider)
+					.provider(extractProvider(claims))
 					.build();
+
 				return memberRepository.save(newMember);
 			});
+	}
+
+	/**
+	 * Firebase UID 기반으로 내 정보 조회
+	 */
+	public Member getMyInfo(String firebaseUid) {
+		return memberRepository.findByFirebaseUidNotDeleted(firebaseUid)
+			.orElseThrow(MemberNotFoundException::new);
+	}
+
+	/**
+	 * Firebase 토큰에서 provider 추출
+	 * @param claims Firebase 토큰의 클레임
+	 * @return provider 이름 (예: "google.com", "facebook.com" 등)
+	 */
+	private String extractProvider(Map<String, Object> claims) {
+		Object firebaseObj = claims.get("firebase");
+		if (firebaseObj instanceof Map<?, ?> map) {
+			Object rawProvider = map.get("sign_in_provider");
+			if (rawProvider instanceof String s) {
+				return s;
+			}
+		}
+		return "unknown";
 	}
 }
