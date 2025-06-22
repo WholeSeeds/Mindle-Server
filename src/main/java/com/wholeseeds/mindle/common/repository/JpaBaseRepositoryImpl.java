@@ -16,6 +16,12 @@ import com.wholeseeds.mindle.common.entity.BaseEntity;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 
+/**
+ * 공통 JPA 레포지토리 구현체
+ *
+ * @param <T>  엔티티 타입
+ * @param <ID> 엔티티 ID 타입
+ */
 public class JpaBaseRepositoryImpl<T extends BaseEntity, ID extends Serializable>
 	extends SimpleJpaRepository<T, ID>
 	implements JpaBaseRepository<T, ID> {

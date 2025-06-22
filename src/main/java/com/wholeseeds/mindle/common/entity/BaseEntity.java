@@ -15,16 +15,28 @@ import lombok.Getter;
 @MappedSuperclass
 public abstract class BaseEntity {
 
+	/**
+	 * ID
+	 */
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 
+	/**
+	 * 생성일시
+	 */
 	@Column(name = "created_at", nullable = false, updatable = false)
 	protected LocalDateTime createdAt;
 
+	/**
+	 * 수정일시
+	 */
 	@Column(name = "updated_at")
 	protected LocalDateTime updatedAt;
 
+	/**
+	 * 삭제일시 (soft delete)
+	 */
 	@Column(name = "deleted_at")
 	protected LocalDateTime deletedAt;
 
