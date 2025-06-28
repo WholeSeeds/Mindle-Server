@@ -36,7 +36,7 @@ public class Complaint extends BaseEntity {
 	private Member member;
 
 	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "subdistrict_id", nullable = false)
+	@JoinColumn(name = "subdistrict_id")
 	private Subdistrict subdistrictId;
 
 	@ManyToOne(fetch = FetchType.LAZY)
