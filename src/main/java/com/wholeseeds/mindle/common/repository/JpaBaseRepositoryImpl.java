@@ -16,6 +16,12 @@ import com.wholeseeds.mindle.common.entity.BaseEntity;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 
+/**
+ * 공통 JPA 레포지토리 구현체
+ *
+ * @param <T>  엔티티 타입
+ * @param <ID> 엔티티 ID 타입
+ */
 public class JpaBaseRepositoryImpl<T extends BaseEntity, ID extends Serializable>
 	extends SimpleJpaRepository<T, ID>
 	implements JpaBaseRepository<T, ID> {
@@ -23,10 +29,10 @@ public class JpaBaseRepositoryImpl<T extends BaseEntity, ID extends Serializable
 	@PersistenceContext
 	private final EntityManager em;
 
-	private final JPAQueryFactory queryFactory;
-	private final EntityPath<T> entityPath;
-	private final NumberPath<Long> idPath;
-	private final DateTimePath<?> deletedAtPath;
+	protected final JPAQueryFactory queryFactory;
+	protected final EntityPath<T> entityPath;
+	protected final NumberPath<Long> idPath;
+	protected final DateTimePath<?> deletedAtPath;
 
 	public JpaBaseRepositoryImpl(Class<T> domainClass, EntityManager em, EntityPath<T> entityPath,
 		NumberPath<Long> idPath, DateTimePath<?> deletedAtPath) {

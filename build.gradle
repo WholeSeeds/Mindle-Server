@@ -48,11 +48,16 @@ dependencies {
     implementation 'com.github.gavlyukovskiy:p6spy-spring-boot-starter:1.8.0' // SQL 이쁘게 포멧팅 라이브러리
     implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.2.0' // swagger-ui
     implementation 'org.hibernate.validator:hibernate-validator'
+    implementation 'com.google.firebase:firebase-admin:9.2.0'
 
     // OpenFeign QueryDSL
     implementation("io.github.openfeign.querydsl:querydsl-core:${queryDslVersion}")
     implementation("io.github.openfeign.querydsl:querydsl-jpa:$queryDslVersion")
     annotationProcessor("io.github.openfeign.querydsl:querydsl-apt:$queryDslVersion:jpa")
+
+    // MapStruct
+    implementation 'org.mapstruct:mapstruct:1.5.5.Final'
+    annotationProcessor 'org.mapstruct:mapstruct-processor:1.5.5.Final'
 }
 
 tasks.named('test') {
