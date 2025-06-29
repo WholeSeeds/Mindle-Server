@@ -3,14 +3,15 @@ package com.wholeseeds.mindle.common.repository;
 import java.util.List;
 import java.util.Optional;
 
+import org.springframework.data.jpa.repository.JpaRepository;
+
 /**
  * 공통 JPA 레포지토리 인터페이스
  *
  * @param <T>  엔티티 타입
  * @param <ID> 엔티티 ID 타입
  */
-public interface JpaBaseRepository<T, ID> {
-
+public interface JpaBaseRepository<T, ID> extends JpaRepository<T, ID> {
 	/**
 	 * ID로 엔티티를 조회하되, 삭제되지 않은 엔티티만 반환
 	 *
