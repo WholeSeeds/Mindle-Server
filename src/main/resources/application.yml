@@ -16,6 +16,9 @@ spring:
       hibernate:
         format_sql: true
 
+firebase:
+  config-path: classpath:mindle-secret.json
+
 logging:
   level:
     org.hibernate.SQL: DEBUG           # Hibernate 실행 SQL

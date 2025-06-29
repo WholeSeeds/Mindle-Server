@@ -1,9 +1,11 @@
 package com.wholeseeds.mindle.config;
 
-import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.io.Resource;
 
 import com.google.auth.oauth2.GoogleCredentials;
 import com.google.firebase.FirebaseApp;
@@ -14,16 +16,19 @@ import jakarta.annotation.PostConstruct;
 @Configuration
 public class FirebaseConfig {
 
+	@Value("${firebase.config-path}")
+	private Resource firebaseConfigFile;
+
 	@PostConstruct
 	public void initialize() throws IOException {
-		FileInputStream serviceAccount =
-			new FileInputStream("mindle-secret.json");
+		try (InputStream serviceAccount = firebaseConfigFile.getInputStream()) {
+			FirebaseOptions options = FirebaseOptions.builder()
+				.setCredentials(GoogleCredentials.fromStream(serviceAccount))
+				.build();
 
-		FirebaseOptions options = FirebaseOptions.builder()
-			.setCredentials(GoogleCredentials.fromStream(serviceAccount))
-			.build();
-
-		FirebaseApp.initializeApp(options);
+			if (FirebaseApp.getApps().isEmpty()) {
+				FirebaseApp.initializeApp(options);
+			}
+		}
 	}
 }
-
