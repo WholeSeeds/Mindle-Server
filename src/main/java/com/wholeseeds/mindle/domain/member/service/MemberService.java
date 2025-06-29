@@ -17,15 +17,6 @@ public class MemberService {
 
 	private final MemberRepository memberRepository;
 
-	// public Member getMember(Long id) {
-	// 	return memberRepository.findByIdNotDeleted(id)
-	// 		.orElseThrow(() -> new IllegalArgumentException("존재하지 않거나 삭제된 회원입니다."));
-	// }
-	//
-	// public List<Member> getAllActiveMembers() {
-	// 	return memberRepository.findAllNotDeleted();
-	// }
-
 	/**
 	 * Firebase UID 기반으로 로그인 (또는 자동 회원가입) 처리
 	 */
@@ -37,11 +28,15 @@ public class MemberService {
 
 		return memberRepository.findByFirebaseUidNotDeleted(uid)
 			.orElseGet(() -> {
+				// 닉네임 없으면 userN 할당
+				String nickname = generateDefaultNickname();
+
 				Member newMember = Member.builder()
 					.firebaseUid(uid)
 					.email(email)
 					.phone(phoneNumber)
 					.provider(extractProvider(claims))
+					.nickname(nickname)
 					.build();
 
 				return memberRepository.save(newMember);
@@ -70,5 +65,18 @@ public class MemberService {
 			}
 		}
 		return "unknown";
+	}
+
+	/**
+	 * 기본 닉네임 생성 (user1, user2, ...)
+	 * - 현재 최대 숫자 + 1로 생성
+	 * - 예: user123 → user124
+	 * @return 생성된 닉네임
+	 */
+	private String generateDefaultNickname() {
+		int next = memberRepository
+			.findMaxUserNicknameSuffix()
+			.orElse(0) + 1;
+		return "user" + next;
 	}
 }
