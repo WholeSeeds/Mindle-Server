@@ -11,4 +11,6 @@ public interface MemberRepositoryCustom {
 	List<Member> findAllNotDeleted();
 
 	Optional<Member> findByFirebaseUidNotDeleted(String firebaseUid);
+
+	Optional<Integer> findMaxUserNicknameSuffix();
 }
