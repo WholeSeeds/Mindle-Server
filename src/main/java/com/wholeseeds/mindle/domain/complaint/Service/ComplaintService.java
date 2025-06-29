@@ -9,6 +9,10 @@ import com.wholeseeds.mindle.domain.complaint.dto.SaveComplaintRequestDto;
 import com.wholeseeds.mindle.domain.complaint.entity.Category;
 import com.wholeseeds.mindle.domain.complaint.entity.Complaint;
 import com.wholeseeds.mindle.domain.complaint.entity.ComplaintImage;
+import com.wholeseeds.mindle.domain.complaint.exception.CategoryNotFoundException;
+import com.wholeseeds.mindle.domain.complaint.exception.CityNotFoundException;
+import com.wholeseeds.mindle.domain.complaint.exception.DistrictNotFoundException;
+import com.wholeseeds.mindle.domain.complaint.exception.SubdistrictNotFoundException;
 import com.wholeseeds.mindle.domain.complaint.repository.CategoryRepository;
 import com.wholeseeds.mindle.domain.complaint.repository.ComplaintImageRepository;
 import com.wholeseeds.mindle.domain.complaint.repository.ComplaintRepository;
@@ -19,6 +23,7 @@ import com.wholeseeds.mindle.domain.location.repository.CityRepository;
 import com.wholeseeds.mindle.domain.location.repository.DistrictRepository;
 import com.wholeseeds.mindle.domain.location.repository.SubdistrictRepository;
 import com.wholeseeds.mindle.domain.member.entity.Member;
+import com.wholeseeds.mindle.domain.member.exception.MemberNotFoundException;
 import com.wholeseeds.mindle.domain.member.repository.MemberRepository;
 import com.wholeseeds.mindle.domain.place.entity.Place;
 import com.wholeseeds.mindle.domain.place.repository.PlaceRepository;
@@ -43,9 +48,9 @@ public class ComplaintService {
 	@Transactional
 	public Complaint saveComplaint(SaveComplaintRequestDto requestDto, @Nullable MultipartFile image) {
 		Category category = categoryRepository.findById(requestDto.getCategoryId())
-			.orElseThrow(() -> new IllegalArgumentException("존재하지 않는 카테고리입니다."));
+			.orElseThrow(CategoryNotFoundException::new);
 		Member member = memberRepository.findById(requestDto.getMemberId())
-			.orElseThrow(() -> new IllegalArgumentException("존재하지 않는 회원입니다."));
+			.orElseThrow(MemberNotFoundException::new);
 
 		// 주소값이 모두 null 이 아닌 경우에만 장소 저장
 		Subdistrict subdistrict = null;
@@ -53,11 +58,11 @@ public class ComplaintService {
 		if (requestDto.getCityName() != null && requestDto.getDistrictName() != null
 			&& requestDto.getSubdistrictName() != null && requestDto.getPlaceName() != null) {
 			City city = cityRepository.findByName(requestDto.getCityName())
-				.orElseThrow(() -> new IllegalArgumentException("존재하지 않는 도시입니다."));
+				.orElseThrow(CityNotFoundException::new);
 			District district = districtRepository.findByName(requestDto.getDistrictName())
-				.orElseThrow(() -> new IllegalArgumentException("존재하지 않는 구입니다."));
+				.orElseThrow(DistrictNotFoundException::new);
 			subdistrict = subdistrictRepository.findByNameAndDistrict(requestDto.getSubdistrictName(), district)
-				.orElseThrow(() -> new IllegalArgumentException("존재하지 않는 동입니다."));
+				.orElseThrow(SubdistrictNotFoundException::new);
 			place = placeRepository.findByName(requestDto.getPlaceName());
 		}
 

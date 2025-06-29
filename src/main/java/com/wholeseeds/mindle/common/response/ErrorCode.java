@@ -21,8 +21,14 @@ public enum ErrorCode {
 	INTERNAL_SERVER_ERROR(500, "서버 내부 오류가 발생했습니다."),
 
 	// member
-	MEMBER_NOT_FOUND(404, "해당 회원을 찾을 수 없습니다.");
+	MEMBER_NOT_FOUND(404, "해당 회원을 찾을 수 없습니다."),
 
+	//complaint
+	CATEGORY_NOT_FOUND(404, "해당 카테고리를 찾을 수 없습니다"),
+	CITY_NOT_FOUND(404, "해당 도시를 찾을 수 없습니다"),
+	DISTRICT_NOT_FOUND(404, "해당 구를 찾을 수 없습니다"),
+	SUBDISTRICT_NOT_FOUND(404, "해당 (읍/면/동/리)를 찾을 수 없습니다"),
+	;
 	private final int status;
 	private final String message;
 
