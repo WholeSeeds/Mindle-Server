@@ -36,9 +36,7 @@ public class ComplaintController {
 		log.info("Request : {}", requestDto);
 		log.info("파일명 : {}", image.getOriginalFilename());
 
-		// TODO : 이미지 S3 업로드 & image 테이블에 s3 url 저장
-		// String imageUrl = s3Uploader.upload(image, "complaints");
-		Complaint saved = complaintService.saveComplaint(requestDto);
+		Complaint saved = complaintService.saveComplaint(requestDto, image);
 
 		SaveComplaintResponseDto resDto = SaveComplaintResponseDto.builder()
 			.complaintId(saved.getId())

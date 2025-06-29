@@ -2,11 +2,15 @@ package com.wholeseeds.mindle.domain.complaint.Service;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
+import com.wholeseeds.mindle.common.service.NcpObjectStorageService;
 import com.wholeseeds.mindle.domain.complaint.dto.SaveComplaintRequestDto;
 import com.wholeseeds.mindle.domain.complaint.entity.Category;
 import com.wholeseeds.mindle.domain.complaint.entity.Complaint;
+import com.wholeseeds.mindle.domain.complaint.entity.ComplaintImage;
 import com.wholeseeds.mindle.domain.complaint.repository.CategoryRepository;
+import com.wholeseeds.mindle.domain.complaint.repository.ComplaintImageRepository;
 import com.wholeseeds.mindle.domain.complaint.repository.ComplaintRepository;
 import com.wholeseeds.mindle.domain.location.entity.City;
 import com.wholeseeds.mindle.domain.location.entity.District;
@@ -19,6 +23,7 @@ import com.wholeseeds.mindle.domain.member.repository.MemberRepository;
 import com.wholeseeds.mindle.domain.place.entity.Place;
 import com.wholeseeds.mindle.domain.place.repository.PlaceRepository;
 
+import jakarta.annotation.Nullable;
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -31,22 +36,20 @@ public class ComplaintService {
 	private final DistrictRepository districtRepository;
 	private final SubdistrictRepository subdistrictRepository;
 	private final PlaceRepository placeRepository;
+	private final ComplaintImageRepository complaintImageRepository;
 
-	/**
-	 * 테스트
-	 * 1. request 에 장소값이 있을때 잘 저장되는지
-	 * 2. request 에 장소값이 없을때 잘 저장되는지
-	 */
+	private final NcpObjectStorageService ncpObjectStorageService;
+
 	@Transactional
-	public Complaint saveComplaint(SaveComplaintRequestDto requestDto) {
+	public Complaint saveComplaint(SaveComplaintRequestDto requestDto, @Nullable MultipartFile image) {
 		Category category = categoryRepository.findById(requestDto.getCategoryId())
 			.orElseThrow(() -> new IllegalArgumentException("존재하지 않는 카테고리입니다."));
 		Member member = memberRepository.findById(requestDto.getMemberId())
 			.orElseThrow(() -> new IllegalArgumentException("존재하지 않는 회원입니다."));
 
+		// 주소값이 모두 null 이 아닌 경우에만 장소 저장
 		Subdistrict subdistrict = null;
 		Place place = null;
-		// 주소값이 모두 null 이 아닌 경우에만 장소 저장
 		if (requestDto.getCityName() != null && requestDto.getDistrictName() != null
 			&& requestDto.getSubdistrictName() != null && requestDto.getPlaceName() != null) {
 			City city = cityRepository.findByName(requestDto.getCityName())
@@ -69,6 +72,18 @@ public class ComplaintService {
 			.longitude(requestDto.getLongitude())
 			.build();
 		Complaint saved = complaintRepository.save(complaint);
+
+		// 이미지 업로드 & image 테이블에 url 저장
+		String imageUrl = null;
+		if (image != null && !image.isEmpty()) {
+			imageUrl = ncpObjectStorageService.uploadFile("complaint", image);
+		}
+		ComplaintImage complaintImage = ComplaintImage.builder()
+			.complaint(saved)
+			.imageUrl(imageUrl)
+			.build();
+		complaintImageRepository.save(complaintImage);
+
 		return saved;
 	}
 }
