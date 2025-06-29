@@ -27,7 +27,16 @@ public class Member extends BaseEntity {
 	@JoinColumn(name = "subdistrict_id", nullable = false)
 	private Subdistrict subdistrictId;
 
-	@Column(nullable = false, length = 50)
+	@Column(name = "firebase_uid", nullable = false, unique = true)
+	private String firebaseUid;
+
+	@Column(name = "email", length = 100)
+	private String email;
+
+	@Column(name = "provider", nullable = false, length = 50)
+	private String provider;
+
+	@Column(name = "nickname", nullable = false, length = 50)
 	private String nickname;
 
 	@Column(name = "phone", length = 13)

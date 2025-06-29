@@ -9,4 +9,6 @@ public interface MemberRepositoryCustom {
 	Optional<Member> findByIdNotDeleted(Long id);
 
 	List<Member> findAllNotDeleted();
+
+	Optional<Member> findByFirebaseUidNotDeleted(String firebaseUid);
 }
