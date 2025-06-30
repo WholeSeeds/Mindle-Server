@@ -9,6 +9,6 @@ public class MemberResponseDto {
 	private Long id;
 	private String firebaseUid;
 	private String email;
-	private String phoneNumber;
+	private String phone;
 	private String provider;
 }

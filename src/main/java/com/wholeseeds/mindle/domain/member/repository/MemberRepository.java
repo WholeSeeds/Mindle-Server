@@ -1,10 +1,10 @@
 package com.wholeseeds.mindle.domain.member.repository;
 
-import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
+import com.wholeseeds.mindle.common.repository.JpaBaseRepository;
 import com.wholeseeds.mindle.domain.member.entity.Member;
 
 @Repository
-public interface MemberRepository extends JpaRepository<Member, Long>, MemberRepositoryCustom {
+public interface MemberRepository extends JpaBaseRepository<Member, Long>, MemberRepositoryCustom {
 }
