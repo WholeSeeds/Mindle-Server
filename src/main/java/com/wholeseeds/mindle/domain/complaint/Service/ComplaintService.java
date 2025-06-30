@@ -25,6 +25,7 @@ import com.wholeseeds.mindle.domain.member.entity.Member;
 import com.wholeseeds.mindle.domain.member.exception.MemberNotFoundException;
 import com.wholeseeds.mindle.domain.member.repository.MemberRepository;
 import com.wholeseeds.mindle.domain.place.entity.Place;
+import com.wholeseeds.mindle.domain.place.exception.PlaceNotFoundException;
 import com.wholeseeds.mindle.domain.place.repository.PlaceRepository;
 import com.wholeseeds.mindle.infra.Service.NcpObjectStorageService;
 
@@ -63,7 +64,8 @@ public class ComplaintService {
 				.orElseThrow(DistrictNotFoundException::new);
 			subdistrict = subdistrictRepository.findByNameAndDistrict(requestDto.getSubdistrictName(), district)
 				.orElseThrow(SubdistrictNotFoundException::new);
-			place = placeRepository.findByName(requestDto.getPlaceName());
+			place = placeRepository.findByName(requestDto.getPlaceName())
+				.orElseThrow(PlaceNotFoundException::new);
 		}
 
 		Complaint complaint = Complaint.builder()
