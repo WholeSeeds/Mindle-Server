@@ -82,13 +82,12 @@ public class ComplaintService {
 		String imageUrl = null;
 		if (image != null && !image.isEmpty()) {
 			imageUrl = ncpObjectStorageService.uploadFile("complaint", image);
+			ComplaintImage complaintImage = ComplaintImage.builder()
+				.complaint(saved)
+				.imageUrl(imageUrl)
+				.build();
+			complaintImageRepository.save(complaintImage);
 		}
-		ComplaintImage complaintImage = ComplaintImage.builder()
-			.complaint(saved)
-			.imageUrl(imageUrl)
-			.build();
-		complaintImageRepository.save(complaintImage);
-
 		return saved;
 	}
 }

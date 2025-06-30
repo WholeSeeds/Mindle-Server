@@ -34,7 +34,7 @@ public class ComplaintController {
 	)
 	public ResponseEntity<ApiResponse<SaveComplaintResponseDto>> saveComplaint(
 		@RequestPart("meta") SaveComplaintRequestDto requestDto,
-		@RequestPart("image") MultipartFile image) throws IOException {
+		@RequestPart(value = "image", required = false) MultipartFile image) throws IOException {
 
 		log.info("Request : {}", requestDto);
 		log.info("파일명 : {}", image.getOriginalFilename());
