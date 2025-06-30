@@ -11,6 +11,7 @@ import org.springframework.web.multipart.MultipartFile;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.amazonaws.services.s3.model.PutObjectRequest;
+import com.wholeseeds.mindle.domain.complaint.exception.NcpFileUploadFailedException;
 
 import lombok.RequiredArgsConstructor;
 
@@ -43,9 +44,9 @@ public class NcpObjectStorageService {
 		// 업로드
 		try (InputStream in = file.getInputStream()) {
 			PutObjectRequest req = new PutObjectRequest(bucketName, key, in, meta);
-			ncp.putObject(req);
+			ncp.putObject(req); // ncp 에 파일 업로드
 		} catch (IOException e) {
-			throw new RuntimeException("파일 업로드 중 오류 발생", e);
+			throw new NcpFileUploadFailedException();
 		}
 
 		// 최종 URL 반환

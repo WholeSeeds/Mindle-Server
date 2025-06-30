@@ -28,6 +28,9 @@ public enum ErrorCode {
 	CITY_NOT_FOUND(404, "해당 도시를 찾을 수 없습니다"),
 	DISTRICT_NOT_FOUND(404, "해당 구를 찾을 수 없습니다"),
 	SUBDISTRICT_NOT_FOUND(404, "해당 (읍/면/동/리)를 찾을 수 없습니다"),
+
+	// NCP
+	NCP_FILE_UPLOAD_FAILED(500, "NCP 에 파일 저장 중 오류가 발생했습니다"),
 	;
 	private final int status;
 	private final String message;
