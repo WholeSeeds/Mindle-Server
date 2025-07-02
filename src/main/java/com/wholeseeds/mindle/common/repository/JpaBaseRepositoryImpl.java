@@ -2,6 +2,7 @@ package com.wholeseeds.mindle.common.repository;
 
 import java.io.Serializable;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 import org.springframework.data.jpa.repository.support.JpaEntityInformation;
@@ -13,6 +14,7 @@ import com.querydsl.core.types.dsl.DateTimePath;
 import com.querydsl.core.types.dsl.NumberPath;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.wholeseeds.mindle.common.entity.BaseEntity;
+import com.wholeseeds.mindle.common.exception.QueryDslNotInitializedException;
 
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
@@ -69,16 +71,23 @@ public class JpaBaseRepositoryImpl<T extends BaseEntity, ID extends Serializable
 
 	@Override
 	public Optional<T> findByIdNotDeleted(ID id) {
-		assert deletedAtPath != null;  // TODO: 별도 예외 클래스로 처리
-		BooleanExpression condition = idPath.eq((Long)id).and(deletedAtPath.isNull());
+		validateQueryDslInitialized();
+		BooleanExpression condition = Objects.requireNonNull(idPath).eq((Long)id)
+			.and(Objects.requireNonNull(deletedAtPath).isNull());
 		return Optional.ofNullable(queryFactory.selectFrom(entityPath).where(condition).fetchOne());
 	}
 
 	@Override
 	public List<T> findAllNotDeleted() {
-		assert deletedAtPath != null;  // TODO: 별도 예외 클래스로 처리
+		validateQueryDslInitialized();
 		return queryFactory.selectFrom(entityPath)
-			.where(deletedAtPath.isNull())
+			.where(Objects.requireNonNull(deletedAtPath).isNull())
 			.fetch();
+	}
+
+	private void validateQueryDslInitialized() {
+		if (idPath == null || entityPath == null || deletedAtPath == null) {
+			throw new QueryDslNotInitializedException();
+		}
 	}
 }
