@@ -21,7 +21,10 @@ public enum ErrorCode {
 	INTERNAL_SERVER_ERROR(500, "서버 내부 오류가 발생했습니다."),
 
 	// member
-	MEMBER_NOT_FOUND(404, "해당 회원을 찾을 수 없습니다.");
+	MEMBER_NOT_FOUND(404, "해당 회원을 찾을 수 없습니다."),
+
+	// develop
+	QUERYDSL_NOT_INITIALIZED(500, "QueryDSL 필드가 초기화되지 않았습니다.");
 
 	private final int status;
 	private final String message;
