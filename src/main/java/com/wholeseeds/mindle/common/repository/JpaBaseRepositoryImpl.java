@@ -35,19 +35,28 @@ public class JpaBaseRepositoryImpl<T extends BaseEntity, ID extends Serializable
 	protected final NumberPath<Long> idPath;
 	protected final DateTimePath<?> deletedAtPath;
 
-	// Spring Data JPA가 사용하는 생성자
-	public JpaBaseRepositoryImpl(JpaEntityInformation<T, ?> entityInformation, EntityManager em) {
+	/**
+	 * [Spring 자동 주입용 생성자]
+	 * Spring Data JPA가 Repository 구현체를 자동 생성할 때 사용.
+	 *
+	 * @deprecated 코드상에서 직접 호출하지 말 것.
+	 * @since 1.0
+	 */
+	@Deprecated(since = "1.0", forRemoval = true)
+	protected JpaBaseRepositoryImpl(JpaEntityInformation<T, ?> entityInformation, EntityManager em) {
 		super(entityInformation, em);
 		this.em = em;
 		this.queryFactory = new JPAQueryFactory(em);
-
-		// 이 3개는 null 처리해도 되고, 하위 클래스에서 재정의할 수 있음
 		this.entityPath = null;
 		this.idPath = null;
 		this.deletedAtPath = null;
 	}
 
-	// 커스텀용 생성자 (직접 구현할 때 사용)
+	/**
+	 * [QueryDSL 커스텀용 생성자]
+	 * 커스텀 Repository 구현체에서 사용.
+	 * QueryDSL용 필드 명시적 주입 필요.
+	 */
 	public JpaBaseRepositoryImpl(Class<T> domainClass, EntityManager em, EntityPath<T> entityPath,
 		NumberPath<Long> idPath, DateTimePath<?> deletedAtPath) {
 		super(domainClass, em);
@@ -60,12 +69,14 @@ public class JpaBaseRepositoryImpl<T extends BaseEntity, ID extends Serializable
 
 	@Override
 	public Optional<T> findByIdNotDeleted(ID id) {
+		assert deletedAtPath != null;  // TODO: 별도 예외 클래스로 처리
 		BooleanExpression condition = idPath.eq((Long)id).and(deletedAtPath.isNull());
 		return Optional.ofNullable(queryFactory.selectFrom(entityPath).where(condition).fetchOne());
 	}
 
 	@Override
 	public List<T> findAllNotDeleted() {
+		assert deletedAtPath != null;  // TODO: 별도 예외 클래스로 처리
 		return queryFactory.selectFrom(entityPath)
 			.where(deletedAtPath.isNull())
 			.fetch();
