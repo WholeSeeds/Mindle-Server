@@ -42,7 +42,7 @@ public class ComplaintController {
 		@RequestPart("meta") SaveComplaintRequestDto requestDto,
 		@RequestPart(value = "image", required = false) List<MultipartFile> imageList) throws IOException {
 
-		if (imageList.size() > 3) {
+		if (!CommonCode.objectIsNullOrEmpty(imageList) && imageList.size() > 3) {
 			throw new ImageUploadLimitExceeded();
 		}
 
@@ -65,12 +65,6 @@ public class ComplaintController {
 		return ResponseEntity.ok(ApiResponse.ok(complaint));
 	}
 
-	// @GetMapping("/detail/image")
-	// public ResponseEntity<ApiResponse<List<String>>> getComplaintImages(Long complaintId) {
-	// 	List<String> imageUrls = complaintService.getComplaintImages(complaintId);
-	// 	return ResponseEntity.ok(ApiResponse.ok(imageUrls));
-	// }
-	//
 	// @GetMapping("/detail/comment")
 	// public ResponseEntity<ApiResponse<List<String>>> getComplaintComments(Long complaintId) {
 	// 	List<String> comments = complaintService.getComplaintComments(complaintId);

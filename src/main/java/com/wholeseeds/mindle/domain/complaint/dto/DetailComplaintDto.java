@@ -1,6 +1,7 @@
 package com.wholeseeds.mindle.domain.complaint.dto;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -24,6 +25,7 @@ public class DetailComplaintDto {
 	private String districtName; // TODO: null 잘 담기는지 테스트
 	private String subdistrictName;
 	private LocalDateTime createdAt;
+	private List<String> imageUrlList;
 
 	// TODO : complaint_reaction
 	// private List<ComplaintReactionDto> reactions; // 추후 구현 예정
