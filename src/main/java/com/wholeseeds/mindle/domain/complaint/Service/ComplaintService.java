@@ -1,9 +1,12 @@
 package com.wholeseeds.mindle.domain.complaint.Service;
 
+import java.util.List;
+
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.wholeseeds.mindle.common.CommonCode;
 import com.wholeseeds.mindle.domain.complaint.dto.SaveComplaintRequestDto;
 import com.wholeseeds.mindle.domain.complaint.entity.Category;
 import com.wholeseeds.mindle.domain.complaint.entity.Complaint;
@@ -29,7 +32,6 @@ import com.wholeseeds.mindle.domain.place.exception.PlaceNotFoundException;
 import com.wholeseeds.mindle.domain.place.repository.PlaceRepository;
 import com.wholeseeds.mindle.infra.Service.NcpObjectStorageService;
 
-import jakarta.annotation.Nullable;
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -47,7 +49,7 @@ public class ComplaintService {
 	private final NcpObjectStorageService ncpObjectStorageService;
 
 	@Transactional
-	public Complaint saveComplaint(SaveComplaintRequestDto requestDto, @Nullable MultipartFile image) {
+	public Complaint saveComplaint(SaveComplaintRequestDto requestDto, List<MultipartFile> imageList) {
 		Category category = categoryRepository.findById(requestDto.getCategoryId())
 			.orElseThrow(CategoryNotFoundException::new);
 		Member member = memberRepository.findById(requestDto.getMemberId())
@@ -80,16 +82,19 @@ public class ComplaintService {
 			.build();
 		Complaint saved = complaintRepository.save(complaint);
 
-		// 이미지 업로드 & image 테이블에 url 저장
-		String imageUrl = null;
-		if (image != null && !image.isEmpty()) {
-			imageUrl = ncpObjectStorageService.uploadFile("complaint", image);
+		/* 이미지 업로드 & image 테이블에 url 저장 */
+		if (CommonCode.objectIsNullOrEmpty(imageList)) {
+			return saved;
+		}
+		for (MultipartFile imageFile : imageList) {
+			String imageUrl = ncpObjectStorageService.uploadFile("complaint", imageFile);
 			ComplaintImage complaintImage = ComplaintImage.builder()
 				.complaint(saved)
 				.imageUrl(imageUrl)
 				.build();
 			complaintImageRepository.save(complaintImage);
 		}
+
 		return saved;
 	}
 }

@@ -1,6 +1,7 @@
 package com.wholeseeds.mindle.domain.complaint.controller;
 
 import java.io.IOException;
+import java.util.List;
 
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -10,11 +11,13 @@ import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.wholeseeds.mindle.common.CommonCode;
 import com.wholeseeds.mindle.common.response.ApiResponse;
 import com.wholeseeds.mindle.domain.complaint.Service.ComplaintService;
 import com.wholeseeds.mindle.domain.complaint.dto.SaveComplaintRequestDto;
 import com.wholeseeds.mindle.domain.complaint.dto.SaveComplaintResponseDto;
 import com.wholeseeds.mindle.domain.complaint.entity.Complaint;
+import com.wholeseeds.mindle.domain.complaint.exception.ImageUploadLimitExceeded;
 import com.wholeseeds.mindle.domain.complaint.mapper.ComplaintMapper;
 
 import lombok.RequiredArgsConstructor;
@@ -34,15 +37,22 @@ public class ComplaintController {
 	)
 	public ResponseEntity<ApiResponse<SaveComplaintResponseDto>> saveComplaint(
 		@RequestPart("meta") SaveComplaintRequestDto requestDto,
-		@RequestPart(value = "image", required = false) MultipartFile image) throws IOException {
+		@RequestPart(value = "image", required = false) List<MultipartFile> imageList) throws IOException {
+
+		if (imageList.size() > 3) {
+			throw new ImageUploadLimitExceeded();
+		}
 
 		log.info("Request : {}", requestDto);
-		log.info("파일명 : {}", image.getOriginalFilename());
+		if (!CommonCode.objectIsNullOrEmpty(imageList)) {
+			for (MultipartFile image : imageList) {
+				log.info("파일명 : {}", image.getOriginalFilename());
+			}
+		}
 
-		Complaint saved = complaintService.saveComplaint(requestDto, image);
+		Complaint saved = complaintService.saveComplaint(requestDto, imageList);
 
 		SaveComplaintResponseDto resDto = complaintMapper.toSaveComplaintResponseDto(saved);
-		log.info("Response : {}\n 이미지 : {}", resDto, image);
 		return ResponseEntity.ok(ApiResponse.ok(resDto));
 	}
 }
