@@ -7,12 +7,14 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.wholeseeds.mindle.common.code.CommonCode;
+import com.wholeseeds.mindle.domain.complaint.dto.DetailComplaintDto;
 import com.wholeseeds.mindle.domain.complaint.dto.SaveComplaintRequestDto;
 import com.wholeseeds.mindle.domain.complaint.entity.Category;
 import com.wholeseeds.mindle.domain.complaint.entity.Complaint;
 import com.wholeseeds.mindle.domain.complaint.entity.ComplaintImage;
 import com.wholeseeds.mindle.domain.complaint.exception.CategoryNotFoundException;
 import com.wholeseeds.mindle.domain.complaint.exception.CityNotFoundException;
+import com.wholeseeds.mindle.domain.complaint.exception.ComplaintNotFoundException;
 import com.wholeseeds.mindle.domain.complaint.exception.SubdistrictNotFoundException;
 import com.wholeseeds.mindle.domain.complaint.repository.CategoryRepository;
 import com.wholeseeds.mindle.domain.complaint.repository.ComplaintImageRepository;
@@ -93,5 +95,9 @@ public class ComplaintService {
 		City city = cityRepository.findByName(dto.getCityName()).orElseThrow(CityNotFoundException::new);
 		return subdistrictRepository.findByNameAndCity(dto.getSubdistrictName(), city)
 			.orElseThrow(SubdistrictNotFoundException::new);
+	}
+
+	public DetailComplaintDto getComplaintDetail(Long complaintId) {
+		return complaintRepository.getDetailById(complaintId).orElseThrow(ComplaintNotFoundException::new);
 	}
 }
