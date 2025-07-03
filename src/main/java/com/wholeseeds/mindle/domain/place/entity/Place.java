@@ -32,6 +32,9 @@ public class Place extends BaseEntity {
 	private Subdistrict subdistrict;
 
 	@Column(nullable = false, unique = true)
+	private String placeId;
+
+	@Column(nullable = false)
 	private String name;
 
 	@Column(length = 500)

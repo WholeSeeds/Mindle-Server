@@ -59,14 +59,14 @@ public class ComplaintService {
 		Subdistrict subdistrict = null;
 		Place place = null;
 		if (requestDto.getCityName() != null && requestDto.getDistrictName() != null
-			&& requestDto.getSubdistrictName() != null && requestDto.getPlaceName() != null) {
+			&& requestDto.getSubdistrictName() != null && requestDto.getPlaceId() != null) {
 			City city = cityRepository.findByName(requestDto.getCityName())
 				.orElseThrow(CityNotFoundException::new);
 			District district = districtRepository.findByName(requestDto.getDistrictName())
 				.orElseThrow(DistrictNotFoundException::new);
 			subdistrict = subdistrictRepository.findByNameAndDistrict(requestDto.getSubdistrictName(), district)
 				.orElseThrow(SubdistrictNotFoundException::new);
-			place = placeRepository.findByName(requestDto.getPlaceName())
+			place = placeRepository.findByPlaceId(requestDto.getPlaceId())
 				.orElseThrow(PlaceNotFoundException::new);
 		}
 

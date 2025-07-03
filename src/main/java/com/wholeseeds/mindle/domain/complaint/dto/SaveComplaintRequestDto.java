@@ -20,7 +20,7 @@ public class SaveComplaintRequestDto {
 	private String cityName;
 	private String districtName;
 	private String subdistrictName;
-	private String placeName;
+	private String placeId;
 	@NotNull
 	private String title;
 	@NotNull
