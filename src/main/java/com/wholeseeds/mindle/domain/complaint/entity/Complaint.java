@@ -37,11 +37,11 @@ public class Complaint extends BaseEntity {
 
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "subdistrict_id")
-	private Subdistrict subdistrictId;
+	private Subdistrict subdistrict;
 
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "place_id")
-	private Place placeId;
+	private Place place;
 
 	@Column(nullable = false)
 	private String title;

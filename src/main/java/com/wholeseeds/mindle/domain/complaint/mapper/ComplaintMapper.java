@@ -10,7 +10,7 @@ import com.wholeseeds.mindle.domain.complaint.entity.Complaint;
 public interface ComplaintMapper {
 	@Mapping(target = "categoryId", source = "category.id")
 	@Mapping(target = "memberId", source = "member.id")
-	@Mapping(target = "subdistrictId", source = "subdistrictId.id")
-	@Mapping(target = "placeId", source = "placeId.id")
+	@Mapping(target = "subdistrictId", source = "subdistrict.id")
+	@Mapping(target = "placeId", source = "place.id")
 	SaveComplaintResponseDto toSaveComplaintResponseDto(Complaint complaint);
 }
