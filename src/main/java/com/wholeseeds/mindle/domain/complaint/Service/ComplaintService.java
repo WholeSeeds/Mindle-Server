@@ -13,13 +13,11 @@ import com.wholeseeds.mindle.domain.complaint.entity.Complaint;
 import com.wholeseeds.mindle.domain.complaint.entity.ComplaintImage;
 import com.wholeseeds.mindle.domain.complaint.exception.CategoryNotFoundException;
 import com.wholeseeds.mindle.domain.complaint.exception.CityNotFoundException;
-import com.wholeseeds.mindle.domain.complaint.exception.DistrictNotFoundException;
 import com.wholeseeds.mindle.domain.complaint.exception.SubdistrictNotFoundException;
 import com.wholeseeds.mindle.domain.complaint.repository.CategoryRepository;
 import com.wholeseeds.mindle.domain.complaint.repository.ComplaintImageRepository;
 import com.wholeseeds.mindle.domain.complaint.repository.ComplaintRepository;
 import com.wholeseeds.mindle.domain.location.entity.City;
-import com.wholeseeds.mindle.domain.location.entity.District;
 import com.wholeseeds.mindle.domain.location.entity.Subdistrict;
 import com.wholeseeds.mindle.domain.location.repository.CityRepository;
 import com.wholeseeds.mindle.domain.location.repository.DistrictRepository;
@@ -54,20 +52,10 @@ public class ComplaintService {
 			.orElseThrow(CategoryNotFoundException::new);
 		Member member = memberRepository.findById(requestDto.getMemberId())
 			.orElseThrow(MemberNotFoundException::new);
-
-		// 주소값이 모두 null 이 아닌 경우에만 장소 저장
-		Subdistrict subdistrict = null;
+		Subdistrict subdistrict = findSubdistrict(requestDto);
 		Place place = null;
-		if (requestDto.getCityName() != null && requestDto.getDistrictName() != null
-			&& requestDto.getSubdistrictName() != null && requestDto.getPlaceId() != null) {
-			City city = cityRepository.findByName(requestDto.getCityName())
-				.orElseThrow(CityNotFoundException::new);
-			District district = districtRepository.findByName(requestDto.getDistrictName())
-				.orElseThrow(DistrictNotFoundException::new);
-			subdistrict = subdistrictRepository.findByNameAndDistrict(requestDto.getSubdistrictName(), district)
-				.orElseThrow(SubdistrictNotFoundException::new);
-			place = placeRepository.findByPlaceId(requestDto.getPlaceId())
-				.orElseThrow(PlaceNotFoundException::new);
+		if (requestDto.getPlaceId() != null) {
+			place = placeRepository.findByPlaceId(requestDto.getPlaceId()).orElseThrow(PlaceNotFoundException::new);
 		}
 
 		Complaint complaint = Complaint.builder()
@@ -96,5 +84,14 @@ public class ComplaintService {
 		}
 
 		return saved;
+	}
+
+	public Subdistrict findSubdistrict(SaveComplaintRequestDto dto) {
+		if (dto.getCityName() == null || dto.getSubdistrictName() == null) { // 주소값 없는 글
+			return null;
+		}
+		City city = cityRepository.findByName(dto.getCityName()).orElseThrow(CityNotFoundException::new);
+		return subdistrictRepository.findByNameAndCity(dto.getSubdistrictName(), city)
+			.orElseThrow(SubdistrictNotFoundException::new);
 	}
 }
