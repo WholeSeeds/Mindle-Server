@@ -1,4 +1,4 @@
-package com.wholeseeds.mindle.common;
+package com.wholeseeds.mindle.common.code;
 
 public class CommonCode {
 	public static boolean objectIsNullOrEmpty(Object object) {
