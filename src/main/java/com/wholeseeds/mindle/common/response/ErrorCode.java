@@ -22,6 +22,8 @@ public enum ErrorCode {
 
 	// member
 	MEMBER_NOT_FOUND(404, "해당 회원을 찾을 수 없습니다."),
+	// develop
+	QUERYDSL_NOT_INITIALIZED(500, "QueryDSL 필드가 초기화되지 않았습니다."),
 
 	//complaint
 	CATEGORY_NOT_FOUND(404, "해당 카테고리를 찾을 수 없습니다"),
@@ -32,6 +34,7 @@ public enum ErrorCode {
 
 	// NCP
 	NCP_FILE_UPLOAD_FAILED(500, "NCP 에 파일 저장 중 오류가 발생했습니다"),
+
 	;
 	private final int status;
 	private final String message;
