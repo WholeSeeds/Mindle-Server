@@ -6,7 +6,7 @@ import com.wholeseeds.mindle.domain.complaint.entity.QCategory;
 
 import jakarta.persistence.EntityManager;
 
-public class CategoryRepositoryImpl extends JpaBaseRepositoryImpl<Category, Long> implements ComplaintRepositoryCustom {
+public class CategoryRepositoryImpl extends JpaBaseRepositoryImpl<Category, Long> implements CategoryRepositoryCustom {
 	private static final QCategory category = QCategory.category;
 
 	public CategoryRepositoryImpl(EntityManager em) {
