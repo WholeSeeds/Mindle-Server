@@ -14,7 +14,7 @@ import lombok.ToString;
 @RequiredArgsConstructor
 @AllArgsConstructor
 @ToString
-public class DetailComplaintDto {
+public class ComplaintDetailWithImagesDto {
 	private Long id;
 	private String title;
 	private String content;
@@ -26,7 +26,4 @@ public class DetailComplaintDto {
 	private String subdistrictName;
 	private LocalDateTime createdAt;
 	private List<String> imageUrlList;
-
-	// TODO : complaint_reaction
-	// private List<ComplaintReactionDto> reactions; // 추후 구현 예정
 }

@@ -16,7 +16,9 @@ import org.springframework.web.multipart.MultipartFile;
 import com.wholeseeds.mindle.common.code.CommonCode;
 import com.wholeseeds.mindle.common.response.ApiResponse;
 import com.wholeseeds.mindle.domain.complaint.Service.ComplaintService;
-import com.wholeseeds.mindle.domain.complaint.dto.DetailComplaintDto;
+import com.wholeseeds.mindle.domain.complaint.dto.ComplaintDetailResponseDto;
+import com.wholeseeds.mindle.domain.complaint.dto.ComplaintDetailWithImagesDto;
+import com.wholeseeds.mindle.domain.complaint.dto.ReactionDto;
 import com.wholeseeds.mindle.domain.complaint.dto.SaveComplaintRequestDto;
 import com.wholeseeds.mindle.domain.complaint.dto.SaveComplaintResponseDto;
 import com.wholeseeds.mindle.domain.complaint.entity.Complaint;
@@ -60,9 +62,16 @@ public class ComplaintController {
 	}
 
 	@GetMapping("/detail/{complaintId}")
-	public ResponseEntity<ApiResponse<DetailComplaintDto>> getComplaintDetail(@PathVariable Long complaintId) {
-		DetailComplaintDto complaint = complaintService.getComplaintDetail(complaintId);
-		return ResponseEntity.ok(ApiResponse.ok(complaint));
+	public ResponseEntity<ApiResponse<ComplaintDetailResponseDto>> getComplaintDetail(
+		@PathVariable Long complaintId) {
+		ComplaintDetailWithImagesDto complaint = complaintService.getComplaintDetail(complaintId);
+		ReactionDto reactionDto = complaintService.getComplaintReaction(complaintId, 1L);
+
+		ComplaintDetailResponseDto responseDto = ComplaintDetailResponseDto.builder()
+			.complaintDetailWithImagesDto(complaint)
+			.reactionDto(reactionDto)
+			.build();
+		return ResponseEntity.ok(ApiResponse.ok(responseDto));
 	}
 
 	// @GetMapping("/detail/comment")
