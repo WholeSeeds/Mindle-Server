@@ -114,7 +114,8 @@ public class ComplaintRepositoryImpl extends JpaBaseRepositoryImpl<Complaint, Lo
 	}
 
 	@Override
-	public List<ComplaintListResponseDto> findListWithCursor(Long cursorComplaintId, int size) {
+	public List<ComplaintListResponseDto> findListWithCursor(Long cursorComplaintId, int size,
+		Long cityId, Long districtId, Long categoryId) {
 		// commentCount 서브쿼리
 		SubQueryExpression<Long> commentCount = JPAExpressions
 			.select(COMMENT.id.count())
@@ -146,6 +147,11 @@ public class ComplaintRepositoryImpl extends JpaBaseRepositoryImpl<Complaint, Lo
 			))
 			.from(C)
 			.where(C.deletedAt.isNull(), cursorComplaintId != null ? C.id.lt(cursorComplaintId) : null)
+			.where(
+				categoryId != null ? C.category.id.eq(categoryId) : null,
+				cityId != null ? C.subdistrict.city.id.eq(cityId) : null,
+				districtId != null ? C.subdistrict.district.id.eq(districtId) : null
+			)
 			.orderBy(C.id.desc())
 			.limit(size)
 			.fetch();

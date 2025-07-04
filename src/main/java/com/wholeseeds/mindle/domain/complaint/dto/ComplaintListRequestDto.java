@@ -16,5 +16,7 @@ import lombok.ToString;
 public class ComplaintListRequestDto {
 	private Long cursorComplaintId;
 	private int size;
-	// todo : category 필터링 추가
+	private Long cityId;
+	private Long districtId;
+	private Long categoryId;
 }

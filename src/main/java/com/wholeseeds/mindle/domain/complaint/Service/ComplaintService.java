@@ -116,7 +116,8 @@ public class ComplaintService {
 	}
 
 	public List<ComplaintListResponseDto> getComplaintList(ComplaintListRequestDto dto) {
-		return complaintRepository.findListWithCursor(dto.getCursorComplaintId(), dto.getSize());
+		return complaintRepository.findListWithCursor(dto.getCursorComplaintId(), dto.getSize(), dto.getCityId(),
+			dto.getDistrictId(), dto.getCategoryId());
 	}
 
 }

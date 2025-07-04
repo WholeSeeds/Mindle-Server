@@ -16,5 +16,6 @@ public interface ComplaintRepositoryCustom {
 
 	List<CommentDto> getComment(Long complaintId, LocalDateTime cursorCreatedAt, int pageSize);
 
-	List<ComplaintListResponseDto> findListWithCursor(Long cursorComplaintId, int size);
+	List<ComplaintListResponseDto> findListWithCursor(Long cursorComplaintId, int size,
+		Long cityId, Long districtId, Long categoryId);
 }
