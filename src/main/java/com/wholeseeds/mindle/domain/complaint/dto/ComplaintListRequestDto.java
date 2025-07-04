@@ -15,7 +15,7 @@ import lombok.ToString;
 @ToString
 public class ComplaintListRequestDto {
 	private Long cursorComplaintId;
-	private int size;
+	private int pageSize;
 	private Long cityId;
 	private Long districtId;
 	private Long categoryId;
