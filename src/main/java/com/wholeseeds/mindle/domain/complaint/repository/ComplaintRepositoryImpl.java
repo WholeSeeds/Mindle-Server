@@ -141,6 +141,8 @@ public class ComplaintRepositoryImpl extends JpaBaseRepositoryImpl<Complaint, Lo
 				C.id,
 				C.title,
 				C.content,
+				C.createdAt,
+				C.isResolved,
 				commentCount,
 				reactionCount,
 				imageUrl
