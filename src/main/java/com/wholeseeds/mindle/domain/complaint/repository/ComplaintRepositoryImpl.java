@@ -7,6 +7,7 @@ import java.util.Optional;
 
 import com.querydsl.core.group.GroupBy;
 import com.querydsl.core.types.Projections;
+import com.querydsl.core.types.SubQueryExpression;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.core.types.dsl.NumberExpression;
 import com.querydsl.jpa.JPAExpressions;
@@ -14,6 +15,7 @@ import com.wholeseeds.mindle.common.repository.JpaBaseRepositoryImpl;
 import com.wholeseeds.mindle.domain.comment.entity.QComment;
 import com.wholeseeds.mindle.domain.complaint.dto.CommentDto;
 import com.wholeseeds.mindle.domain.complaint.dto.ComplaintDetailWithImagesDto;
+import com.wholeseeds.mindle.domain.complaint.dto.ComplaintListResponseDto;
 import com.wholeseeds.mindle.domain.complaint.dto.ReactionDto;
 import com.wholeseeds.mindle.domain.complaint.entity.Complaint;
 import com.wholeseeds.mindle.domain.complaint.entity.QComplaint;
@@ -108,6 +110,44 @@ public class ComplaintRepositoryImpl extends JpaBaseRepositoryImpl<Complaint, Lo
 			.where(COMMENT.complaint.id.eq(complaintId).and(COMMENT.deletedAt.isNull()), beforeCursor)
 			.orderBy(COMMENT.createdAt.desc())
 			.limit(pageSize)
+			.fetch();
+	}
+
+	@Override
+	public List<ComplaintListResponseDto> findListWithCursor(Long cursorComplaintId, int size) {
+		// commentCount 서브쿼리
+		SubQueryExpression<Long> commentCount = JPAExpressions
+			.select(COMMENT.id.count())
+			.from(COMMENT)
+			.where(COMMENT.complaint.id.eq(C.id).and(COMMENT.deletedAt.isNull()));
+
+		// reactionCount 서브쿼리
+		SubQueryExpression<Long> reactionCount = JPAExpressions
+			.select(R.id.count())
+			.from(R)
+			.where(R.complaint.id.eq(C.id).and(R.deletedAt.isNull()));
+
+		// 대표 이미지 URL
+		SubQueryExpression<String> imageUrl = JPAExpressions
+			.select(I.imageUrl)
+			.from(I)
+			.where(I.complaint.id.eq(C.id).and(I.deletedAt.isNull()))
+			.limit(1);
+
+		return queryFactory
+			.select(Projections.constructor(
+				ComplaintListResponseDto.class,
+				C.id,
+				C.title,
+				C.content,
+				commentCount,
+				reactionCount,
+				imageUrl
+			))
+			.from(C)
+			.where(C.deletedAt.isNull(), cursorComplaintId != null ? C.id.lt(cursorComplaintId) : null)
+			.orderBy(C.id.desc())
+			.limit(size)
 			.fetch();
 	}
 }

@@ -10,6 +10,8 @@ import com.wholeseeds.mindle.common.code.CommonCode;
 import com.wholeseeds.mindle.domain.complaint.dto.CommentDto;
 import com.wholeseeds.mindle.domain.complaint.dto.CommentRequestDto;
 import com.wholeseeds.mindle.domain.complaint.dto.ComplaintDetailWithImagesDto;
+import com.wholeseeds.mindle.domain.complaint.dto.ComplaintListRequestDto;
+import com.wholeseeds.mindle.domain.complaint.dto.ComplaintListResponseDto;
 import com.wholeseeds.mindle.domain.complaint.dto.ReactionDto;
 import com.wholeseeds.mindle.domain.complaint.dto.SaveComplaintRequestDto;
 import com.wholeseeds.mindle.domain.complaint.entity.Category;
@@ -112,4 +114,9 @@ public class ComplaintService {
 		return complaintRepository.getComment(dto.getComplaintId(),
 			CommonCode.stringToLocalDateTime(dto.getCursorCreatedAt()), dto.getPageSize());
 	}
+
+	public List<ComplaintListResponseDto> getComplaintList(ComplaintListRequestDto dto) {
+		return complaintRepository.findListWithCursor(dto.getCursorComplaintId(), dto.getSize());
+	}
+
 }

@@ -21,6 +21,8 @@ import com.wholeseeds.mindle.domain.complaint.dto.CommentDto;
 import com.wholeseeds.mindle.domain.complaint.dto.CommentRequestDto;
 import com.wholeseeds.mindle.domain.complaint.dto.ComplaintDetailResponseDto;
 import com.wholeseeds.mindle.domain.complaint.dto.ComplaintDetailWithImagesDto;
+import com.wholeseeds.mindle.domain.complaint.dto.ComplaintListRequestDto;
+import com.wholeseeds.mindle.domain.complaint.dto.ComplaintListResponseDto;
 import com.wholeseeds.mindle.domain.complaint.dto.ReactionDto;
 import com.wholeseeds.mindle.domain.complaint.dto.SaveComplaintRequestDto;
 import com.wholeseeds.mindle.domain.complaint.dto.SaveComplaintResponseDto;
@@ -83,4 +85,12 @@ public class ComplaintController {
 		List<CommentDto> comments = complaintService.getComplaintComments(requestDto);
 		return ResponseEntity.ok(ApiResponse.ok(comments));
 	}
+
+	@GetMapping("/list")
+	public ResponseEntity<ApiResponse<List<ComplaintListResponseDto>>> getComplaintList(
+		@ModelAttribute ComplaintListRequestDto requestDto) {
+		List<ComplaintListResponseDto> complaintList = complaintService.getComplaintList(requestDto);
+		return ResponseEntity.ok(ApiResponse.ok(complaintList));
+	}
+
 }

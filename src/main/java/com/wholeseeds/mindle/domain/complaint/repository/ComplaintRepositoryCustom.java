@@ -6,6 +6,7 @@ import java.util.Optional;
 
 import com.wholeseeds.mindle.domain.complaint.dto.CommentDto;
 import com.wholeseeds.mindle.domain.complaint.dto.ComplaintDetailWithImagesDto;
+import com.wholeseeds.mindle.domain.complaint.dto.ComplaintListResponseDto;
 import com.wholeseeds.mindle.domain.complaint.dto.ReactionDto;
 
 public interface ComplaintRepositoryCustom {
@@ -13,5 +14,7 @@ public interface ComplaintRepositoryCustom {
 
 	Optional<ReactionDto> getReaction(Long complaintId, Long memberId);
 
-	public List<CommentDto> getComment(Long complaintId, LocalDateTime cursorCreatedAt, int pageSize);
+	List<CommentDto> getComment(Long complaintId, LocalDateTime cursorCreatedAt, int pageSize);
+
+	List<ComplaintListResponseDto> findListWithCursor(Long cursorComplaintId, int size);
 }
