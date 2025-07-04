@@ -1,5 +1,7 @@
 package com.wholeseeds.mindle.domain.complaint.repository;
 
+import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -9,6 +11,8 @@ import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.core.types.dsl.NumberExpression;
 import com.querydsl.jpa.JPAExpressions;
 import com.wholeseeds.mindle.common.repository.JpaBaseRepositoryImpl;
+import com.wholeseeds.mindle.domain.comment.entity.QComment;
+import com.wholeseeds.mindle.domain.complaint.dto.CommentDto;
 import com.wholeseeds.mindle.domain.complaint.dto.ComplaintDetailWithImagesDto;
 import com.wholeseeds.mindle.domain.complaint.dto.ReactionDto;
 import com.wholeseeds.mindle.domain.complaint.entity.Complaint;
@@ -24,6 +28,7 @@ public class ComplaintRepositoryImpl extends JpaBaseRepositoryImpl<Complaint, Lo
 	private static final QComplaint C = QComplaint.complaint;
 	private static final QComplaintImage I = QComplaintImage.complaintImage;
 	private static final QComplaintReaction R = QComplaintReaction.complaintReaction;
+	private static final QComment COMMENT = QComment.comment;
 
 	public ComplaintRepositoryImpl(EntityManager em) {
 		super(Complaint.class, em, C, C.id, C.deletedAt);
@@ -82,5 +87,27 @@ public class ComplaintRepositoryImpl extends JpaBaseRepositoryImpl<Complaint, Lo
 			.from(R)
 			.where(R.complaint.id.eq(complaintId).and(R.deletedAt.isNull()))
 			.fetchOne());
+	}
+
+	/* 댓글 조회 cursor 기반 페이지네이션 (최신순) */
+	@Override
+	public List<CommentDto> getComment(Long complaintId, LocalDateTime cursorCreatedAt, int pageSize) {
+		// 주어진 시각 이전에 작성된 과거 댓글 조회 (페이지네이션)
+		BooleanExpression beforeCursor = cursorCreatedAt != null ? COMMENT.createdAt.lt(cursorCreatedAt) : null;
+
+		return queryFactory
+			.select(Projections.constructor(
+				CommentDto.class,
+				COMMENT.id,
+				COMMENT.content,
+				COMMENT.createdAt,
+				COMMENT.member.id,
+				COMMENT.member.nickname
+			))
+			.from(COMMENT)
+			.where(COMMENT.complaint.id.eq(complaintId).and(COMMENT.deletedAt.isNull()), beforeCursor)
+			.orderBy(COMMENT.createdAt.desc())
+			.limit(pageSize)
+			.fetch();
 	}
 }

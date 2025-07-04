@@ -6,6 +6,7 @@ import java.util.List;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -16,6 +17,8 @@ import org.springframework.web.multipart.MultipartFile;
 import com.wholeseeds.mindle.common.code.CommonCode;
 import com.wholeseeds.mindle.common.response.ApiResponse;
 import com.wholeseeds.mindle.domain.complaint.Service.ComplaintService;
+import com.wholeseeds.mindle.domain.complaint.dto.CommentDto;
+import com.wholeseeds.mindle.domain.complaint.dto.CommentRequestDto;
 import com.wholeseeds.mindle.domain.complaint.dto.ComplaintDetailResponseDto;
 import com.wholeseeds.mindle.domain.complaint.dto.ComplaintDetailWithImagesDto;
 import com.wholeseeds.mindle.domain.complaint.dto.ReactionDto;
@@ -74,9 +77,10 @@ public class ComplaintController {
 		return ResponseEntity.ok(ApiResponse.ok(responseDto));
 	}
 
-	// @GetMapping("/detail/comment")
-	// public ResponseEntity<ApiResponse<List<String>>> getComplaintComments(Long complaintId) {
-	// 	List<String> comments = complaintService.getComplaintComments(complaintId);
-	// 	return ResponseEntity.ok(ApiResponse.ok(comments));
-	// }
+	@GetMapping("/detail/comment")
+	public ResponseEntity<ApiResponse<List<CommentDto>>> getComplaintComments(
+		@ModelAttribute CommentRequestDto requestDto) {
+		List<CommentDto> comments = complaintService.getComplaintComments(requestDto);
+		return ResponseEntity.ok(ApiResponse.ok(comments));
+	}
 }

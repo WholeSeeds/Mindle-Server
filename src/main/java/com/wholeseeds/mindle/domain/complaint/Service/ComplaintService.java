@@ -7,6 +7,8 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.wholeseeds.mindle.common.code.CommonCode;
+import com.wholeseeds.mindle.domain.complaint.dto.CommentDto;
+import com.wholeseeds.mindle.domain.complaint.dto.CommentRequestDto;
 import com.wholeseeds.mindle.domain.complaint.dto.ComplaintDetailWithImagesDto;
 import com.wholeseeds.mindle.domain.complaint.dto.ReactionDto;
 import com.wholeseeds.mindle.domain.complaint.dto.SaveComplaintRequestDto;
@@ -104,5 +106,10 @@ public class ComplaintService {
 
 	public ReactionDto getComplaintReaction(Long complaintId, Long memberId) {
 		return complaintRepository.getReaction(complaintId, memberId).orElseThrow(ComplaintNotFoundException::new);
+	}
+
+	public List<CommentDto> getComplaintComments(CommentRequestDto dto) {
+		return complaintRepository.getComment(dto.getComplaintId(),
+			CommonCode.stringToLocalDateTime(dto.getCursorCreatedAt()), dto.getPageSize());
 	}
 }
