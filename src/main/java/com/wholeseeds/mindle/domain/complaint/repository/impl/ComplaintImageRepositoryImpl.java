@@ -1,8 +1,9 @@
-package com.wholeseeds.mindle.domain.complaint.repository;
+package com.wholeseeds.mindle.domain.complaint.repository.impl;
 
 import com.wholeseeds.mindle.common.repository.JpaBaseRepositoryImpl;
 import com.wholeseeds.mindle.domain.complaint.entity.ComplaintImage;
 import com.wholeseeds.mindle.domain.complaint.entity.QComplaintImage;
+import com.wholeseeds.mindle.domain.complaint.repository.custom.ComplaintImageRepositoryCustom;
 
 import jakarta.persistence.EntityManager;
 

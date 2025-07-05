@@ -1,4 +1,4 @@
-package com.wholeseeds.mindle.domain.member.repository;
+package com.wholeseeds.mindle.domain.member.repository.impl;
 
 import java.util.Optional;
 
@@ -7,6 +7,7 @@ import com.querydsl.core.types.dsl.StringTemplate;
 import com.wholeseeds.mindle.common.repository.JpaBaseRepositoryImpl;
 import com.wholeseeds.mindle.domain.member.entity.Member;
 import com.wholeseeds.mindle.domain.member.entity.QMember;
+import com.wholeseeds.mindle.domain.member.repository.custom.MemberRepositoryCustom;
 
 import jakarta.persistence.EntityManager;
 

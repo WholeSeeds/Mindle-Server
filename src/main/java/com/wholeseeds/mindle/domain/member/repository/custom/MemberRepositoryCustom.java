@@ -1,4 +1,4 @@
-package com.wholeseeds.mindle.domain.member.repository;
+package com.wholeseeds.mindle.domain.member.repository.custom;
 
 import java.util.Optional;
 

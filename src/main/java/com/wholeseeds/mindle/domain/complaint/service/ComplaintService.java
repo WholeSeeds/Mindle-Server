@@ -35,6 +35,7 @@ import lombok.RequiredArgsConstructor;
 @Service
 @RequiredArgsConstructor
 public class ComplaintService {
+	public static final String COMPLAINT = "complaint";
 	private final ComplaintRepository complaintRepository;
 	private final CategoryRepository categoryRepository;
 	private final MemberRepository memberRepository;
@@ -75,7 +76,7 @@ public class ComplaintService {
 			return saved;
 		}
 		for (MultipartFile imageFile : imageList) {
-			String imageUrl = ncpObjectStorageService.uploadFile("complaint", imageFile);
+			String imageUrl = ncpObjectStorageService.uploadFile(COMPLAINT, imageFile);
 			ComplaintImage complaintImage = ComplaintImage.builder()
 				.complaint(saved)
 				.imageUrl(imageUrl)
