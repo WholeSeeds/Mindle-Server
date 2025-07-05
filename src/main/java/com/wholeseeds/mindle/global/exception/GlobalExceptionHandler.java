@@ -8,11 +8,13 @@ import com.wholeseeds.mindle.common.exception.BusinessException;
 import com.wholeseeds.mindle.common.response.ErrorCode;
 import com.wholeseeds.mindle.common.response.ErrorResponse;
 
+import io.swagger.v3.oas.annotations.Hidden;
 import lombok.extern.slf4j.Slf4j;
 
 /**
  * 전역 예외 처리 클래스
  */
+@Hidden
 @RestControllerAdvice
 @Slf4j
 public class GlobalExceptionHandler {
