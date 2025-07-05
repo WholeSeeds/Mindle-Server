@@ -1,4 +1,4 @@
-package com.wholeseeds.mindle.common.auth.interceptor;
+package com.wholeseeds.mindle.global.interceptor;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
@@ -7,7 +7,7 @@ import org.springframework.web.servlet.HandlerInterceptor;
 
 import com.google.firebase.auth.FirebaseAuthException;
 import com.google.firebase.auth.FirebaseToken;
-import com.wholeseeds.mindle.common.auth.annotation.RequireAuth;
+import com.wholeseeds.mindle.common.annotation.RequireAuth;
 import com.wholeseeds.mindle.domain.auth.service.FirebaseAuthService;
 
 import jakarta.servlet.http.HttpServletRequest;

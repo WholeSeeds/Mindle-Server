@@ -1,4 +1,4 @@
-package com.wholeseeds.mindle.global.exception;
+package com.wholeseeds.mindle.global.handler;
 
 import java.util.Map;
 
@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import com.wholeseeds.mindle.common.exception.BusinessException;
 import com.wholeseeds.mindle.common.response.ErrorCode;
-import com.wholeseeds.mindle.global.util.ResponseTemplate;
+import com.wholeseeds.mindle.common.util.ResponseTemplate;
 
 import io.swagger.v3.oas.annotations.Hidden;
 import lombok.RequiredArgsConstructor;

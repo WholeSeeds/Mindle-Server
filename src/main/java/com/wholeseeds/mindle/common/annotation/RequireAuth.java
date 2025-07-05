@@ -1,4 +1,4 @@
-package com.wholeseeds.mindle.common.auth.annotation;
+package com.wholeseeds.mindle.common.annotation;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

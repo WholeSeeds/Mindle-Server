@@ -1,4 +1,4 @@
-package com.wholeseeds.mindle.domain.complaint.Service;
+package com.wholeseeds.mindle.domain.complaint.service;
 
 import java.util.List;
 
@@ -6,7 +6,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.wholeseeds.mindle.common.code.CommonCode;
+import com.wholeseeds.mindle.common.util.ObjectUtils;
 import com.wholeseeds.mindle.domain.complaint.dto.SaveComplaintRequestDto;
 import com.wholeseeds.mindle.domain.complaint.entity.Category;
 import com.wholeseeds.mindle.domain.complaint.entity.Complaint;
@@ -71,7 +71,7 @@ public class ComplaintService {
 		Complaint saved = complaintRepository.save(complaint);
 
 		/* 이미지 업로드 & image 테이블에 url 저장 */
-		if (CommonCode.objectIsNullOrEmpty(imageList)) {
+		if (ObjectUtils.objectIsNullOrEmpty(imageList)) {
 			return saved;
 		}
 		for (MultipartFile imageFile : imageList) {
