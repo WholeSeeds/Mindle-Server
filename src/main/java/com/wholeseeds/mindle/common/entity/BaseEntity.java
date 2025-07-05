@@ -44,6 +44,11 @@ public abstract class BaseEntity {
 	protected void onCreate() {
 		this.createdAt = LocalDateTime.now();
 		this.updatedAt = this.createdAt;
+		onPrePersist();
+	}
+
+	/* 하위 클래스에서 초기값 줘야 하는 경우 override 해서 사용 */
+	protected void onPrePersist() {
 	}
 
 	@PreUpdate

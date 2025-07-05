@@ -22,10 +22,21 @@ public enum ErrorCode {
 
 	// member
 	MEMBER_NOT_FOUND(404, "해당 회원을 찾을 수 없습니다."),
-
 	// develop
-	QUERYDSL_NOT_INITIALIZED(500, "QueryDSL 필드가 초기화되지 않았습니다.");
+	QUERYDSL_NOT_INITIALIZED(500, "QueryDSL 필드가 초기화되지 않았습니다."),
 
+	//complaint
+	CATEGORY_NOT_FOUND(404, "해당 카테고리를 찾을 수 없습니다"),
+	CITY_NOT_FOUND(404, "해당 도시를 찾을 수 없습니다"),
+	DISTRICT_NOT_FOUND(404, "해당 구를 찾을 수 없습니다"),
+	SUBDISTRICT_NOT_FOUND(404, "해당 (읍/면/동/리)를 찾을 수 없습니다"),
+	PLACE_NOT_FOUND(404, "해당 장소를 찾을 수 없습니다"),
+	IMAGE_UPLOAD_LIMIT_EXCEEDED(400, "이미지는 최대 3장까지 업로드 가능합니다"),
+
+	// NCP
+	NCP_FILE_UPLOAD_FAILED(500, "NCP 에 파일 저장 중 오류가 발생했습니다"),
+
+	;
 	private final int status;
 	private final String message;
 

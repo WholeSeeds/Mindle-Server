@@ -31,6 +31,9 @@ public class Place extends BaseEntity {
 	@JoinColumn(name = "subdistrict_id")
 	private Subdistrict subdistrict;
 
+	@Column(nullable = false, unique = true)
+	private String placeId;
+
 	@Column(nullable = false)
 	private String name;
 

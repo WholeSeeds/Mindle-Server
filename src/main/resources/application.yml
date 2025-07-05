@@ -36,3 +36,11 @@ spring-doc: # swagger 설정
     tags-sorter: alpha         # 태그 알파벳 정렬
     operations-sorter: method  # 메소드 정렬
     doc-expansion: none        # 접은 상태로 표시
+
+ncp:
+  object:
+    endpoint: https://kr.object.ncloudstorage.com
+    region: kr-standard
+    access-key: ${NCP_ACCESS_KEY}
+    secret-key: ${NCP_SECRET_KEY}
+    bucket-name: ${NCP_BUCKET_NAME}

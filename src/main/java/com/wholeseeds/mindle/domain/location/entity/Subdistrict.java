@@ -25,7 +25,11 @@ import lombok.NoArgsConstructor;
 public class Subdistrict extends BaseEntity {
 
 	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "district_id", nullable = false)
+	@JoinColumn(name = "city_id", nullable = false)
+	private City city;
+
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "district_id")
 	private District district;
 
 	@Column(length = 100, nullable = false)

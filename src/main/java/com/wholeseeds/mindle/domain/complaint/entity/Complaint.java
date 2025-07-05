@@ -36,12 +36,12 @@ public class Complaint extends BaseEntity {
 	private Member member;
 
 	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "subdistrict_id", nullable = false)
-	private Subdistrict subdistrictId;
+	@JoinColumn(name = "subdistrict_id")
+	private Subdistrict subdistrict;
 
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "place_id")
-	private Place placeId;
+	private Place place;
 
 	@Column(nullable = false)
 	private String title;
@@ -57,14 +57,25 @@ public class Complaint extends BaseEntity {
 
 	@Enumerated(EnumType.STRING)
 	@Column
-	private Status status = Status.REPORTED;
+	private Status status;
 
 	@Column(name = "is_resolved")
-	private Boolean isResolved = false;
+	private Boolean isResolved;
 
 	public enum Status {
 		REPORTED,
 		IN_PROGRESS,
 		RESOLVED
+	}
+
+	// 초기값
+	@Override
+	protected void onPrePersist() {
+		if (status == null) {
+			status = Status.REPORTED;
+		}
+		if (isResolved == null) {
+			isResolved = false;
+		}
 	}
 }
