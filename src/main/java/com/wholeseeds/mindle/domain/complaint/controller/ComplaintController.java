@@ -1,9 +1,10 @@
 package com.wholeseeds.mindle.domain.complaint.controller;
 
+import static org.springframework.http.MediaType.*;
+
 import java.io.IOException;
 import java.util.List;
 
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -14,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.wholeseeds.mindle.common.code.CommonCode;
 import com.wholeseeds.mindle.common.response.ApiResponse;
 import com.wholeseeds.mindle.domain.complaint.Service.ComplaintService;
@@ -40,19 +42,22 @@ import lombok.extern.slf4j.Slf4j;
 public class ComplaintController {
 	private final ComplaintService complaintService;
 	private final ComplaintMapper complaintMapper;
+	private final ObjectMapper objectMapper;
 
+	// swagger 이미지업로드를 위한 Operation
 	@PostMapping(
 		value = "/save",
-		consumes = MediaType.MULTIPART_FORM_DATA_VALUE
+		consumes = MULTIPART_FORM_DATA_VALUE
 	)
 	public ResponseEntity<ApiResponse<SaveComplaintResponseDto>> saveComplaint(
-		@RequestPart("meta") SaveComplaintRequestDto requestDto,
-		@RequestPart(value = "image", required = false) List<MultipartFile> imageList) throws IOException {
+		@RequestPart("meta") String metaJson,
+		@RequestPart(value = "files", required = false) List<MultipartFile> imageList
+	) throws IOException {
+		SaveComplaintRequestDto requestDto = objectMapper.readValue(metaJson, SaveComplaintRequestDto.class);
 
 		if (!CommonCode.objectIsNullOrEmpty(imageList) && imageList.size() > 3) {
 			throw new ImageUploadLimitExceeded();
 		}
-
 		log.info("Request : {}", requestDto);
 		if (!CommonCode.objectIsNullOrEmpty(imageList)) {
 			for (MultipartFile image : imageList) {
