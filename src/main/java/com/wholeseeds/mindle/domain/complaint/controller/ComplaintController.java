@@ -50,10 +50,19 @@ public class ComplaintController {
 		consumes = MULTIPART_FORM_DATA_VALUE
 	)
 	public ResponseEntity<ApiResponse<SaveComplaintResponseDto>> saveComplaint(
-		@RequestPart("meta") String metaJson,
+		@io.swagger.v3.oas.annotations.Parameter(
+			name = "meta",
+			description = "민원 메타 정보 (JSON)",
+			required = true,
+			content = @io.swagger.v3.oas.annotations.media.Content(
+				mediaType = APPLICATION_JSON_VALUE,
+				schema = @io.swagger.v3.oas.annotations.media.Schema(implementation = SaveComplaintRequestDto.class)
+			)
+		)
+		@RequestPart("meta")
+		SaveComplaintRequestDto requestDto,
 		@RequestPart(value = "files", required = false) List<MultipartFile> imageList
 	) throws IOException {
-		SaveComplaintRequestDto requestDto = objectMapper.readValue(metaJson, SaveComplaintRequestDto.class);
 
 		if (!CommonCode.objectIsNullOrEmpty(imageList) && imageList.size() > 3) {
 			throw new ImageUploadLimitExceeded();
