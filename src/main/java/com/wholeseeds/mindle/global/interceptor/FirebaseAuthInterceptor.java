@@ -26,40 +26,41 @@ public class FirebaseAuthInterceptor implements HandlerInterceptor {
 		@NonNull HttpServletRequest request,
 		@NonNull HttpServletResponse response,
 		@NonNull Object handler
-	)
-		throws Exception {
+	) throws Exception {
 
-		// Handler가 메서드인지 확인
 		if (!(handler instanceof HandlerMethod handlerMethod)) {
 			return true;
 		}
 
-		// 애노테이션이 있는지 확인 (클래스나 메서드)
-		boolean hasAnnotation =
-			handlerMethod.getMethod().isAnnotationPresent(RequireAuth.class)
-				|| handlerMethod.getBeanType().isAnnotationPresent(RequireAuth.class);
-
-		if (!hasAnnotation) {
-			return true; // 애노테이션 없으면 통과
+		// Authorization 헤더에서 Firebase ID Token 추출 시도
+		String authHeader = request.getHeader("Authorization");
+		if (authHeader != null && authHeader.startsWith("Bearer ")) {
+			String idToken = authHeader.substring(7);
+			try {
+				FirebaseToken token = firebaseAuthService.verifyIdToken(idToken);
+				request.setAttribute("firebaseToken", token);
+			} catch (FirebaseAuthException e) {
+				// 인증 실패 처리 여부는 아래에서 결정
+				if (requiresAuth(handlerMethod)) {
+					response.setStatus(HttpStatus.UNAUTHORIZED.value());
+					response.getWriter().write("Invalid Firebase ID Token");
+					return false;
+				}
+			}
 		}
 
-		// Authorization 헤더에서 Firebase ID Token 추출
-		String authHeader = request.getHeader("Authorization");
-		if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+		// @RequireAuth가 붙은 경우인데 firebaseToken이 없는 경우
+		if (requiresAuth(handlerMethod) && request.getAttribute("firebaseToken") == null) {
 			response.setStatus(HttpStatus.UNAUTHORIZED.value());
 			response.getWriter().write("Missing or invalid Authorization header");
 			return false;
 		}
 
-		String idToken = authHeader.substring(7);
-		try {
-			FirebaseToken token = firebaseAuthService.verifyIdToken(idToken);
-			request.setAttribute("firebaseToken", token);
-			return true;
-		} catch (FirebaseAuthException e) {
-			response.setStatus(HttpStatus.UNAUTHORIZED.value());
-			response.getWriter().write("Invalid Firebase ID Token");
-			return false;
-		}
+		return true;
+	}
+
+	private boolean requiresAuth(HandlerMethod handlerMethod) {
+		return handlerMethod.getMethod().isAnnotationPresent(RequireAuth.class)
+			|| handlerMethod.getBeanType().isAnnotationPresent(RequireAuth.class);
 	}
 }
