@@ -69,6 +69,12 @@ public class JpaBaseRepositoryImpl<T extends BaseEntity, ID extends Serializable
 		this.deletedAtPath = deletedAtPath;
 	}
 
+	/**
+	 * ID로 엔티티를 조회하되, 삭제되지 않은 엔티티만 반환합니다.
+	 *
+	 * @param id 엔티티 ID
+	 * @return 삭제되지 않은 엔티티가 존재하면 Optional에 포함, 없으면 Optional.empty()
+	 */
 	@Override
 	public Optional<T> findByIdNotDeleted(ID id) {
 		validateQueryDslInitialized();
@@ -77,6 +83,11 @@ public class JpaBaseRepositoryImpl<T extends BaseEntity, ID extends Serializable
 		return Optional.ofNullable(queryFactory.selectFrom(entityPath).where(condition).fetchOne());
 	}
 
+	/**
+	 * 삭제되지 않은 모든 엔티티를 조회합니다.
+	 *
+	 * @return 삭제되지 않은 엔티티 리스트
+	 */
 	@Override
 	public List<T> findAllNotDeleted() {
 		validateQueryDslInitialized();
@@ -85,6 +96,12 @@ public class JpaBaseRepositoryImpl<T extends BaseEntity, ID extends Serializable
 			.fetch();
 	}
 
+	/**
+	 * QueryDSL이 초기화되었는지 확인합니다.
+	 * idPath, entityPath, deletedAtPath가 모두 설정되어 있어야 합니다.
+	 *
+	 * @throws QueryDslNotInitializedException 초기화되지 않은 경우
+	 */
 	private void validateQueryDslInitialized() {
 		if (idPath == null || entityPath == null || deletedAtPath == null) {
 			throw new QueryDslNotInitializedException();
