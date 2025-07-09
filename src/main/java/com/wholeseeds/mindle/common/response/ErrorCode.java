@@ -15,13 +15,17 @@ public enum ErrorCode {
 
 	// global
 	BAD_REQUEST(400, "잘못된 요청입니다."),
-	UNAUTHORIZED(401, "인증이 필요합니다."),
 	FORBIDDEN(403, "접근 권한이 없습니다."),
 	NOT_FOUND(404, "존재하지 않는 리소스입니다."),
 	INTERNAL_SERVER_ERROR(500, "서버 내부 오류가 발생했습니다."),
 
+	// auth
+	MISSING_TOKEN(401, "Firebase 토큰이 누락되었습니다."),
+	INVALID_TOKEN(401, "유효하지 않은 Firebase 토큰입니다."),
+
 	// member
 	MEMBER_NOT_FOUND(404, "해당 회원을 찾을 수 없습니다."),
+
 	// develop
 	QUERYDSL_NOT_INITIALIZED(500, "QueryDSL 필드가 초기화되지 않았습니다."),
 
@@ -34,9 +38,8 @@ public enum ErrorCode {
 	IMAGE_UPLOAD_LIMIT_EXCEEDED(400, "이미지는 최대 3장까지 업로드 가능합니다"),
 
 	// NCP
-	NCP_FILE_UPLOAD_FAILED(500, "NCP 에 파일 저장 중 오류가 발생했습니다"),
+	NCP_FILE_UPLOAD_FAILED(500, "NCP 에 파일 저장 중 오류가 발생했습니다");
 
-	;
 	private final int status;
 	private final String message;
 
