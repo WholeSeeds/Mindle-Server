@@ -6,27 +6,27 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 import com.wholeseeds.mindle.global.interceptor.FirebaseAuthInterceptor;
 import com.wholeseeds.mindle.global.interceptor.LoggingInterceptor;
+import com.wholeseeds.mindle.global.interceptor.RequireAuthInterceptor;
+
+import lombok.RequiredArgsConstructor;
 
 @Configuration
+@RequiredArgsConstructor
 public class WebConfig implements WebMvcConfigurer {
 
 	private final LoggingInterceptor loggingInterceptor;
 	private final FirebaseAuthInterceptor firebaseAuthInterceptor;
-
-	public WebConfig(
-		LoggingInterceptor loggingInterceptor,
-		FirebaseAuthInterceptor firebaseAuthInterceptor
-	) {
-		this.loggingInterceptor = loggingInterceptor;
-		this.firebaseAuthInterceptor = firebaseAuthInterceptor;
-	}
+	private final RequireAuthInterceptor requireAuthInterceptor;
 
 	@Override
 	public void addInterceptors(InterceptorRegistry registry) {
 		registry.addInterceptor(loggingInterceptor)
 			.addPathPatterns("/**");
 
+		registry.addInterceptor(requireAuthInterceptor)
+			.addPathPatterns("/**");
+
 		registry.addInterceptor(firebaseAuthInterceptor)
-			.addPathPatterns("/api/**"); // 또는 /** 로 전체 요청 적용 가능
+			.addPathPatterns("/api/**");
 	}
 }

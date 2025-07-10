@@ -15,6 +15,13 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 
+
+/**
+ * Firebase 인증 토큰을 검사하는 인터셉터
+ * - 요청 헤더에서 Bearer 토큰을 추출하고, Firebase에서 검증
+ * - 유효한 토큰이면 요청에 FirebaseToken 객체를 저장
+ * - 유효하지 않거나 누락된 경우 예외 발생
+ */
 @Component
 @RequiredArgsConstructor
 public class FirebaseAuthInterceptor implements HandlerInterceptor {
