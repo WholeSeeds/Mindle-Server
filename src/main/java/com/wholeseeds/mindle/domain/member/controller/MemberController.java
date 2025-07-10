@@ -49,9 +49,7 @@ public class MemberController {
 	@RequireAuth
 	@GetMapping("/me")
 	public ResponseEntity<Map<String, Object>> getMyInfo(HttpServletRequest request) {
-		FirebaseToken firebaseToken = (FirebaseToken)request.getAttribute("firebaseToken");
-		String firebaseUid = firebaseToken.getUid();
-		Member member = memberService.getMyInfo(firebaseUid);
+		Member member = (Member) request.getAttribute("currentMember");
 		MemberResponseDto dto = memberMapper.toMemberResponseDto(member);
 		return responseTemplate.success(dto, HttpStatus.OK);
 	}

@@ -47,15 +47,6 @@ public class MemberService {
 	}
 
 	/**
-	 * Firebase UID 기반으로 내 정보 조회
-	 */
-	@Transactional(readOnly = true)
-	public Member getMyInfo(String firebaseUid) {
-		return memberRepository.findByFirebaseUidNotDeleted(firebaseUid)
-			.orElseThrow(MemberNotFoundException::new);
-	}
-
-	/**
 	 * 닉네임 변경
 	 * - 중복 체크 후 변경
 	 * @param firebaseUid Firebase UID
