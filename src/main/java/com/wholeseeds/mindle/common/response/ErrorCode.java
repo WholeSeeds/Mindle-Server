@@ -22,6 +22,7 @@ public enum ErrorCode {
 	// auth
 	MISSING_TOKEN(401, "Firebase 토큰이 누락되었습니다."),
 	INVALID_TOKEN(401, "유효하지 않은 Firebase 토큰입니다."),
+	MISSING_CURRENT_MEMBER(401, "인증된 회원 정보를 확인할 수 없습니다."),
 
 	// member
 	MEMBER_NOT_FOUND(404, "해당 회원을 찾을 수 없습니다."),

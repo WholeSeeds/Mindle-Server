@@ -7,6 +7,7 @@ import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.method.support.ModelAndViewContainer;
 
 import com.wholeseeds.mindle.common.annotation.CurrentMember;
+import com.wholeseeds.mindle.domain.auth.exception.MissingCurrentMemberException;
 import com.wholeseeds.mindle.domain.member.entity.Member;
 
 import jakarta.servlet.http.HttpServletRequest;
@@ -37,7 +38,7 @@ public class CurrentMemberArgumentResolver implements HandlerMethodArgumentResol
 		Object member = request.getAttribute("currentMember");
 
 		if (member == null) {
-			throw new IllegalStateException("currentMember가 request에 존재하지 않음");
+			throw new MissingCurrentMemberException();
 		}
 
 		return member;
