@@ -2,6 +2,7 @@ package com.wholeseeds.mindle.domain.member.repository.impl;
 
 import java.util.Optional;
 
+import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.core.types.dsl.NumberTemplate;
 import com.wholeseeds.mindle.common.repository.JpaBaseRepositoryImpl;
@@ -51,5 +52,18 @@ public class MemberRepositoryImpl extends JpaBaseRepositoryImpl<Member, Long> im
 			.fetchOne();
 
 		return Optional.ofNullable(result);
+	}
+
+	@Override
+	public boolean existsByNicknameAndNotId(String nickname, Long excludeId) {
+		BooleanExpression sameNickname = member.nickname.eq(nickname);
+		BooleanExpression notCurrentMember = member.id.ne(excludeId);
+		BooleanExpression notDeleted = member.deletedAt.isNull();
+
+		return queryFactory
+			.selectOne()
+			.from(member)
+			.where(sameNickname, notCurrentMember, notDeleted)
+			.fetchFirst() != null;
 	}
 }

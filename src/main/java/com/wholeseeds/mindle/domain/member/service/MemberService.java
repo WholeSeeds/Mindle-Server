@@ -3,9 +3,11 @@ package com.wholeseeds.mindle.domain.member.service;
 import java.util.Map;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.google.firebase.auth.FirebaseToken;
 import com.wholeseeds.mindle.domain.member.entity.Member;
+import com.wholeseeds.mindle.domain.member.exception.DuplicateNicknameException;
 import com.wholeseeds.mindle.domain.member.exception.MemberNotFoundException;
 import com.wholeseeds.mindle.domain.member.repository.MemberRepository;
 
@@ -20,6 +22,7 @@ public class MemberService {
 	/**
 	 * Firebase UID 기반으로 로그인 (또는 자동 회원가입) 처리
 	 */
+	@Transactional
 	public Member login(FirebaseToken firebaseToken) {
 		String uid = firebaseToken.getUid();
 		String email = firebaseToken.getEmail();
@@ -46,9 +49,30 @@ public class MemberService {
 	/**
 	 * Firebase UID 기반으로 내 정보 조회
 	 */
+	@Transactional(readOnly = true)
 	public Member getMyInfo(String firebaseUid) {
 		return memberRepository.findByFirebaseUidNotDeleted(firebaseUid)
 			.orElseThrow(MemberNotFoundException::new);
+	}
+
+	/**
+	 * 닉네임 변경
+	 * - 중복 체크 후 변경
+	 * @param firebaseUid Firebase UID
+	 * @param newNickname 새 닉네임
+	 * @return 변경된 회원 정보
+	 */
+	@Transactional
+	public Member updateNickname(String firebaseUid, String newNickname) {
+		Member member = memberRepository.findByFirebaseUidNotDeleted(firebaseUid)
+			.orElseThrow(MemberNotFoundException::new);
+
+		if (memberRepository.existsByNicknameAndNotId(newNickname, member.getId())) {
+			throw new DuplicateNicknameException();
+		}
+
+		member.updateNickname(newNickname);
+		return member;
 	}
 
 	/**

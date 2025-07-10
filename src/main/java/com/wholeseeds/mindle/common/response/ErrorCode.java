@@ -25,6 +25,7 @@ public enum ErrorCode {
 
 	// member
 	MEMBER_NOT_FOUND(404, "해당 회원을 찾을 수 없습니다."),
+	DUPLICATE_NICKNAME(400, "이미 사용 중인 닉네임입니다."),
 
 	// develop
 	QUERYDSL_NOT_INITIALIZED(500, "QueryDSL 필드가 초기화되지 않았습니다."),

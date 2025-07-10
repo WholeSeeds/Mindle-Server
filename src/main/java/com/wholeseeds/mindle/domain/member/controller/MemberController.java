@@ -5,18 +5,22 @@ import java.util.Map;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.google.firebase.auth.FirebaseToken;
 import com.wholeseeds.mindle.common.annotation.RequireAuth;
 import com.wholeseeds.mindle.common.util.ResponseTemplate;
+import com.wholeseeds.mindle.domain.member.dto.request.NicknameRequestDto;
 import com.wholeseeds.mindle.domain.member.dto.response.MemberResponseDto;
 import com.wholeseeds.mindle.domain.member.entity.Member;
 import com.wholeseeds.mindle.domain.member.mapper.MemberMapper;
 import com.wholeseeds.mindle.domain.member.service.MemberService;
 
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
 @RestController
@@ -50,5 +54,16 @@ public class MemberController {
 		Member member = memberService.getMyInfo(firebaseUid);
 		MemberResponseDto dto = memberMapper.toMemberResponseDto(member);
 		return responseTemplate.success(dto, HttpStatus.OK);
+	}
+
+	@PatchMapping("/nickname")
+	public ResponseEntity<Map<String, Object>> updateNickname(
+		HttpServletRequest request,
+		@Valid @RequestBody NicknameRequestDto dto
+	) {
+		FirebaseToken firebaseToken = (FirebaseToken) request.getAttribute("firebaseToken");
+		Member member = memberService.updateNickname(firebaseToken.getUid(), dto.getNickname());
+		MemberResponseDto responseDto = memberMapper.toMemberResponseDto(member);
+		return responseTemplate.success(responseDto, HttpStatus.OK);
 	}
 }

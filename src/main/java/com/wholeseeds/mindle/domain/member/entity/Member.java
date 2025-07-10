@@ -36,7 +36,7 @@ public class Member extends BaseEntity {
 	@Column(name = "provider", nullable = false, length = 50)
 	private String provider;
 
-	@Column(name = "nickname", nullable = false, length = 50)
+	@Column(name = "nickname", nullable = false, length = 50, unique = true)
 	private String nickname;
 
 	@Column(name = "phone", length = 13)
@@ -50,4 +50,8 @@ public class Member extends BaseEntity {
 
 	@Column(name = "contribution_score")
 	private Integer contributionScore = 0;
+
+	public void updateNickname(String newNickname) {
+		this.nickname = newNickname;
+	}
 }
