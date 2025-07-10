@@ -28,7 +28,7 @@ import com.wholeseeds.mindle.domain.member.repository.MemberRepository;
 import com.wholeseeds.mindle.domain.place.entity.Place;
 import com.wholeseeds.mindle.domain.place.exception.PlaceNotFoundException;
 import com.wholeseeds.mindle.domain.place.repository.PlaceRepository;
-import com.wholeseeds.mindle.infra.Service.NcpObjectStorageService;
+import com.wholeseeds.mindle.infra.service.NcpObjectStorageService;
 
 import lombok.RequiredArgsConstructor;
 
