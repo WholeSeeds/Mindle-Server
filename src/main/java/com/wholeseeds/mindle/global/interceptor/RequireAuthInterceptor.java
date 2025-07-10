@@ -15,7 +15,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 
 /**
- * @RequireAuth가 붙은 요청에 대해 Firebase 인증 토큰을 검사하고, 해당 회원이 존재하는지 확인하는 인터셉터
+ * `@RequireAuth`가 붙은 요청에 대해 Firebase 인증 토큰을 검사하고, 해당 회원이 존재하는지 확인하는 인터셉터
  * - Firebase 토큰이 없으면 예외 발생
  * - 해당 uid로 가입된 회원이 없으면 예외 발생
  * - 인증된 회원 정보를 request에 저장
