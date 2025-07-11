@@ -32,7 +32,7 @@ public class Subdistrict extends BaseEntity {
 	@JoinColumn(name = "district_id")
 	private District district;
 
-	@Column(length = 100, nullable = false)
+	@Column(length = 100, nullable = false, unique = true)
 	private String name;
 
 	@Enumerated(EnumType.STRING)

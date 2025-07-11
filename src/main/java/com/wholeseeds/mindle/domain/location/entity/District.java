@@ -26,6 +26,6 @@ public class District extends BaseEntity {
 	@JoinColumn(name = "city_id", nullable = false)
 	private City city;
 
-	@Column(length = 100, nullable = false)
+	@Column(length = 100, nullable = false, unique = true)
 	private String name;
 }
