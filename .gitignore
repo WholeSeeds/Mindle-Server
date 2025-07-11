@@ -42,3 +42,7 @@ out/
 
 ### Firebase Secret ###
 src/main/resources/mindle-secret.json
+
+### NCP SECRET ###
+configmap.yaml
+secret.yaml
