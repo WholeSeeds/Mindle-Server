@@ -32,6 +32,7 @@ public enum ErrorCode {
 	SUBDISTRICT_NOT_FOUND(404, "해당 (읍/면/동/리)를 찾을 수 없습니다"),
 	PLACE_NOT_FOUND(404, "해당 장소를 찾을 수 없습니다"),
 	IMAGE_UPLOAD_LIMIT_EXCEEDED(400, "이미지는 최대 3장까지 업로드 가능합니다"),
+	COMPLAINT_NOT_FOUND(404, "해당 민원을 찾을 수 없습니다"),
 
 	// NCP
 	NCP_FILE_UPLOAD_FAILED(500, "NCP 에 파일 저장 중 오류가 발생했습니다"),

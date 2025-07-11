@@ -6,13 +6,20 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.wholeseeds.mindle.common.util.ObjectUtils;
+import com.wholeseeds.mindle.common.code.CommonCode;
+import com.wholeseeds.mindle.domain.complaint.dto.CommentDto;
+import com.wholeseeds.mindle.domain.complaint.dto.CommentRequestDto;
+import com.wholeseeds.mindle.domain.complaint.dto.ComplaintDetailWithImagesDto;
+import com.wholeseeds.mindle.domain.complaint.dto.ComplaintListRequestDto;
+import com.wholeseeds.mindle.domain.complaint.dto.ComplaintListResponseDto;
+import com.wholeseeds.mindle.domain.complaint.dto.ReactionDto;
 import com.wholeseeds.mindle.domain.complaint.dto.SaveComplaintRequestDto;
 import com.wholeseeds.mindle.domain.complaint.entity.Category;
 import com.wholeseeds.mindle.domain.complaint.entity.Complaint;
 import com.wholeseeds.mindle.domain.complaint.entity.ComplaintImage;
 import com.wholeseeds.mindle.domain.complaint.exception.CategoryNotFoundException;
 import com.wholeseeds.mindle.domain.complaint.exception.CityNotFoundException;
+import com.wholeseeds.mindle.domain.complaint.exception.ComplaintNotFoundException;
 import com.wholeseeds.mindle.domain.complaint.exception.SubdistrictNotFoundException;
 import com.wholeseeds.mindle.domain.complaint.repository.CategoryRepository;
 import com.wholeseeds.mindle.domain.complaint.repository.ComplaintImageRepository;
@@ -72,11 +79,11 @@ public class ComplaintService {
 		Complaint saved = complaintRepository.save(complaint);
 
 		/* 이미지 업로드 & image 테이블에 url 저장 */
-		if (ObjectUtils.objectIsNullOrEmpty(imageList)) {
+		if (CommonCode.objectIsNullOrEmpty(imageList)) {
 			return saved;
 		}
 		for (MultipartFile imageFile : imageList) {
-			String imageUrl = ncpObjectStorageService.uploadFile(COMPLAINT_IMAGE_FOLDER, imageFile);
+			String imageUrl = ncpObjectStorageService.uploadFile("complaint", imageFile);
 			ComplaintImage complaintImage = ComplaintImage.builder()
 				.complaint(saved)
 				.imageUrl(imageUrl)
@@ -95,4 +102,23 @@ public class ComplaintService {
 		return subdistrictRepository.findByNameAndCity(dto.getSubdistrictName(), city)
 			.orElseThrow(SubdistrictNotFoundException::new);
 	}
+
+	public ComplaintDetailWithImagesDto getComplaintDetail(Long complaintId) {
+		return complaintRepository.getComplaintWithImages(complaintId).orElseThrow(ComplaintNotFoundException::new);
+	}
+
+	public ReactionDto getComplaintReaction(Long complaintId, Long memberId) {
+		return complaintRepository.getReaction(complaintId, memberId).orElseThrow(ComplaintNotFoundException::new);
+	}
+
+	public List<CommentDto> getComplaintComments(CommentRequestDto dto) {
+		return complaintRepository.getComment(dto.getComplaintId(),
+			CommonCode.stringToLocalDateTime(dto.getCursorCreatedAt()), dto.getPageSize());
+	}
+
+	public List<ComplaintListResponseDto> getComplaintList(ComplaintListRequestDto dto) {
+		return complaintRepository.findListWithCursor(dto.getCursorComplaintId(), dto.getPageSize(), dto.getCityId(),
+			dto.getDistrictId(), dto.getCategoryId());
+	}
+
 }

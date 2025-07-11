@@ -1,4 +1,4 @@
-package com.wholeseeds.mindle.domain.complaint.repository.custom;
+package com.wholeseeds.mindle.domain.complaint.repository;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -16,6 +16,6 @@ public interface ComplaintRepositoryCustom {
 
 	List<CommentDto> getComment(Long complaintId, LocalDateTime cursorCreatedAt, int pageSize);
 
-	List<ComplaintListResponseDto> findListWithCursor(Long cursorComplaintId, int pageSize,
+	List<ComplaintListResponseDto> findListWithCursor(Long cursorComplaintId, int size,
 		Long cityId, Long districtId, Long categoryId);
 }
