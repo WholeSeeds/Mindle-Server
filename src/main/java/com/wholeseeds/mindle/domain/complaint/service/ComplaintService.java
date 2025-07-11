@@ -1,4 +1,4 @@
-package com.wholeseeds.mindle.domain.complaint.Service;
+package com.wholeseeds.mindle.domain.complaint.service;
 
 import java.util.List;
 
@@ -42,6 +42,7 @@ import lombok.RequiredArgsConstructor;
 @Service
 @RequiredArgsConstructor
 public class ComplaintService {
+	private static final String COMPLAINT_IMAGE_FOLDER = "complaint";
 	private final ComplaintRepository complaintRepository;
 	private final CategoryRepository categoryRepository;
 	private final MemberRepository memberRepository;

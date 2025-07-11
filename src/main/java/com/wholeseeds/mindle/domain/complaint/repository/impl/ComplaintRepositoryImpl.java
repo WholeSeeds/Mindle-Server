@@ -1,4 +1,4 @@
-package com.wholeseeds.mindle.domain.complaint.repository;
+package com.wholeseeds.mindle.domain.complaint.repository.impl;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -21,6 +21,7 @@ import com.wholeseeds.mindle.domain.complaint.entity.Complaint;
 import com.wholeseeds.mindle.domain.complaint.entity.QComplaint;
 import com.wholeseeds.mindle.domain.complaint.entity.QComplaintImage;
 import com.wholeseeds.mindle.domain.complaint.entity.QComplaintReaction;
+import com.wholeseeds.mindle.domain.complaint.repository.custom.ComplaintRepositoryCustom;
 
 import jakarta.persistence.EntityManager;
 

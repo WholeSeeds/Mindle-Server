@@ -1,8 +1,9 @@
-package com.wholeseeds.mindle.domain.location.repository;
+package com.wholeseeds.mindle.domain.location.repository.impl;
 
 import com.wholeseeds.mindle.common.repository.JpaBaseRepositoryImpl;
 import com.wholeseeds.mindle.domain.location.entity.City;
 import com.wholeseeds.mindle.domain.location.entity.QCity;
+import com.wholeseeds.mindle.domain.location.repository.custom.CityRepositoryCustom;
 
 import jakarta.persistence.EntityManager;
 

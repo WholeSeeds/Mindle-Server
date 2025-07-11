@@ -15,10 +15,8 @@ import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.wholeseeds.mindle.common.code.CommonCode;
 import com.wholeseeds.mindle.common.response.ApiResponse;
-import com.wholeseeds.mindle.domain.complaint.Service.ComplaintService;
 import com.wholeseeds.mindle.domain.complaint.dto.CommentDto;
 import com.wholeseeds.mindle.domain.complaint.dto.CommentRequestDto;
 import com.wholeseeds.mindle.domain.complaint.dto.ComplaintDetailResponseDto;
@@ -26,6 +24,7 @@ import com.wholeseeds.mindle.domain.complaint.dto.ComplaintDetailWithImagesDto;
 import com.wholeseeds.mindle.domain.complaint.dto.ComplaintListRequestDto;
 import com.wholeseeds.mindle.domain.complaint.dto.ComplaintListResponseDto;
 import com.wholeseeds.mindle.domain.complaint.dto.ReactionDto;
+import com.wholeseeds.mindle.domain.complaint.service.ComplaintService;
 import com.wholeseeds.mindle.domain.complaint.dto.SaveComplaintRequestDto;
 import com.wholeseeds.mindle.domain.complaint.dto.SaveComplaintResponseDto;
 import com.wholeseeds.mindle.domain.complaint.entity.Complaint;
@@ -42,7 +41,6 @@ import lombok.extern.slf4j.Slf4j;
 public class ComplaintController {
 	private final ComplaintService complaintService;
 	private final ComplaintMapper complaintMapper;
-	private final ObjectMapper objectMapper;
 
 	// swagger 이미지업로드를 위한 Operation
 	@PostMapping(
