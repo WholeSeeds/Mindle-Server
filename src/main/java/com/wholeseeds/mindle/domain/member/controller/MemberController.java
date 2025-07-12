@@ -75,7 +75,7 @@ public class MemberController {
 		content = @Content(schema = @Schema(implementation = MemberResponseDto.class))
 	)
 	@RequireAuth
-	@GetMapping("/myInfo")
+	@GetMapping("/my-info")
 	public ResponseEntity<Map<String, Object>> getMyInfo(
 		@Parameter(hidden = true) @CurrentMember Member member
 	) {
