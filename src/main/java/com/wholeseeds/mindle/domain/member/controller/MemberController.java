@@ -14,7 +14,8 @@ import com.google.firebase.auth.FirebaseToken;
 import com.wholeseeds.mindle.common.annotation.CurrentMember;
 import com.wholeseeds.mindle.common.annotation.RequireAuth;
 import com.wholeseeds.mindle.common.util.ResponseTemplate;
-import com.wholeseeds.mindle.domain.member.dto.request.NicknameRequestDto;
+import com.wholeseeds.mindle.domain.member.dto.request.UpdateNicknameRequestDto;
+import com.wholeseeds.mindle.domain.member.dto.request.UpdateSubdistrictRequestDto;
 import com.wholeseeds.mindle.domain.member.dto.response.MemberResponseDto;
 import com.wholeseeds.mindle.domain.member.entity.Member;
 import com.wholeseeds.mindle.domain.member.mapper.MemberMapper;
@@ -64,8 +65,23 @@ public class MemberController {
 	@PatchMapping("/nickname")
 	public ResponseEntity<Map<String, Object>> updateNickname(
 		@Parameter(hidden = true) @CurrentMember Member member,
-		@Valid @RequestBody NicknameRequestDto dto
+		@Valid @RequestBody UpdateNicknameRequestDto dto
 	) {
+		memberService.updateNickname(member, dto.getNickname());
+		MemberResponseDto responseDto = memberMapper.toMemberResponseDto(member);
+		return responseTemplate.success(responseDto, HttpStatus.OK);
+	}
+
+	/**
+	 * 회원 동네 설정
+	 */
+	@RequireAuth
+	@PatchMapping("/subdistrict")
+	public ResponseEntity<Map<String, Object>> updateSubdistrict(
+		@Parameter(hidden = true) @CurrentMember Member member,
+		@Valid @RequestBody UpdateSubdistrictRequestDto dto
+	) {
+		memberService.updateSubdistrict(member, dto.getSubdistrictId());
 		MemberResponseDto responseDto = memberMapper.toMemberResponseDto(member);
 		return responseTemplate.success(responseDto, HttpStatus.OK);
 	}
