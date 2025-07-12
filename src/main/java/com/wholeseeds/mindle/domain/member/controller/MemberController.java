@@ -1,13 +1,16 @@
 package com.wholeseeds.mindle.domain.member.controller;
 
+import java.util.Map;
+
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.google.firebase.auth.FirebaseToken;
-import com.wholeseeds.mindle.common.auth.annotation.RequireAuth;
-import com.wholeseeds.mindle.common.response.ApiResponse;
+import com.wholeseeds.mindle.common.annotation.RequireAuth;
+import com.wholeseeds.mindle.common.util.ResponseTemplate;
 import com.wholeseeds.mindle.domain.member.dto.response.MemberResponseDto;
 import com.wholeseeds.mindle.domain.member.entity.Member;
 import com.wholeseeds.mindle.domain.member.mapper.MemberMapper;
@@ -23,17 +26,17 @@ public class MemberController {
 
 	private final MemberService memberService;
 	private final MemberMapper memberMapper;
+	private final ResponseTemplate responseTemplate;
 
 	/**
 	 * Firebase UID 기반으로 로그인 (또는 자동 회원가입) 처리
 	 */
 	@GetMapping("/login")
-	public ResponseEntity<ApiResponse<MemberResponseDto>> login(HttpServletRequest request) {
+	public ResponseEntity<Map<String, Object>> login(HttpServletRequest request) {
 		FirebaseToken firebaseToken = (FirebaseToken)request.getAttribute("firebaseToken");
 		Member member = memberService.login(firebaseToken);
 		MemberResponseDto dto = memberMapper.toMemberResponseDto(member);
-
-		return ResponseEntity.ok(ApiResponse.ok(dto));
+		return responseTemplate.success(dto, HttpStatus.OK);
 	}
 
 	/**
@@ -41,12 +44,11 @@ public class MemberController {
 	 */
 	@RequireAuth
 	@GetMapping("/me")
-	public ResponseEntity<ApiResponse<MemberResponseDto>> getMyInfo(HttpServletRequest request) {
+	public ResponseEntity<Map<String, Object>> getMyInfo(HttpServletRequest request) {
 		FirebaseToken firebaseToken = (FirebaseToken)request.getAttribute("firebaseToken");
 		String firebaseUid = firebaseToken.getUid();
-
 		Member member = memberService.getMyInfo(firebaseUid);
 		MemberResponseDto dto = memberMapper.toMemberResponseDto(member);
-		return ResponseEntity.ok(ApiResponse.ok(dto));
+		return responseTemplate.success(dto, HttpStatus.OK);
 	}
 }
