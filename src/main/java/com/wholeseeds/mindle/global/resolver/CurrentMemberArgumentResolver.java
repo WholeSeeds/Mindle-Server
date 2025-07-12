@@ -35,7 +35,7 @@ public class CurrentMemberArgumentResolver implements HandlerMethodArgumentResol
 		org.springframework.web.bind.support.WebDataBinderFactory binderFactory
 	) {
 		HttpServletRequest request = (HttpServletRequest) webRequest.getNativeRequest();
-		Object member = request.getAttribute("currentMember");
+		Object member = request.getAttribute(CURRENT_MEMBER_KEY);
 
 		if (member == null) {
 			throw new MissingCurrentMemberException();
