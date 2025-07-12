@@ -12,8 +12,8 @@ import com.wholeseeds.mindle.domain.complaint.entity.Category;
 import com.wholeseeds.mindle.domain.complaint.entity.Complaint;
 import com.wholeseeds.mindle.domain.complaint.entity.ComplaintImage;
 import com.wholeseeds.mindle.domain.complaint.exception.CategoryNotFoundException;
-import com.wholeseeds.mindle.domain.complaint.exception.CityNotFoundException;
-import com.wholeseeds.mindle.domain.complaint.exception.SubdistrictNotFoundException;
+import com.wholeseeds.mindle.domain.location.exception.CityNotFoundException;
+import com.wholeseeds.mindle.domain.location.exception.SubdistrictNotFoundException;
 import com.wholeseeds.mindle.domain.complaint.repository.CategoryRepository;
 import com.wholeseeds.mindle.domain.complaint.repository.ComplaintImageRepository;
 import com.wholeseeds.mindle.domain.complaint.repository.ComplaintRepository;
@@ -28,7 +28,7 @@ import com.wholeseeds.mindle.domain.member.repository.MemberRepository;
 import com.wholeseeds.mindle.domain.place.entity.Place;
 import com.wholeseeds.mindle.domain.place.exception.PlaceNotFoundException;
 import com.wholeseeds.mindle.domain.place.repository.PlaceRepository;
-import com.wholeseeds.mindle.infra.Service.NcpObjectStorageService;
+import com.wholeseeds.mindle.infra.service.NcpObjectStorageService;
 
 import lombok.RequiredArgsConstructor;
 

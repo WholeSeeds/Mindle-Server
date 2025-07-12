@@ -21,7 +21,7 @@ firebase:
 
 logging:
   level:
-    app: DEBUG
+    com.wholeseeds.mindle: DEBUG
 #    root: ERROR
     org.hibernate.SQL: DEBUG           # Hibernate 실행 SQL
     org.hibernate.type.descriptor.sql: TRACE   # SQL 에 바인딩되는 파라미터 값도 출력

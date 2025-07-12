@@ -29,7 +29,7 @@ public class LogBackConfig {
 
 	private final LoggerContext logCtx = (LoggerContext) LoggerFactory.getILoggerFactory();
 
-	@Value("${logging.level.app:TRACE}")
+	@Value("${logging.level.com.wholeseeds.mindle:TRACE}")
 	private String appLogLevel;
 
 	@Value("${logging.level.root:ERROR}")
