@@ -2,6 +2,7 @@ package com.wholeseeds.mindle.global.resolver;
 
 import org.springframework.core.MethodParameter;
 import org.springframework.stereotype.Component;
+import org.springframework.web.bind.support.WebDataBinderFactory;
 import org.springframework.web.context.request.NativeWebRequest;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.method.support.ModelAndViewContainer;
@@ -21,6 +22,8 @@ import lombok.NonNull;
 @Component
 public class CurrentMemberArgumentResolver implements HandlerMethodArgumentResolver {
 
+	private static final String CURRENT_MEMBER_KEY = "currentMember";
+
 	@Override
 	public boolean supportsParameter(MethodParameter parameter) {
 		return parameter.hasParameterAnnotation(CurrentMember.class)
@@ -32,7 +35,7 @@ public class CurrentMemberArgumentResolver implements HandlerMethodArgumentResol
 		@NonNull MethodParameter parameter,
 		ModelAndViewContainer mavContainer,
 		NativeWebRequest webRequest,
-		org.springframework.web.bind.support.WebDataBinderFactory binderFactory
+		WebDataBinderFactory binderFactory
 	) {
 		HttpServletRequest request = (HttpServletRequest) webRequest.getNativeRequest();
 		Object member = request.getAttribute(CURRENT_MEMBER_KEY);
