@@ -56,10 +56,11 @@ public class ComplaintService {
 	private final NcpObjectStorageService ncpObjectStorageService;
 
 	@Transactional
-	public Complaint saveComplaint(SaveComplaintRequestDto requestDto, List<MultipartFile> imageList) {
+	public Complaint saveComplaint(SaveComplaintRequestDto requestDto, List<MultipartFile> imageList,
+		Member memberDto) {
 		Category category = categoryRepository.findById(requestDto.getCategoryId())
 			.orElseThrow(CategoryNotFoundException::new);
-		Member member = memberRepository.findById(requestDto.getMemberId())
+		Member member = memberRepository.findById(memberDto.getId())
 			.orElseThrow(MemberNotFoundException::new);
 		Subdistrict subdistrict = findSubdistrict(requestDto);
 		Place place = null;

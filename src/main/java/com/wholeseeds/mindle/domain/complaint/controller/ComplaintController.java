@@ -15,6 +15,8 @@ import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.wholeseeds.mindle.common.annotation.CurrentMember;
+import com.wholeseeds.mindle.common.annotation.RequireAuth;
 import com.wholeseeds.mindle.common.code.CommonCode;
 import com.wholeseeds.mindle.common.response.ApiResponse;
 import com.wholeseeds.mindle.domain.complaint.dto.CommentDto;
@@ -24,12 +26,13 @@ import com.wholeseeds.mindle.domain.complaint.dto.ComplaintDetailWithImagesDto;
 import com.wholeseeds.mindle.domain.complaint.dto.ComplaintListRequestDto;
 import com.wholeseeds.mindle.domain.complaint.dto.ComplaintListResponseDto;
 import com.wholeseeds.mindle.domain.complaint.dto.ReactionDto;
-import com.wholeseeds.mindle.domain.complaint.service.ComplaintService;
 import com.wholeseeds.mindle.domain.complaint.dto.SaveComplaintRequestDto;
 import com.wholeseeds.mindle.domain.complaint.dto.SaveComplaintResponseDto;
 import com.wholeseeds.mindle.domain.complaint.entity.Complaint;
 import com.wholeseeds.mindle.domain.complaint.exception.ImageUploadLimitExceeded;
 import com.wholeseeds.mindle.domain.complaint.mapper.ComplaintMapper;
+import com.wholeseeds.mindle.domain.complaint.service.ComplaintService;
+import com.wholeseeds.mindle.domain.member.entity.Member;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -43,6 +46,7 @@ public class ComplaintController {
 	private final ComplaintMapper complaintMapper;
 
 	// swagger 이미지업로드를 위한 Operation
+	@RequireAuth
 	@PostMapping(
 		value = "/save",
 		consumes = MULTIPART_FORM_DATA_VALUE
@@ -59,6 +63,7 @@ public class ComplaintController {
 		)
 		@RequestPart("meta")
 		SaveComplaintRequestDto requestDto,
+		@CurrentMember Member member,
 		@RequestPart(value = "files", required = false) List<MultipartFile> imageList
 	) throws IOException {
 
@@ -72,12 +77,13 @@ public class ComplaintController {
 			}
 		}
 
-		Complaint saved = complaintService.saveComplaint(requestDto, imageList);
+		Complaint saved = complaintService.saveComplaint(requestDto, imageList, member);
 
 		SaveComplaintResponseDto resDto = complaintMapper.toSaveComplaintResponseDto(saved);
 		return ResponseEntity.ok(ApiResponse.ok(resDto));
 	}
 
+	@RequireAuth
 	@GetMapping("/detail/{complaintId}")
 	public ResponseEntity<ApiResponse<ComplaintDetailResponseDto>> getComplaintDetail(
 		@PathVariable Long complaintId) {
@@ -91,6 +97,7 @@ public class ComplaintController {
 		return ResponseEntity.ok(ApiResponse.ok(responseDto));
 	}
 
+	@RequireAuth
 	@GetMapping("/detail/comment")
 	public ResponseEntity<ApiResponse<List<CommentDto>>> getComplaintComments(
 		@ModelAttribute CommentRequestDto requestDto) {
@@ -98,6 +105,7 @@ public class ComplaintController {
 		return ResponseEntity.ok(ApiResponse.ok(comments));
 	}
 
+	@RequireAuth
 	@GetMapping("/list")
 	public ResponseEntity<ApiResponse<List<ComplaintListResponseDto>>> getComplaintList(
 		@ModelAttribute ComplaintListRequestDto requestDto) {

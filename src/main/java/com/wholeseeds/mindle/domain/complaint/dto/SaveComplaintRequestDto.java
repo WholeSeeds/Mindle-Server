@@ -15,8 +15,6 @@ import lombok.ToString;
 public class SaveComplaintRequestDto {
 	@NotNull
 	private Long categoryId;
-	@NotNull
-	private Long memberId;
 	private String cityName;
 	private String districtName;
 	private String subdistrictName;
@@ -27,5 +25,4 @@ public class SaveComplaintRequestDto {
 	private String content;
 	private double latitude;
 	private double longitude;
-	// private String photoUrl; // TODO 이미지 파일
 }
