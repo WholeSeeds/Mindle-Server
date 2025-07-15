@@ -1,5 +1,9 @@
 package com.wholeseeds.mindle.config;
 
+import java.util.List;
+
+import org.springframework.context.annotation.Configuration;
+import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import java.util.ArrayList;
 import java.util.List;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
@@ -9,24 +13,44 @@ import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
-/**
- * application/octet-stream 타입을 읽을 수 있도록 설정해줌
- * swagger 가 이미지 업로드시에 meta 파트에 application/octet-stream 헤더를 잘못 붙여 보내는데
- * 서버가 이를 json 으로 인식할 수 있도록 변경
- */
+import com.wholeseeds.mindle.global.interceptor.FirebaseAuthInterceptor;
 import com.wholeseeds.mindle.global.interceptor.LoggingInterceptor;
+import com.wholeseeds.mindle.global.interceptor.RequireAuthInterceptor;
+import com.wholeseeds.mindle.global.resolver.CurrentMemberArgumentResolver;
+
+import lombok.RequiredArgsConstructor;
 
 @Configuration
+@RequiredArgsConstructor
 public class WebConfig implements WebMvcConfigurer {
+	// Argument Resolver
+	private final CurrentMemberArgumentResolver currentMemberArgumentResolver;
 
+	// Interceptor
 	private final LoggingInterceptor loggingInterceptor;
+	private final FirebaseAuthInterceptor firebaseAuthInterceptor;
+	private final RequireAuthInterceptor requireAuthInterceptor;
 
-	public WebConfig(LoggingInterceptor loggingInterceptor) {
-		this.loggingInterceptor = loggingInterceptor;
+	@Override
+	public void addArgumentResolvers(List<HandlerMethodArgumentResolver> resolvers) {
+		resolvers.add(currentMemberArgumentResolver);
 	}
+
+	@Override
 	public void addInterceptors(InterceptorRegistry registry) {
-		registry.addInterceptor(loggingInterceptor);
+		String apiPath = "/api/**";
+
+		registry.addInterceptor(loggingInterceptor)
+			.addPathPatterns(apiPath);
+
+		registry.addInterceptor(firebaseAuthInterceptor)
+			.addPathPatterns(apiPath);
+
+		registry.addInterceptor(requireAuthInterceptor)
+			.addPathPatterns(apiPath);
 	}
+
+	// swagger 이미지 업로드 때 사용됨
 	@Override
 	public void extendMessageConverters(List<HttpMessageConverter<?>> converters) {
 		for (HttpMessageConverter<?> conv : converters) {

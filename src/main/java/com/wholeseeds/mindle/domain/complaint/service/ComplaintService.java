@@ -7,6 +7,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.wholeseeds.mindle.common.code.CommonCode;
+import com.wholeseeds.mindle.common.util.ObjectUtils;
 import com.wholeseeds.mindle.domain.complaint.dto.CommentDto;
 import com.wholeseeds.mindle.domain.complaint.dto.CommentRequestDto;
 import com.wholeseeds.mindle.domain.complaint.dto.ComplaintDetailWithImagesDto;
@@ -18,14 +19,14 @@ import com.wholeseeds.mindle.domain.complaint.entity.Category;
 import com.wholeseeds.mindle.domain.complaint.entity.Complaint;
 import com.wholeseeds.mindle.domain.complaint.entity.ComplaintImage;
 import com.wholeseeds.mindle.domain.complaint.exception.CategoryNotFoundException;
-import com.wholeseeds.mindle.domain.complaint.exception.CityNotFoundException;
 import com.wholeseeds.mindle.domain.complaint.exception.ComplaintNotFoundException;
-import com.wholeseeds.mindle.domain.complaint.exception.SubdistrictNotFoundException;
 import com.wholeseeds.mindle.domain.complaint.repository.CategoryRepository;
 import com.wholeseeds.mindle.domain.complaint.repository.ComplaintImageRepository;
 import com.wholeseeds.mindle.domain.complaint.repository.ComplaintRepository;
 import com.wholeseeds.mindle.domain.location.entity.City;
 import com.wholeseeds.mindle.domain.location.entity.Subdistrict;
+import com.wholeseeds.mindle.domain.location.exception.CityNotFoundException;
+import com.wholeseeds.mindle.domain.location.exception.SubdistrictNotFoundException;
 import com.wholeseeds.mindle.domain.location.repository.CityRepository;
 import com.wholeseeds.mindle.domain.location.repository.DistrictRepository;
 import com.wholeseeds.mindle.domain.location.repository.SubdistrictRepository;
@@ -35,7 +36,7 @@ import com.wholeseeds.mindle.domain.member.repository.MemberRepository;
 import com.wholeseeds.mindle.domain.place.entity.Place;
 import com.wholeseeds.mindle.domain.place.exception.PlaceNotFoundException;
 import com.wholeseeds.mindle.domain.place.repository.PlaceRepository;
-import com.wholeseeds.mindle.infra.Service.NcpObjectStorageService;
+import com.wholeseeds.mindle.infra.service.NcpObjectStorageService;
 
 import lombok.RequiredArgsConstructor;
 
@@ -79,11 +80,11 @@ public class ComplaintService {
 		Complaint saved = complaintRepository.save(complaint);
 
 		/* 이미지 업로드 & image 테이블에 url 저장 */
-		if (CommonCode.objectIsNullOrEmpty(imageList)) {
+		if (ObjectUtils.objectIsNullOrEmpty(imageList)) {
 			return saved;
 		}
 		for (MultipartFile imageFile : imageList) {
-			String imageUrl = ncpObjectStorageService.uploadFile("complaint", imageFile);
+			String imageUrl = ncpObjectStorageService.uploadFile(COMPLAINT_IMAGE_FOLDER, imageFile);
 			ComplaintImage complaintImage = ComplaintImage.builder()
 				.complaint(saved)
 				.imageUrl(imageUrl)

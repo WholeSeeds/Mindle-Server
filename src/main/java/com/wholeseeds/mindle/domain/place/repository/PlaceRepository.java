@@ -2,10 +2,9 @@ package com.wholeseeds.mindle.domain.place.repository;
 
 import java.util.Optional;
 
-import org.springframework.data.jpa.repository.JpaRepository;
-
+import com.wholeseeds.mindle.common.repository.JpaBaseRepository;
 import com.wholeseeds.mindle.domain.place.entity.Place;
 
-public interface PlaceRepository extends JpaRepository<Place, Long> {
+public interface PlaceRepository extends JpaBaseRepository<Place, Long> {
 	Optional<Place> findByPlaceId(String placeId);
 }
