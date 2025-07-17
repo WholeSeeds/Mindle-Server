@@ -14,10 +14,10 @@ jobs:
 
       - name: NCP 레지스트리 로그인
         run: |
-            echo "${{ secrets.NCP_SECRET_KEY }}" \
-             | docker login mindle.kr.ncr.ntruss.com \
-               --username "${{ secrets.NCP_ACCESS_KEY }}" \
-               --password-stdin
+          echo "${{ secrets.NCP_SECRET_KEY }}" \
+          | docker login mindle.kr.ncr.ntruss.com \
+            --username "${{ secrets.NCP_ACCESS_KEY }}" \
+            --password-stdin
 
       - name: QEMU 설치 (멀티플랫폼 지원)
         uses: docker/setup-qemu-action@v2
