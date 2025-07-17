@@ -1,0 +1,62 @@
+name: CI for NKS via ArgoCD
+
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: 코드 체크아웃
+        uses: actions/checkout@v4
+
+      - name: NCP 레지스트리 로그인
+        run: echo "${{ secrets.NCP_SECRET_KEY }}" \
+             | docker login mindle.kr.ncr.ntruss.com \
+               --username "${{ secrets.NCP_ACCESS_KEY }}" \
+               --password-stdin
+
+      - name: QEMU 설치 (멀티플랫폼 지원)
+        uses: docker/setup-qemu-action@v2
+        with:
+          platforms: linux/amd64
+
+      - name: Buildx 설치 및 초기화
+        uses: docker/setup-buildx-action@v2
+        with:
+          install: true
+
+      - name: 빌더 생성 및 부트스트랩
+        run: |
+          docker buildx create --use --name multiarch-builder
+          docker buildx inspect multiarch-builder --bootstrap
+
+      - name: 이미지 빌드 및 푸시
+        env:
+          IMAGE_TAG: ${{ github.sha }}
+        run: |
+          docker buildx build \
+            --platform linux/amd64 \
+            -t mindle.kr.ncr.ntruss.com/my-spring-app:$IMAGE_TAG \
+            --push \
+            .
+
+      - name: 매니페스트 이미지 태그 업데이트
+        env:
+          IMAGE_TAG: ${{ github.sha }}
+        run: |
+          yq e -i \
+            '.spec.template.spec.containers[0].image = "mindle.kr.ncr.ntruss.com/my-spring-app:'"$IMAGE_TAG"'"' \
+            k8s/deployment.yaml
+
+      - name: 매니페스트 커밋 및 푸시
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          git config user.name "github-actions"
+          git config user.email "actions@github.com"
+          git add k8s/deployment.yaml
+          git commit -m "ci: update image tag to $IMAGE_TAG"
+          git push
