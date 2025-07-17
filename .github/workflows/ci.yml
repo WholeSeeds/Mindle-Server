@@ -13,7 +13,8 @@ jobs:
         uses: actions/checkout@v4
 
       - name: NCP 레지스트리 로그인
-        run: echo "${{ secrets.NCP_SECRET_KEY }}" \
+        run: |
+            echo "${{ secrets.NCP_SECRET_KEY }}" \
              | docker login mindle.kr.ncr.ntruss.com \
                --username "${{ secrets.NCP_ACCESS_KEY }}" \
                --password-stdin
