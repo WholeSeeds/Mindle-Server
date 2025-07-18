@@ -42,8 +42,9 @@ jobs:
 
       - name: yq 설치 (매니페스트 이미지 태그 수정할 때 사용)
         run: |
-          wget https://github.com/mikefarah/yq/releases/download/v4.42.2/yq_linux_amd64 -O /usr/local/bin/yq
-          chmod +x /usr/local/bin/yq
+          wget https://github.com/mikefarah/yq/releases/download/v4.46.1/yq_linux_amd64 -O yq
+          chmod +x yq
+          sudo mv yq /usr/local/bin/yq          
 
       - name: 매니페스트 이미지 태그 업데이트
         env:
