@@ -70,4 +70,6 @@ tasks.named('test') {
 
 tasks.named('checkstyleMain') {
     dependsOn 'compileTestJava'
+    // Skip generated QueryDSL classes
+    exclude "**/build/generated/querydsl/**/*.java"
 }
