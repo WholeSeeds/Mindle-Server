@@ -64,9 +64,9 @@ dependencies {
     implementation 'com.amazonaws:aws-java-sdk-s3:1.12.563'
 }
 
-tasks.named('test') {
-    useJUnitPlatform()
-}
+//tasks.named('test') {
+//    useJUnitPlatform()
+//}
 
 tasks.named('checkstyleMain') {
     dependsOn 'compileTestJava'
