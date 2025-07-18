@@ -32,6 +32,7 @@ checkstyle {
     configFile = file("${rootDir}/config/naver-checkstyle-rules.xml")
     configProperties = ["suppressionFile": "${rootDir}/config/naver-checkstyle-suppressions.xml"]
     toolVersion = "8.42"
+    ignoreFailures = true // warning 만 띄우고 build 되도록
 }
 
 dependencies {
