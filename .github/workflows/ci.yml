@@ -2,41 +2,37 @@ name: CI for NKS via ArgoCD
 
 on:
   push:
-    branches: [ "#18-deploy" ]
+    branches:
+      - "#18-deploy"
 
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
-
     steps:
       - name: 코드 체크아웃
         uses: actions/checkout@v4
 
+      - name: 프로젝트 빌드 (Jar 생성)
+        run: ./gradlew clean build --no-daemon
+
       - name: NCP 레지스트리 로그인
-        run: |
-          echo "${{ secrets.NCP_SECRET_KEY }}" \
-          | docker login mindle.kr.ncr.ntruss.com \
-            --username "${{ secrets.NCP_ACCESS_KEY }}" \
-            --password-stdin
+        uses: docker/login-action@v2
+        with:
+          registry: mindle.kr.ncr.ntruss.com
+          username: ${{ secrets.NCP_ACCESS_KEY }}
+          password: ${{ secrets.NCP_SECRET_KEY }}
 
       - name: QEMU 설치 (멀티플랫폼 지원)
         uses: docker/setup-qemu-action@v2
         with:
           platforms: linux/amd64
 
-      - name: Buildx 설치 및 초기화
+      - name: Buildx 설치
         uses: docker/setup-buildx-action@v2
-        with:
-          install: true
-
-      - name: 빌더 생성 및 부트스트랩
-        run: |
-          docker buildx create --use --name multiarch-builder
-          docker buildx inspect multiarch-builder --bootstrap
 
       - name: 이미지 빌드 및 푸시
         env:
-          IMAGE_TAG: ${{ github.sha }}
+          IMAGE_TAG: "1.0.${{ github.run_number }}"
         run: |
           docker buildx build \
             --platform linux/amd64 \
@@ -44,9 +40,12 @@ jobs:
             --push \
             .
 
+      - name: yq 설치 (매니페스트 이미지 태그 수정할 때 사용)
+        run: sudo apt-get update && sudo apt-get install -y yq
+
       - name: 매니페스트 이미지 태그 업데이트
         env:
-          IMAGE_TAG: ${{ github.sha }}
+          IMAGE_TAG: "1.0.${{ github.run_number }}"
         run: |
           yq e -i \
             '.spec.template.spec.containers[0].image = "mindle.kr.ncr.ntruss.com/my-spring-app:'"$IMAGE_TAG"'"' \
