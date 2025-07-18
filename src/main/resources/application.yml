@@ -10,7 +10,7 @@ spring:
 
   jpa:
     hibernate:
-      ddl-auto: update
+      ddl-auto: create
     show-sql: true # sql 로그 출력
     properties:
       hibernate:
@@ -22,7 +22,7 @@ firebase:
 logging:
   level:
     com.wholeseeds.mindle: DEBUG
-#    root: ERROR
+    #    root: ERROR
     org.hibernate.SQL: DEBUG           # Hibernate 실행 SQL
     org.hibernate.type.descriptor.sql: TRACE   # SQL 에 바인딩되는 파라미터 값도 출력
 
