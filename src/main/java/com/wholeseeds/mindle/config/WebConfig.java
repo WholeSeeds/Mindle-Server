@@ -4,7 +4,13 @@ import java.util.List;
 
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
+import java.util.ArrayList;
+import java.util.List;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.http.MediaType;
+import org.springframework.http.converter.HttpMessageConverter;
+import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 import com.wholeseeds.mindle.global.interceptor.FirebaseAuthInterceptor;
@@ -42,5 +48,20 @@ public class WebConfig implements WebMvcConfigurer {
 
 		registry.addInterceptor(requireAuthInterceptor)
 			.addPathPatterns(apiPath);
+	}
+
+	// swagger 이미지 업로드 때 사용됨
+	@Override
+	public void extendMessageConverters(List<HttpMessageConverter<?>> converters) {
+		for (HttpMessageConverter<?> conv : converters) {
+			if (conv instanceof MappingJackson2HttpMessageConverter jackson) {
+				// JSON 기본 지원 타입
+				List<MediaType> mts = new ArrayList<>(jackson.getSupportedMediaTypes());
+				// octet-stream을 JSON 파이프라인에 추가
+				mts.add(MediaType.APPLICATION_OCTET_STREAM);
+				jackson.setSupportedMediaTypes(mts);
+				break;  // 한 번만 적용
+			}
+		}
 	}
 }
