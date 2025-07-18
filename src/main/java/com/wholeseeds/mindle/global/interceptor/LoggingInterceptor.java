@@ -8,6 +8,10 @@ import org.springframework.web.servlet.HandlerInterceptor;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
+/**
+ * 모든 요청에 대해 URL을 로깅하는 인터셉터
+ * - 요청이 들어올 때마다 URL을 로그로 남김
+ */
 @Component
 public class LoggingInterceptor implements HandlerInterceptor {
 

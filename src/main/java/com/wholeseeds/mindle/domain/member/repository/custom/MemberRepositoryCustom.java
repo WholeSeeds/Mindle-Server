@@ -22,4 +22,13 @@ public interface MemberRepositoryCustom {
 	 * @return 최대 숫자 부분을 Optional로 감싸서 반환, 없으면 Optional.empty()
 	 */
 	Optional<Integer> findMaxUserNicknameSuffix();
+
+	/**
+	 * 주어진 닉네임을 가진 다른 회원이 존재하는지 확인
+	 *
+	 * @param nickname 중복 여부를 검사할 닉네임
+	 * @param excludeId 제외할 회원의 ID (보통 현재 로그인한 회원의 ID)
+	 * @return 조건에 해당하는 회원이 존재하면 true, 존재하지 않으면 false
+	 */
+	boolean existsByNicknameAndNotId(String nickname, Long excludeId);
 }

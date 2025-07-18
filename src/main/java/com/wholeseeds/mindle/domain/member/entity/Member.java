@@ -25,7 +25,7 @@ public class Member extends BaseEntity {
 
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "subdistrict_id")
-	private Subdistrict subdistrictId;
+	private Subdistrict subdistrict;
 
 	@Column(name = "firebase_uid", nullable = false, unique = true)
 	private String firebaseUid;
@@ -36,7 +36,7 @@ public class Member extends BaseEntity {
 	@Column(name = "provider", nullable = false, length = 50)
 	private String provider;
 
-	@Column(name = "nickname", nullable = false, length = 50)
+	@Column(name = "nickname", nullable = false, length = 50, unique = true)
 	private String nickname;
 
 	@Column(name = "phone", length = 13)
@@ -50,4 +50,12 @@ public class Member extends BaseEntity {
 
 	@Column(name = "contribution_score")
 	private Integer contributionScore = 0;
+
+	public void updateNickname(String newNickname) {
+		this.nickname = newNickname;
+	}
+
+	public void updateSubdistrict(Subdistrict subdistrict) {
+		this.subdistrict = subdistrict;
+	}
 }

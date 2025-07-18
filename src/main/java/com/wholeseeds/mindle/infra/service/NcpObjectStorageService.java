@@ -1,4 +1,4 @@
-package com.wholeseeds.mindle.infra.Service;
+package com.wholeseeds.mindle.infra.service;
 
 import java.io.IOException;
 import java.io.InputStream;

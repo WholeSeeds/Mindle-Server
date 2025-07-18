@@ -3,11 +3,16 @@ package com.wholeseeds.mindle.domain.member.service;
 import java.util.Map;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.google.firebase.auth.FirebaseToken;
+import com.wholeseeds.mindle.domain.location.exception.SubdistrictNotFoundException;
+import com.wholeseeds.mindle.domain.location.entity.Subdistrict;
+import com.wholeseeds.mindle.domain.location.repository.SubdistrictRepository;
 import com.wholeseeds.mindle.domain.member.entity.Member;
-import com.wholeseeds.mindle.domain.member.exception.MemberNotFoundException;
+import com.wholeseeds.mindle.domain.member.exception.DuplicateNicknameException;
 import com.wholeseeds.mindle.domain.member.repository.MemberRepository;
+
 
 import lombok.RequiredArgsConstructor;
 
@@ -16,10 +21,12 @@ import lombok.RequiredArgsConstructor;
 public class MemberService {
 
 	private final MemberRepository memberRepository;
+	private final SubdistrictRepository subdistrictRepository;
 
 	/**
 	 * Firebase UID 기반으로 로그인 (또는 자동 회원가입) 처리
 	 */
+	@Transactional
 	public Member login(FirebaseToken firebaseToken) {
 		String uid = firebaseToken.getUid();
 		String email = firebaseToken.getEmail();
@@ -44,11 +51,31 @@ public class MemberService {
 	}
 
 	/**
-	 * Firebase UID 기반으로 내 정보 조회
+	 * 닉네임 변경
+	 * - 중복 체크 후 변경
+	 *
+	 * @param member      현재 회원 정보
+	 * @param newNickname 새 닉네임
 	 */
-	public Member getMyInfo(String firebaseUid) {
-		return memberRepository.findByFirebaseUidNotDeleted(firebaseUid)
-			.orElseThrow(MemberNotFoundException::new);
+	@Transactional
+	public void updateNickname(Member member, String newNickname) {
+		if (memberRepository.existsByNicknameAndNotId(newNickname, member.getId())) {
+			throw new DuplicateNicknameException();
+		}
+		member.updateNickname(newNickname);
+	}
+
+	/**
+	 * 기본 동네 설정
+	 * - Firebase UID로 회원 조회 후 동네 설정
+	 * @param member 현재 회원 정보
+	 * @param subdistrictId 동네 ID
+	 */
+	@Transactional
+	public void updateSubdistrict(Member member, Long subdistrictId) {
+		Subdistrict subdistrict = subdistrictRepository.findByIdNotDeleted(subdistrictId)
+			.orElseThrow(SubdistrictNotFoundException::new);
+		member.updateSubdistrict(subdistrict);
 	}
 
 	/**
