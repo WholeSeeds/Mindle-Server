@@ -2,7 +2,7 @@ name: CI for NKS via ArgoCD
 
 on:
   push:
-    branches: [ main ]
+    branches: [ "#18-deploy" ]
 
 jobs:
   build-and-deploy:
