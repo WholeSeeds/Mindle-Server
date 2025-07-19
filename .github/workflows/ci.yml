@@ -52,7 +52,10 @@ jobs:
         run: |
           yq e -i \
             '.spec.template.spec.containers[0].image = "mindle.kr.ncr.ntruss.com/my-spring-app:'"$IMAGE_TAG"'"' \
-            k8s/deployment.yaml
+            deployment.yaml
+          yq e -i \
+            '.spec.template.spec.containers[0].image = "mindle.kr.ncr.ntruss.com/my-spring-app:'"$IMAGE_TAG"'"' \
+            service.yaml
 
       - name: 매니페스트 커밋 및 푸시
         env:
@@ -60,6 +63,6 @@ jobs:
         run: |
           git config user.name "github-actions"
           git config user.email "actions@github.com"
-          git add k8s/deployment.yaml
+          git add deployment.yaml service.yaml
           git commit -m "ci: update image tag to $IMAGE_TAG"
           git push
