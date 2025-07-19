@@ -16,7 +16,7 @@ spec:
         - name: ncr-registry-secret # registry 접근용 Secret
       containers:
         - name: spring # 컨테이너 이름
-          image: mindle.kr.ncr.ntruss.com/my-spring-app:1.0.21
+          image: mindle.kr.ncr.ntruss.com/my-spring-app:1.0.22
           imagePullPolicy: Always # 항상 최신 이미지 풀링
           ports:
             - containerPort: 8080 # 컨테이너 내부 포트
