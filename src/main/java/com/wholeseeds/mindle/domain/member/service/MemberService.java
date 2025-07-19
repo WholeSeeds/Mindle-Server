@@ -1,6 +1,7 @@
 package com.wholeseeds.mindle.domain.member.service;
 
 import java.util.Map;
+import java.util.Objects;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -10,6 +11,7 @@ import com.wholeseeds.mindle.domain.location.entity.Subdistrict;
 import com.wholeseeds.mindle.domain.location.exception.SubdistrictNotFoundException;
 import com.wholeseeds.mindle.domain.location.repository.SubdistrictRepository;
 import com.wholeseeds.mindle.domain.member.entity.Member;
+import com.wholeseeds.mindle.domain.member.enums.NotificationType;
 import com.wholeseeds.mindle.domain.member.exception.DuplicateNicknameException;
 import com.wholeseeds.mindle.domain.member.repository.MemberRepository;
 
@@ -76,6 +78,15 @@ public class MemberService {
 		Subdistrict subdistrict = subdistrictRepository.findByIdNotDeleted(subdistrictId)
 			.orElseThrow(SubdistrictNotFoundException::new);
 		member.updateSubdistrict(subdistrict);
+	}
+
+	@Transactional
+	public void updateNotificationSetting(Member member, NotificationType type, boolean enabled) {
+		if (Objects.requireNonNull(type) == NotificationType.PUSH) {
+			member.setNotificationPush(enabled);
+		} else if (type == NotificationType.IN_APP) {
+			member.setNotificationInapp(enabled);
+		}
 	}
 
 	/**

@@ -16,6 +16,7 @@ import com.wholeseeds.mindle.common.annotation.CurrentMember;
 import com.wholeseeds.mindle.common.annotation.RequireAuth;
 import com.wholeseeds.mindle.common.util.ResponseTemplate;
 import com.wholeseeds.mindle.domain.member.dto.request.UpdateNicknameRequestDto;
+import com.wholeseeds.mindle.domain.member.dto.request.UpdateNotificationSettingRequestDto;
 import com.wholeseeds.mindle.domain.member.dto.request.UpdateSubdistrictRequestDto;
 import com.wholeseeds.mindle.domain.member.dto.response.MemberResponseDto;
 import com.wholeseeds.mindle.domain.member.entity.Member;
@@ -35,7 +36,7 @@ import lombok.RequiredArgsConstructor;
 
 @Tag(
 	name = "회원",
-	description = "회원 API (로그인 또는 회원가입, 내 정보 조회, 닉네임 설정, 회원 동네 설정, 회원 탈퇴)"
+	description = "회원 API (로그인 또는 회원가입, 내 정보 조회, 닉네임 설정, 회원 동네 설정, 알림 설정 변경, 회원 탈퇴)"
 )
 @RestController
 @RequestMapping("/api/member")
@@ -132,6 +133,32 @@ public class MemberController {
 		@Valid @RequestBody UpdateSubdistrictRequestDto dto
 	) {
 		memberService.updateSubdistrict(member, dto.getSubdistrictId());
+		MemberResponseDto responseDto = memberMapper.toMemberResponseDto(member);
+		return responseTemplate.success(responseDto, HttpStatus.OK);
+	}
+
+	/**
+	 * 알림 설정 변경
+	 * - PUSH 또는 IN_APP 알림 설정을 변경합니다.
+	 */
+	@Operation(
+		summary = "알림 설정 변경",
+		description = "PUSH 또는 IN_APP 알림 설정을 변경합니다."
+	)
+	@ApiResponse(
+		responseCode = "200",
+		description = "알림 설정 변경 성공",
+		content = @Content(schema = @Schema(implementation = MemberResponseDto.class))
+	)
+	@RequireAuth
+	@PatchMapping("/notification")
+	public ResponseEntity<Map<String, Object>> updateNotificationSetting(
+		@Parameter(hidden = true) @CurrentMember Member member,
+		@io.swagger.v3.oas.annotations.parameters.RequestBody(description = "변경할 알림 설정", required = true,
+			content = @Content(schema = @Schema(implementation = UpdateNotificationSettingRequestDto.class)))
+		@Valid @RequestBody UpdateNotificationSettingRequestDto dto
+	) {
+		memberService.updateNotificationSetting(member, dto.getType(), dto.getEnabled());
 		MemberResponseDto responseDto = memberMapper.toMemberResponseDto(member);
 		return responseTemplate.success(responseDto, HttpStatus.OK);
 	}
