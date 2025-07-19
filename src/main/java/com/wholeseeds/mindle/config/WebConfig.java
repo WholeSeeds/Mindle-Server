@@ -1,22 +1,20 @@
 package com.wholeseeds.mindle.config;
 
-import java.util.List;
-
-import org.springframework.context.annotation.Configuration;
-import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import java.util.ArrayList;
 import java.util.List;
-import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
+
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.MediaType;
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
+import org.springframework.web.method.support.HandlerMethodArgumentResolver;
+import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 import com.wholeseeds.mindle.global.interceptor.FirebaseAuthInterceptor;
 import com.wholeseeds.mindle.global.interceptor.LoggingInterceptor;
 import com.wholeseeds.mindle.global.interceptor.RequireAuthInterceptor;
-import com.wholeseeds.mindle.global.resolver.CurrentMemberArgumentResolver;
+import com.wholeseeds.mindle.global.resolver.CurrentMemberIdArgumentResolver;
 
 import lombok.RequiredArgsConstructor;
 
@@ -24,7 +22,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class WebConfig implements WebMvcConfigurer {
 	// Argument Resolver
-	private final CurrentMemberArgumentResolver currentMemberArgumentResolver;
+	private final CurrentMemberIdArgumentResolver currentMemberIdArgumentResolver;
 
 	// Interceptor
 	private final LoggingInterceptor loggingInterceptor;
@@ -33,7 +31,7 @@ public class WebConfig implements WebMvcConfigurer {
 
 	@Override
 	public void addArgumentResolvers(List<HandlerMethodArgumentResolver> resolvers) {
-		resolvers.add(currentMemberArgumentResolver);
+		resolvers.add(currentMemberIdArgumentResolver);
 	}
 
 	@Override

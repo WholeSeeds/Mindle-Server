@@ -6,8 +6,9 @@ import org.springframework.web.servlet.HandlerInterceptor;
 
 import com.google.firebase.auth.FirebaseToken;
 import com.wholeseeds.mindle.common.annotation.RequireAuth;
+import com.wholeseeds.mindle.domain.auth.exception.MissingCurrentMemberException;
+import com.wholeseeds.mindle.domain.auth.exception.MissingTokenException;
 import com.wholeseeds.mindle.domain.member.entity.Member;
-import com.wholeseeds.mindle.domain.member.exception.MemberNotFoundException;
 import com.wholeseeds.mindle.domain.member.repository.MemberRepository;
 
 import jakarta.servlet.http.HttpServletRequest;
@@ -41,13 +42,13 @@ public class RequireAuthInterceptor implements HandlerInterceptor {
 		// Firebase 토큰이 없는 경우
 		FirebaseToken firebaseToken = (FirebaseToken) request.getAttribute("firebaseToken");
 		if (firebaseToken == null) {
-			throw new MemberNotFoundException();
+			throw new MissingTokenException();
 		}
 
 		// 해당 uid로 가입된 회원이 존재하는지 확인
 		String firebaseUid = firebaseToken.getUid();
 		Member member = memberRepository.findByFirebaseUidNotDeleted(firebaseUid)
-			.orElseThrow(MemberNotFoundException::new);
+			.orElseThrow(MissingCurrentMemberException::new);
 
 		// request에 저장
 		request.setAttribute("currentMember", member);

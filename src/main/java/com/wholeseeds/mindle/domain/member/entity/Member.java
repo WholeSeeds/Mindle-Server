@@ -42,13 +42,16 @@ public class Member extends BaseEntity {
 	@Column(name = "phone", length = 13)
 	private String phone;
 
-	@Column(name = "notification_push")
+	@Builder.Default
+	@Column(name = "notification_push", nullable = false)
 	private Boolean notificationPush = false;
 
-	@Column(name = "notification_inapp")
+	@Builder.Default
+	@Column(name = "notification_inapp", nullable = false)
 	private Boolean notificationInapp = false;
 
-	@Column(name = "contribution_score")
+	@Builder.Default
+	@Column(name = "contribution_score", nullable = false)
 	private Integer contributionScore = 0;
 
 	public void updateNickname(String newNickname) {
@@ -57,5 +60,13 @@ public class Member extends BaseEntity {
 
 	public void updateSubdistrict(Subdistrict subdistrict) {
 		this.subdistrict = subdistrict;
+	}
+
+	public void updateNotificationPush(boolean value) {
+		this.notificationPush = value;
+	}
+
+	public void updateNotificationInapp(boolean value) {
+		this.notificationInapp = value;
 	}
 }

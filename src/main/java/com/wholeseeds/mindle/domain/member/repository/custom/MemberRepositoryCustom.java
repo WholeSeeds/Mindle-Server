@@ -5,6 +5,13 @@ import java.util.Optional;
 import com.wholeseeds.mindle.domain.member.entity.Member;
 
 public interface MemberRepositoryCustom {
+	/**
+	 * Firebase UID로 회원을 조회
+	 *
+	 * @param firebaseUid Firebase UID
+	 * @return 해당 UID를 가진 회원이 존재하면 Optional에 포함, 없으면 Optional.empty()
+	 */
+	Optional<Member> findByFirebaseUid(String firebaseUid);
 
 	/**
 	 * Firebase UID로 회원을 조회하되, 삭제되지 않은 회원만 반환

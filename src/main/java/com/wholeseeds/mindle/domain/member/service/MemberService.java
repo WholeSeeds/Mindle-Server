@@ -1,18 +1,21 @@
 package com.wholeseeds.mindle.domain.member.service;
 
 import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.google.firebase.auth.FirebaseToken;
-import com.wholeseeds.mindle.domain.location.exception.SubdistrictNotFoundException;
 import com.wholeseeds.mindle.domain.location.entity.Subdistrict;
+import com.wholeseeds.mindle.domain.location.exception.SubdistrictNotFoundException;
 import com.wholeseeds.mindle.domain.location.repository.SubdistrictRepository;
 import com.wholeseeds.mindle.domain.member.entity.Member;
+import com.wholeseeds.mindle.domain.member.enums.NotificationType;
 import com.wholeseeds.mindle.domain.member.exception.DuplicateNicknameException;
+import com.wholeseeds.mindle.domain.member.exception.MemberNotFoundException;
 import com.wholeseeds.mindle.domain.member.repository.MemberRepository;
-
 
 import lombok.RequiredArgsConstructor;
 
@@ -24,7 +27,19 @@ public class MemberService {
 	private final SubdistrictRepository subdistrictRepository;
 
 	/**
+	 * 회원 ID로 탈퇴하지 않은 회원 객체 조회
+	 * @param id 회원 ID
+	 * @return Member 객체
+	 */
+	public Member getMember(Long id) {
+		return memberRepository.findByIdNotDeleted(id)
+			.orElseThrow(MemberNotFoundException::new);
+	}
+
+	/**
 	 * Firebase UID 기반으로 로그인 (또는 자동 회원가입) 처리
+	 * @param firebaseToken Firebase 인증 토큰
+	 * @return 로그인 또는 생성된 Member 객체
 	 */
 	@Transactional
 	public Member login(FirebaseToken firebaseToken) {
@@ -33,49 +48,93 @@ public class MemberService {
 		Map<String, Object> claims = firebaseToken.getClaims();
 		String phoneNumber = (String)claims.getOrDefault("phone_number", null);
 
-		return memberRepository.findByFirebaseUidNotDeleted(uid)
-			.orElseGet(() -> {
-				// 닉네임 없으면 userN 할당
-				String nickname = generateDefaultNickname();
+		// 삭제되지 않은 회원이 있으면 바로 로그인
+		Optional<Member> existing = memberRepository.findByFirebaseUidNotDeleted(uid);
+		if (existing.isPresent()) {
+			return existing.get();
+		}
 
-				Member newMember = Member.builder()
-					.firebaseUid(uid)
-					.email(email)
-					.phone(phoneNumber)
-					.provider(extractProvider(claims))
-					.nickname(nickname)
-					.build();
+		Optional<Member> softDeleted = memberRepository.findByFirebaseUid(uid);
 
-				return memberRepository.save(newMember);
-			});
+		// soft delete된 회원이 있으면 복구 처리
+		if (softDeleted.isPresent()) {
+			Member member = softDeleted.get();
+			member.restore();
+			return member;
+		}
+
+		// 신규 회원 생성
+		String nickname = generateDefaultNickname();
+		Member newMember = Member.builder()
+			.firebaseUid(uid)
+			.email(email)
+			.phone(phoneNumber)
+			.provider(extractProvider(claims))
+			.nickname(nickname)
+			.build();
+
+		return memberRepository.save(newMember);
 	}
 
 	/**
 	 * 닉네임 변경
-	 * - 중복 체크 후 변경
-	 *
-	 * @param member      현재 회원 정보
+	 * @param memberId 회원 ID
 	 * @param newNickname 새 닉네임
+	 * @return 업데이트된 Member 객체
 	 */
 	@Transactional
-	public void updateNickname(Member member, String newNickname) {
-		if (memberRepository.existsByNicknameAndNotId(newNickname, member.getId())) {
+	public Member updateNickname(Long memberId, String newNickname) {
+		if (memberRepository.existsByNicknameAndNotId(newNickname, memberId)) {
 			throw new DuplicateNicknameException();
 		}
+		Member member = getMember(memberId);
 		member.updateNickname(newNickname);
+		return member;
 	}
 
 	/**
 	 * 기본 동네 설정
-	 * - Firebase UID로 회원 조회 후 동네 설정
-	 * @param member 현재 회원 정보
+	 * @param memberId 회원 ID
 	 * @param subdistrictId 동네 ID
+	 * @return 업데이트된 Member 객체
 	 */
 	@Transactional
-	public void updateSubdistrict(Member member, Long subdistrictId) {
+	public Member updateSubdistrict(Long memberId, Long subdistrictId) {
 		Subdistrict subdistrict = subdistrictRepository.findByIdNotDeleted(subdistrictId)
 			.orElseThrow(SubdistrictNotFoundException::new);
+		Member member = getMember(memberId);
 		member.updateSubdistrict(subdistrict);
+		return member;
+	}
+
+	/**
+	 * 알림 설정 업데이트
+	 * @param memberId 회원 ID
+	 * @param type 알림 타입 (PUSH, IN_APP 등)
+	 * @param enabled 알림 활성화 여부
+	 * @return 업데이트된 Member 객체
+	 */
+	@Transactional
+	public Member updateNotificationSetting(Long memberId, NotificationType type, boolean enabled) {
+		Member member = getMember(memberId);
+		if (type == NotificationType.PUSH) {
+			member.updateNotificationPush(enabled);
+		} else if (type == NotificationType.IN_APP) {
+			member.updateNotificationInapp(enabled);
+		}
+		return member;
+	}
+
+	/**
+	 * 회원 탈퇴 처리 (soft delete)
+	 * @param memberId 회원 ID
+	 */
+	@Transactional
+	public void withdraw(Long memberId) {
+		Member member = getMember(memberId);
+		if (!member.isDeleted()) {
+			member.softDelete();
+		}
 	}
 
 	/**
@@ -96,8 +155,6 @@ public class MemberService {
 
 	/**
 	 * 기본 닉네임 생성 (user1, user2, ...)
-	 * - 현재 최대 숫자 + 1로 생성
-	 * - 예: user123 → user124
 	 * @return 생성된 닉네임
 	 */
 	private String generateDefaultNickname() {
