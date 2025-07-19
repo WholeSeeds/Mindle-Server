@@ -2,7 +2,6 @@ package com.wholeseeds.mindle.domain.complaint.controller;
 
 import static org.springframework.http.MediaType.*;
 
-import java.io.IOException;
 import java.util.List;
 
 import org.springframework.http.ResponseEntity;
@@ -15,8 +14,8 @@ import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.wholeseeds.mindle.common.code.CommonCode;
 import com.wholeseeds.mindle.common.response.ApiResponse;
+import com.wholeseeds.mindle.common.util.ObjectUtils;
 import com.wholeseeds.mindle.domain.complaint.dto.CommentDto;
 import com.wholeseeds.mindle.domain.complaint.dto.CommentRequestDto;
 import com.wholeseeds.mindle.domain.complaint.dto.ComplaintDetailResponseDto;
@@ -60,13 +59,13 @@ public class ComplaintController {
 		@RequestPart("meta")
 		SaveComplaintRequestDto requestDto,
 		@RequestPart(value = "files", required = false) List<MultipartFile> imageList
-	) throws IOException {
+	) {
 
-		if (!CommonCode.objectIsNullOrEmpty(imageList) && imageList.size() > 3) {
+		if (!ObjectUtils.objectIsNullOrEmpty(imageList) && imageList.size() > 3) {
 			throw new ImageUploadLimitExceeded();
 		}
 		log.info("Request : {}", requestDto);
-		if (!CommonCode.objectIsNullOrEmpty(imageList)) {
+		if (!ObjectUtils.objectIsNullOrEmpty(imageList)) {
 			for (MultipartFile image : imageList) {
 				log.info("파일명 : {}", image.getOriginalFilename());
 			}

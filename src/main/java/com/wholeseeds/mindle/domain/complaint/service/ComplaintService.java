@@ -6,7 +6,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.wholeseeds.mindle.common.code.CommonCode;
 import com.wholeseeds.mindle.common.util.ObjectUtils;
 import com.wholeseeds.mindle.domain.complaint.dto.CommentDto;
 import com.wholeseeds.mindle.domain.complaint.dto.CommentRequestDto;
@@ -114,7 +113,7 @@ public class ComplaintService {
 
 	public List<CommentDto> getComplaintComments(CommentRequestDto dto) {
 		return complaintRepository.getComment(dto.getComplaintId(),
-			CommonCode.stringToLocalDateTime(dto.getCursorCreatedAt()), dto.getPageSize());
+			ObjectUtils.stringToLocalDateTime(dto.getCursorCreatedAt()), dto.getPageSize());
 	}
 
 	public List<ComplaintListResponseDto> getComplaintList(ComplaintListRequestDto dto) {
