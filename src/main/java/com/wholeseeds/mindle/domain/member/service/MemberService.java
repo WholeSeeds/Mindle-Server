@@ -2,6 +2,7 @@ package com.wholeseeds.mindle.domain.member.service;
 
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -47,21 +48,33 @@ public class MemberService {
 		Map<String, Object> claims = firebaseToken.getClaims();
 		String phoneNumber = (String)claims.getOrDefault("phone_number", null);
 
-		return memberRepository.findByFirebaseUidNotDeleted(uid)
-			.orElseGet(() -> {
-				// 닉네임 없으면 userN 할당
-				String nickname = generateDefaultNickname();
+		// 삭제되지 않은 회원이 있으면 바로 로그인
+		Optional<Member> existing = memberRepository.findByFirebaseUidNotDeleted(uid);
+		if (existing.isPresent()) {
+			return existing.get();
+		}
 
-				Member newMember = Member.builder()
-					.firebaseUid(uid)
-					.email(email)
-					.phone(phoneNumber)
-					.provider(extractProvider(claims))
-					.nickname(nickname)
-					.build();
+		// soft deleted 회원도 조회
+		Optional<Member> softDeleted = memberRepository.findByFirebaseUid(uid); // deleted 여부 상관없이
 
-				return memberRepository.save(newMember);
-			});
+		if (softDeleted.isPresent()) {
+			// 복구 처리
+			Member member = softDeleted.get();
+			member.restore();
+			return member;
+		}
+
+		// 신규 → 새로 생성
+		String nickname = generateDefaultNickname();
+		Member newMember = Member.builder()
+			.firebaseUid(uid)
+			.email(email)
+			.phone(phoneNumber)
+			.provider(extractProvider(claims))
+			.nickname(nickname)
+			.build();
+
+		return memberRepository.save(newMember);
 	}
 
 	/**
@@ -115,7 +128,6 @@ public class MemberService {
 
 	/**
 	 * 회원 탈퇴 처리 (soft delete)
-	 *
 	 * @param memberId 회원 ID
 	 */
 	@Transactional
