@@ -1,3 +1,5 @@
+permissions:
+  contents: write
 name: CI for NKS via ArgoCD
 
 on:
@@ -11,6 +13,9 @@ jobs:
     steps:
       - name: 코드 체크아웃
         uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          persist-credentials: true
 
       - name: 프로젝트 빌드 (Jar 생성)
         run: ./gradlew clean build --no-daemon
