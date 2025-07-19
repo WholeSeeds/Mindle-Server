@@ -14,7 +14,7 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import com.wholeseeds.mindle.global.interceptor.FirebaseAuthInterceptor;
 import com.wholeseeds.mindle.global.interceptor.LoggingInterceptor;
 import com.wholeseeds.mindle.global.interceptor.RequireAuthInterceptor;
-import com.wholeseeds.mindle.global.resolver.CurrentMemberArgumentResolver;
+import com.wholeseeds.mindle.global.resolver.CurrentMemberIdArgumentResolver;
 
 import lombok.RequiredArgsConstructor;
 
@@ -22,7 +22,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class WebConfig implements WebMvcConfigurer {
 	// Argument Resolver
-	private final CurrentMemberArgumentResolver currentMemberArgumentResolver;
+	private final CurrentMemberIdArgumentResolver currentMemberIdArgumentResolver;
 
 	// Interceptor
 	private final LoggingInterceptor loggingInterceptor;
@@ -31,7 +31,7 @@ public class WebConfig implements WebMvcConfigurer {
 
 	@Override
 	public void addArgumentResolvers(List<HandlerMethodArgumentResolver> resolvers) {
-		resolvers.add(currentMemberArgumentResolver);
+		resolvers.add(currentMemberIdArgumentResolver);
 	}
 
 	@Override

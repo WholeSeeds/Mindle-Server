@@ -21,6 +21,14 @@ public class MemberRepositoryImpl extends JpaBaseRepositoryImpl<Member, Long> im
 	}
 
 	@Override
+	public Optional<Member> findByFirebaseUid(String firebaseUid) {
+		return Optional.ofNullable(queryFactory
+			.selectFrom(member)
+			.where(member.firebaseUid.eq(firebaseUid))
+			.fetchOne());
+	}
+
+	@Override
 	public Optional<Member> findByFirebaseUidNotDeleted(String firebaseUid) {
 		return Optional.ofNullable(queryFactory
 			.selectFrom(member)

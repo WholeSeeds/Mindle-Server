@@ -13,8 +13,8 @@ import com.wholeseeds.mindle.domain.location.repository.SubdistrictRepository;
 import com.wholeseeds.mindle.domain.member.entity.Member;
 import com.wholeseeds.mindle.domain.member.enums.NotificationType;
 import com.wholeseeds.mindle.domain.member.exception.DuplicateNicknameException;
+import com.wholeseeds.mindle.domain.member.exception.MemberNotFoundException;
 import com.wholeseeds.mindle.domain.member.repository.MemberRepository;
-
 
 import lombok.RequiredArgsConstructor;
 
@@ -26,7 +26,19 @@ public class MemberService {
 	private final SubdistrictRepository subdistrictRepository;
 
 	/**
+	 * 회원 ID로 탈퇴하지 않은 회원 객체 조회
+	 * @param id 회원 ID
+	 * @return Member 객체
+	 */
+	public Member getMember(Long id) {
+		return memberRepository.findByIdNotDeleted(id)
+			.orElseThrow(MemberNotFoundException::new);
+	}
+
+	/**
 	 * Firebase UID 기반으로 로그인 (또는 자동 회원가입) 처리
+	 * @param firebaseToken Firebase 인증 토큰
+	 * @return 로그인 또는 생성된 Member 객체
 	 */
 	@Transactional
 	public Member login(FirebaseToken firebaseToken) {
@@ -54,49 +66,61 @@ public class MemberService {
 
 	/**
 	 * 닉네임 변경
-	 * - 중복 체크 후 변경
-	 *
-	 * @param member      현재 회원 정보
+	 * @param memberId 회원 ID
 	 * @param newNickname 새 닉네임
+	 * @return 업데이트된 Member 객체
 	 */
 	@Transactional
-	public void updateNickname(Member member, String newNickname) {
-		if (memberRepository.existsByNicknameAndNotId(newNickname, member.getId())) {
+	public Member updateNickname(Long memberId, String newNickname) {
+		if (memberRepository.existsByNicknameAndNotId(newNickname, memberId)) {
 			throw new DuplicateNicknameException();
 		}
+		Member member = getMember(memberId);
 		member.updateNickname(newNickname);
+		return member;
 	}
 
 	/**
 	 * 기본 동네 설정
-	 * - Firebase UID로 회원 조회 후 동네 설정
-	 * @param member 현재 회원 정보
+	 * @param memberId 회원 ID
 	 * @param subdistrictId 동네 ID
+	 * @return 업데이트된 Member 객체
 	 */
 	@Transactional
-	public void updateSubdistrict(Member member, Long subdistrictId) {
+	public Member updateSubdistrict(Long memberId, Long subdistrictId) {
 		Subdistrict subdistrict = subdistrictRepository.findByIdNotDeleted(subdistrictId)
 			.orElseThrow(SubdistrictNotFoundException::new);
+		Member member = getMember(memberId);
 		member.updateSubdistrict(subdistrict);
+		return member;
 	}
 
+	/**
+	 * 알림 설정 업데이트
+	 * @param memberId 회원 ID
+	 * @param type 알림 타입 (PUSH, IN_APP 등)
+	 * @param enabled 알림 활성화 여부
+	 * @return 업데이트된 Member 객체
+	 */
 	@Transactional
-	public void updateNotificationSetting(Member member, NotificationType type, boolean enabled) {
+	public Member updateNotificationSetting(Long memberId, NotificationType type, boolean enabled) {
+		Member member = getMember(memberId);
 		if (Objects.requireNonNull(type) == NotificationType.PUSH) {
 			member.setNotificationPush(enabled);
 		} else if (type == NotificationType.IN_APP) {
 			member.setNotificationInapp(enabled);
 		}
+		return member;
 	}
 
 	/**
-	 * 회원 탈퇴 처리
-	 * - soft delete 방식으로 삭제
-	 * - deletedAt 필드에 현재 시간 저장
-	 * @param member 현재 회원 정보
+	 * 회원 탈퇴 처리 (soft delete)
+	 *
+	 * @param memberId 회원 ID
 	 */
 	@Transactional
-	public void withdraw(Member member) {
+	public void withdraw(Long memberId) {
+		Member member = getMember(memberId);
 		if (!member.isDeleted()) {
 			member.softDelete();
 		}
@@ -120,8 +144,6 @@ public class MemberService {
 
 	/**
 	 * 기본 닉네임 생성 (user1, user2, ...)
-	 * - 현재 최대 숫자 + 1로 생성
-	 * - 예: user123 → user124
 	 * @return 생성된 닉네임
 	 */
 	private String generateDefaultNickname() {

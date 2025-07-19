@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.google.firebase.auth.FirebaseToken;
-import com.wholeseeds.mindle.common.annotation.CurrentMember;
+import com.wholeseeds.mindle.common.annotation.CurrentMemberId;
 import com.wholeseeds.mindle.common.annotation.RequireAuth;
 import com.wholeseeds.mindle.common.util.ResponseTemplate;
 import com.wholeseeds.mindle.domain.member.dto.request.UpdateNicknameRequestDto;
@@ -60,7 +60,9 @@ public class MemberController {
 		content = @Content(schema = @Schema(implementation = MemberResponseDto.class))
 	)
 	@GetMapping("/login")
-	public ResponseEntity<Map<String, Object>> login(HttpServletRequest request) {
+	public ResponseEntity<Map<String, Object>> login(
+		HttpServletRequest request
+	) {
 		FirebaseToken firebaseToken = (FirebaseToken)request.getAttribute("firebaseToken");
 		Member member = memberService.login(firebaseToken);
 		MemberResponseDto dto = memberMapper.toMemberResponseDto(member);
@@ -82,8 +84,9 @@ public class MemberController {
 	@RequireAuth
 	@GetMapping("/my-info")
 	public ResponseEntity<Map<String, Object>> getMyInfo(
-		@Parameter(hidden = true) @CurrentMember Member member
+		@Parameter(hidden = true) @CurrentMemberId Long memberId
 	) {
+		Member member = memberService.getMember(memberId);
 		MemberResponseDto dto = memberMapper.toMemberResponseDto(member);
 		return responseTemplate.success(dto, HttpStatus.OK);
 	}
@@ -103,13 +106,13 @@ public class MemberController {
 	@RequireAuth
 	@PatchMapping("/nickname")
 	public ResponseEntity<Map<String, Object>> updateNickname(
-		@Parameter(hidden = true) @CurrentMember Member member,
+		@Parameter(hidden = true) @CurrentMemberId Long memberId,
 		@io.swagger.v3.oas.annotations.parameters.RequestBody(description = "변경할 닉네임", required = true,
 			content = @Content(schema = @Schema(implementation = UpdateNicknameRequestDto.class)))
 		@Valid @RequestBody UpdateNicknameRequestDto dto
 	) {
-		memberService.updateNickname(member, dto.getNickname());
-		MemberResponseDto responseDto = memberMapper.toMemberResponseDto(member);
+		Member updatedMember = memberService.updateNickname(memberId, dto.getNickname());
+		MemberResponseDto responseDto = memberMapper.toMemberResponseDto(updatedMember);
 		return responseTemplate.success(responseDto, HttpStatus.OK);
 	}
 
@@ -127,13 +130,13 @@ public class MemberController {
 	@RequireAuth
 	@PatchMapping("/subdistrict")
 	public ResponseEntity<Map<String, Object>> updateSubdistrict(
-		@Parameter(hidden = true) @CurrentMember Member member,
+		@Parameter(hidden = true) @CurrentMemberId Long memberId,
 		@io.swagger.v3.oas.annotations.parameters.RequestBody(description = "설정할 동네 ID", required = true,
 			content = @Content(schema = @Schema(implementation = UpdateSubdistrictRequestDto.class)))
 		@Valid @RequestBody UpdateSubdistrictRequestDto dto
 	) {
-		memberService.updateSubdistrict(member, dto.getSubdistrictId());
-		MemberResponseDto responseDto = memberMapper.toMemberResponseDto(member);
+		Member updatedMember = memberService.updateSubdistrict(memberId, dto.getSubdistrictId());
+		MemberResponseDto responseDto = memberMapper.toMemberResponseDto(updatedMember);
 		return responseTemplate.success(responseDto, HttpStatus.OK);
 	}
 
@@ -153,13 +156,13 @@ public class MemberController {
 	@RequireAuth
 	@PatchMapping("/notification")
 	public ResponseEntity<Map<String, Object>> updateNotificationSetting(
-		@Parameter(hidden = true) @CurrentMember Member member,
+		@Parameter(hidden = true) @CurrentMemberId Long memberId,
 		@io.swagger.v3.oas.annotations.parameters.RequestBody(description = "변경할 알림 설정", required = true,
 			content = @Content(schema = @Schema(implementation = UpdateNotificationSettingRequestDto.class)))
 		@Valid @RequestBody UpdateNotificationSettingRequestDto dto
 	) {
-		memberService.updateNotificationSetting(member, dto.getType(), dto.getEnabled());
-		MemberResponseDto responseDto = memberMapper.toMemberResponseDto(member);
+		Member updatedMember = memberService.updateNotificationSetting(memberId, dto.getType(), dto.getEnabled());
+		MemberResponseDto responseDto = memberMapper.toMemberResponseDto(updatedMember);
 		return responseTemplate.success(responseDto, HttpStatus.OK);
 	}
 
@@ -177,9 +180,9 @@ public class MemberController {
 	@RequireAuth
 	@DeleteMapping("/withdraw")
 	public ResponseEntity<Map<String, Object>> withdraw(
-		@Parameter(hidden = true) @CurrentMember Member member
+		@Parameter(hidden = true) @CurrentMemberId Long memberId
 	) {
-		memberService.withdraw(member);
+		memberService.withdraw(memberId);
 		return responseTemplate.success(null, HttpStatus.OK);
 	}
 }
