@@ -4,6 +4,7 @@ import java.util.Map;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -32,7 +33,10 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
 
-@Tag(name = "회원", description = "회원 API (로그인 또는 회원가입, 내 정보 조회, 닉네임 설정, 회원 동네 설정)")
+@Tag(
+	name = "회원",
+	description = "회원 API (로그인 또는 회원가입, 내 정보 조회, 닉네임 설정, 회원 동네 설정, 회원 탈퇴)"
+)
 @RestController
 @RequestMapping("/api/member")
 @RequiredArgsConstructor
@@ -130,5 +134,25 @@ public class MemberController {
 		memberService.updateSubdistrict(member, dto.getSubdistrictId());
 		MemberResponseDto responseDto = memberMapper.toMemberResponseDto(member);
 		return responseTemplate.success(responseDto, HttpStatus.OK);
+	}
+
+	/**
+	 * 회원 탈퇴 (Soft Delete)
+	 */
+	@Operation(
+		summary = "회원 탈퇴",
+		description = "회원을 탈퇴 처리(Soft Delete) 합니다."
+	)
+	@ApiResponse(
+		responseCode = "200",
+		description = "회원 탈퇴 성공"
+	)
+	@RequireAuth
+	@DeleteMapping("/withdraw")
+	public ResponseEntity<Map<String, Object>> withdraw(
+		@Parameter(hidden = true) @CurrentMember Member member
+	) {
+		memberService.withdraw(member);
+		return responseTemplate.success(null, HttpStatus.OK);
 	}
 }

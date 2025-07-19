@@ -6,8 +6,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.google.firebase.auth.FirebaseToken;
-import com.wholeseeds.mindle.domain.location.exception.SubdistrictNotFoundException;
 import com.wholeseeds.mindle.domain.location.entity.Subdistrict;
+import com.wholeseeds.mindle.domain.location.exception.SubdistrictNotFoundException;
 import com.wholeseeds.mindle.domain.location.repository.SubdistrictRepository;
 import com.wholeseeds.mindle.domain.member.entity.Member;
 import com.wholeseeds.mindle.domain.member.exception.DuplicateNicknameException;
@@ -76,6 +76,19 @@ public class MemberService {
 		Subdistrict subdistrict = subdistrictRepository.findByIdNotDeleted(subdistrictId)
 			.orElseThrow(SubdistrictNotFoundException::new);
 		member.updateSubdistrict(subdistrict);
+	}
+
+	/**
+	 * 회원 탈퇴 처리
+	 * - soft delete 방식으로 삭제
+	 * - deletedAt 필드에 현재 시간 저장
+	 * @param member 현재 회원 정보
+	 */
+	@Transactional
+	public void withdraw(Member member) {
+		if (!member.isDeleted()) {
+			member.softDelete();
+		}
 	}
 
 	/**
