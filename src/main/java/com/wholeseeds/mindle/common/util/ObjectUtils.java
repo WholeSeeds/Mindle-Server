@@ -1,5 +1,7 @@
 package com.wholeseeds.mindle.common.util;
 
+import java.time.LocalDateTime;
+
 import lombok.experimental.UtilityClass;
 
 @UtilityClass
@@ -21,5 +23,15 @@ public class ObjectUtils {
 			return array.length == 0;
 		}
 		return false;
+	}
+
+	/**
+	 * 문자열을 LocalDateTime으로 변환
+	 */
+	public static LocalDateTime stringToLocalDateTime(String dateTimeString) {
+		if (dateTimeString == null || dateTimeString.isEmpty()) {
+			return null;
+		}
+		return LocalDateTime.parse(dateTimeString);
 	}
 }
