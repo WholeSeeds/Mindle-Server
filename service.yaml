@@ -9,3 +9,7 @@ spec:
   ports:
     - port: 80 # 외부인터넷에서 80 포트로 접근하면 8080 포트로 포트포워딩 해줌
       targetPort: 8080
+  template:
+    spec:
+      containers:
+        - image: mindle.kr.ncr.ntruss.com/my-spring-app:1.0.16

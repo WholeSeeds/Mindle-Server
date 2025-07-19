@@ -1,25 +1,25 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: spring-app       # Deployment 이름
+  name: spring-app # Deployment 이름
 spec:
-  replicas: 1            # pod 개수
+  replicas: 1 # pod 개수
   selector:
     matchLabels:
-      app: spring-app    # pod 라벨
+      app: spring-app # pod 라벨
   template:
     metadata:
       labels:
-        app: spring-app  # pod 에 붙일 라벨
+        app: spring-app # pod 에 붙일 라벨
     spec:
       imagePullSecrets:
-        - name: ncr-registry-secret   # registry 접근용 Secret
+        - name: ncr-registry-secret # registry 접근용 Secret
       containers:
-        - name: spring               # 컨테이너 이름
-          image: mindle.kr.ncr.ntruss.com/my-spring-app:1.0
-          imagePullPolicy: Always    # 항상 최신 이미지 풀링
+        - name: spring # 컨테이너 이름
+          image: mindle.kr.ncr.ntruss.com/my-spring-app:1.0.16
+          imagePullPolicy: Always # 항상 최신 이미지 풀링
           ports:
-            - containerPort: 8080    # 컨테이너 내부 포트
+            - containerPort: 8080 # 컨테이너 내부 포트
           env:
             - name: SPRING_PROFILES_ACTIVE
               value: prod
