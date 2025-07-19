@@ -107,8 +107,11 @@ public class MemberController {
 	@PatchMapping("/nickname")
 	public ResponseEntity<Map<String, Object>> updateNickname(
 		@Parameter(hidden = true) @CurrentMemberId Long memberId,
-		@io.swagger.v3.oas.annotations.parameters.RequestBody(description = "변경할 닉네임", required = true,
-			content = @Content(schema = @Schema(implementation = UpdateNicknameRequestDto.class)))
+		@io.swagger.v3.oas.annotations.parameters.RequestBody(
+			description = "변경할 닉네임",
+			required = true,
+			content = @Content(schema = @Schema(implementation = UpdateNicknameRequestDto.class))
+		)
 		@Valid @RequestBody UpdateNicknameRequestDto dto
 	) {
 		Member updatedMember = memberService.updateNickname(memberId, dto.getNickname());
@@ -131,8 +134,10 @@ public class MemberController {
 	@PatchMapping("/subdistrict")
 	public ResponseEntity<Map<String, Object>> updateSubdistrict(
 		@Parameter(hidden = true) @CurrentMemberId Long memberId,
-		@io.swagger.v3.oas.annotations.parameters.RequestBody(description = "설정할 동네 ID", required = true,
-			content = @Content(schema = @Schema(implementation = UpdateSubdistrictRequestDto.class)))
+		@io.swagger.v3.oas.annotations.parameters.RequestBody(
+			description = "설정할 동네 ID", required = true,
+			content = @Content(schema = @Schema(implementation = UpdateSubdistrictRequestDto.class))
+		)
 		@Valid @RequestBody UpdateSubdistrictRequestDto dto
 	) {
 		Member updatedMember = memberService.updateSubdistrict(memberId, dto.getSubdistrictId());
@@ -157,8 +162,10 @@ public class MemberController {
 	@PatchMapping("/notification")
 	public ResponseEntity<Map<String, Object>> updateNotificationSetting(
 		@Parameter(hidden = true) @CurrentMemberId Long memberId,
-		@io.swagger.v3.oas.annotations.parameters.RequestBody(description = "변경할 알림 설정", required = true,
-			content = @Content(schema = @Schema(implementation = UpdateNotificationSettingRequestDto.class)))
+		@io.swagger.v3.oas.annotations.parameters.RequestBody(
+			description = "변경할 알림 설정", required = true,
+			content = @Content(schema = @Schema(implementation = UpdateNotificationSettingRequestDto.class))
+		)
 		@Valid @RequestBody UpdateNotificationSettingRequestDto dto
 	) {
 		Member updatedMember = memberService.updateNotificationSetting(memberId, dto.getType(), dto.getEnabled());

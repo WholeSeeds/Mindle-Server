@@ -62,11 +62,11 @@ public class Member extends BaseEntity {
 		this.subdistrict = subdistrict;
 	}
 
-	public void setNotificationPush(boolean value) {
+	public void updateNotificationPush(boolean value) {
 		this.notificationPush = value;
 	}
 
-	public void setNotificationInapp(boolean value) {
+	public void updateNotificationInapp(boolean value) {
 		this.notificationInapp = value;
 	}
 }

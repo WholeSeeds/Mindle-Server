@@ -54,17 +54,16 @@ public class MemberService {
 			return existing.get();
 		}
 
-		// soft deleted 회원도 조회
-		Optional<Member> softDeleted = memberRepository.findByFirebaseUid(uid); // deleted 여부 상관없이
+		Optional<Member> softDeleted = memberRepository.findByFirebaseUid(uid);
 
+		// soft delete된 회원이 있으면 복구 처리
 		if (softDeleted.isPresent()) {
-			// 복구 처리
 			Member member = softDeleted.get();
 			member.restore();
 			return member;
 		}
 
-		// 신규 → 새로 생성
+		// 신규 회원 생성
 		String nickname = generateDefaultNickname();
 		Member newMember = Member.builder()
 			.firebaseUid(uid)
@@ -118,10 +117,10 @@ public class MemberService {
 	@Transactional
 	public Member updateNotificationSetting(Long memberId, NotificationType type, boolean enabled) {
 		Member member = getMember(memberId);
-		if (Objects.requireNonNull(type) == NotificationType.PUSH) {
-			member.setNotificationPush(enabled);
+		if (type == NotificationType.PUSH) {
+			member.updateNotificationPush(enabled);
 		} else if (type == NotificationType.IN_APP) {
-			member.setNotificationInapp(enabled);
+			member.updateNotificationInapp(enabled);
 		}
 		return member;
 	}
