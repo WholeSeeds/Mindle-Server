@@ -3,7 +3,7 @@ package com.wholeseeds.mindle.domain.complaint.mapper;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
-import com.wholeseeds.mindle.domain.complaint.dto.SaveComplaintResponseDto;
+import com.wholeseeds.mindle.domain.complaint.dto.response.SaveComplaintResponseDto;
 import com.wholeseeds.mindle.domain.complaint.entity.Complaint;
 
 @Mapper(componentModel = "spring")

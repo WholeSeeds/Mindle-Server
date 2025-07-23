@@ -1,4 +1,4 @@
-package com.wholeseeds.mindle.domain.complaint.dto;
+package com.wholeseeds.mindle.domain.complaint.dto.response;
 
 import java.time.LocalDateTime;
 

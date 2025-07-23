@@ -1,4 +1,7 @@
-package com.wholeseeds.mindle.domain.complaint.dto;
+package com.wholeseeds.mindle.domain.complaint.dto.response;
+
+import com.wholeseeds.mindle.domain.complaint.dto.ComplaintDetailWithImagesDto;
+import com.wholeseeds.mindle.domain.complaint.dto.ReactionDto;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
