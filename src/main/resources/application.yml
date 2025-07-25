@@ -39,6 +39,9 @@ spring-doc: # swagger 설정
     operations-sorter: method  # 메소드 정렬
     doc-expansion: none        # 접은 상태로 표시
 
+swagger:
+  server-url: http://localhost:8080
+
 ncp:
   object:
     endpoint: https://kr.object.ncloudstorage.com
@@ -46,3 +49,16 @@ ncp:
     access-key: ${NCP_ACCESS_KEY}
     secret-key: ${NCP_SECRET_KEY}
     bucket-name: ${NCP_BUCKET_NAME}
+
+---
+# prod 환경일 때 아래 코드 실행됨
+spring:
+  config:
+    activate:
+      on-profile: prod
+
+firebase:
+  config-path: file:/etc/firebase/mindle-secret.json
+
+swagger:
+  server-url: http://default-spring-svc-973a8-106892561-1156db887a39.kr.lb.naverncp.com
