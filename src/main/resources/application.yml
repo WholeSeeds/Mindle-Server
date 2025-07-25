@@ -46,3 +46,13 @@ ncp:
     access-key: ${NCP_ACCESS_KEY}
     secret-key: ${NCP_SECRET_KEY}
     bucket-name: ${NCP_BUCKET_NAME}
+
+---
+# prod 환경일 때 아래 코드 실행됨
+spring:
+  config:
+    activate:
+      on-profile: prod
+
+firebase:
+  config-path: file:/etc/firebase/mindle-secret.json
