@@ -14,12 +14,22 @@ spec:
     spec:
       imagePullSecrets:
         - name: ncr-registry-secret # registry 접근용 Secret
+      # Secret 볼륨을 추가합니다
+      volumes:
+        - name: firebase-config
+          secret:
+            secretName: firebase-config-secret
       containers:
         - name: spring # 컨테이너 이름
-          image: mindle.kr.ncr.ntruss.com/my-spring-app:1.0.22
+          image: mindle.kr.ncr.ntruss.com/my-spring-app:1.0.27
           imagePullPolicy: Always # 항상 최신 이미지 풀링
           ports:
             - containerPort: 8080 # 컨테이너 내부 포트
+          # volumeMounts 를 추가해서 Secret 파일을 마운트합니다
+          volumeMounts:
+            - name: firebase-config
+              mountPath: /etc/firebase/mindle-secret.json
+              subPath: mindle-secret.json
           env:
             - name: SPRING_PROFILES_ACTIVE
               value: prod

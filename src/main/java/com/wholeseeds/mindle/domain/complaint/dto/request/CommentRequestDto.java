@@ -1,4 +1,4 @@
-package com.wholeseeds.mindle.domain.complaint.dto;
+package com.wholeseeds.mindle.domain.complaint.dto.request;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -13,10 +13,8 @@ import lombok.ToString;
 @RequiredArgsConstructor
 @AllArgsConstructor
 @ToString
-public class ComplaintListRequestDto {
-	private Long cursorComplaintId;
+public class CommentRequestDto {
+	private Long complaintId;
+	private String cursorCreatedAt;
 	private int pageSize;
-	private Long cityId;
-	private Long districtId;
-	private Long categoryId;
 }

@@ -8,12 +8,12 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.wholeseeds.mindle.common.util.ObjectUtils;
 import com.wholeseeds.mindle.domain.complaint.dto.CommentDto;
-import com.wholeseeds.mindle.domain.complaint.dto.CommentRequestDto;
 import com.wholeseeds.mindle.domain.complaint.dto.ComplaintDetailWithImagesDto;
-import com.wholeseeds.mindle.domain.complaint.dto.ComplaintListRequestDto;
-import com.wholeseeds.mindle.domain.complaint.dto.ComplaintListResponseDto;
 import com.wholeseeds.mindle.domain.complaint.dto.ReactionDto;
-import com.wholeseeds.mindle.domain.complaint.dto.SaveComplaintRequestDto;
+import com.wholeseeds.mindle.domain.complaint.dto.request.CommentRequestDto;
+import com.wholeseeds.mindle.domain.complaint.dto.request.ComplaintListRequestDto;
+import com.wholeseeds.mindle.domain.complaint.dto.request.SaveComplaintRequestDto;
+import com.wholeseeds.mindle.domain.complaint.dto.response.ComplaintListResponseDto;
 import com.wholeseeds.mindle.domain.complaint.entity.Category;
 import com.wholeseeds.mindle.domain.complaint.entity.Complaint;
 import com.wholeseeds.mindle.domain.complaint.entity.ComplaintImage;

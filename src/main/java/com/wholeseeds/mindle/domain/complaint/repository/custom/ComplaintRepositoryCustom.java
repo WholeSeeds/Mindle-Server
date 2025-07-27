@@ -6,8 +6,8 @@ import java.util.Optional;
 
 import com.wholeseeds.mindle.domain.complaint.dto.CommentDto;
 import com.wholeseeds.mindle.domain.complaint.dto.ComplaintDetailWithImagesDto;
-import com.wholeseeds.mindle.domain.complaint.dto.ComplaintListResponseDto;
 import com.wholeseeds.mindle.domain.complaint.dto.ReactionDto;
+import com.wholeseeds.mindle.domain.complaint.dto.response.ComplaintListResponseDto;
 
 public interface ComplaintRepositoryCustom {
 	Optional<ComplaintDetailWithImagesDto> getComplaintWithImages(Long complaintId);

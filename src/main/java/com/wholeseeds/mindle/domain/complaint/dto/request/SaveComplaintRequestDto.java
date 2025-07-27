@@ -1,4 +1,4 @@
-package com.wholeseeds.mindle.domain.complaint.dto;
+package com.wholeseeds.mindle.domain.complaint.dto.request;
 
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
