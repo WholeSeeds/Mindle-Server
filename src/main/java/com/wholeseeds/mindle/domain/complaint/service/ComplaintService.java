@@ -33,8 +33,7 @@ import com.wholeseeds.mindle.domain.location.exception.SubdistrictNotFoundExcept
 import com.wholeseeds.mindle.domain.location.repository.CityRepository;
 import com.wholeseeds.mindle.domain.location.repository.SubdistrictRepository;
 import com.wholeseeds.mindle.domain.member.entity.Member;
-import com.wholeseeds.mindle.domain.member.exception.MemberNotFoundException;
-import com.wholeseeds.mindle.domain.member.repository.MemberRepository;
+import com.wholeseeds.mindle.domain.member.service.MemberService;
 import com.wholeseeds.mindle.domain.place.entity.Place;
 import com.wholeseeds.mindle.domain.place.exception.PlaceNotFoundException;
 import com.wholeseeds.mindle.domain.place.repository.PlaceRepository;
@@ -55,23 +54,27 @@ public class ComplaintService {
 
 	private final ComplaintRepository complaintRepository;
 	private final CategoryRepository categoryRepository;
-	private final MemberRepository memberRepository;
 	private final CityRepository cityRepository;
 	private final SubdistrictRepository subdistrictRepository;
 	private final PlaceRepository placeRepository;
 	private final ComplaintImageRepository complaintImageRepository;
 	private final NcpObjectStorageService ncpObjectStorageService;
 	private final ComplaintMapper complaintMapper;
+	private final MemberService memberService;
 
 	/**
 	 * 민원 등록
 	 */
 	@Transactional
-	public SaveComplaintResponseDto handleSaveComplaint(SaveComplaintRequestDto requestDto, List<MultipartFile> imageList) {
+	public SaveComplaintResponseDto handleSaveComplaint(
+		Long memberId,
+		SaveComplaintRequestDto requestDto,
+		List<MultipartFile> imageList
+	) {
 		validateImageCount(imageList);
 		logRequest(requestDto, imageList);
 
-		Complaint saved = createAndSaveComplaint(requestDto, imageList);
+		Complaint saved = createAndSaveComplaint(memberId, requestDto, imageList);
 		return complaintMapper.toSaveComplaintResponseDto(saved);
 	}
 
@@ -146,10 +149,12 @@ public class ComplaintService {
 	 * @return 저장된 Complaint 객체
 	 */
 	protected Complaint createAndSaveComplaint(
-		SaveComplaintRequestDto requestDto, List<MultipartFile> imageList
+		Long memberId,
+		SaveComplaintRequestDto requestDto,
+		List<MultipartFile> imageList
 	) {
 		Category category = findCategory(requestDto.getCategoryId());
-		Member member = findMember(requestDto.getMemberId());
+		Member member = memberService.getMember(memberId);
 		Subdistrict subdistrict = findSubdistrict(requestDto);
 		Place place = findPlace(requestDto.getPlaceId());
 
@@ -218,16 +223,6 @@ public class ComplaintService {
 	private Category findCategory(Long categoryId) {
 		return categoryRepository.findById(categoryId)
 			.orElseThrow(CategoryNotFoundException::new);
-	}
-
-	/**
-	 * 회원 조회
-	 * @param memberId 회원 ID
-	 * @return Member 객체
-	 */
-	private Member findMember(Long memberId) {
-		return memberRepository.findById(memberId)
-			.orElseThrow(MemberNotFoundException::new);
 	}
 
 	/**

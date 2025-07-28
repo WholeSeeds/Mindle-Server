@@ -16,6 +16,8 @@ import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.wholeseeds.mindle.common.annotation.CurrentMemberId;
+import com.wholeseeds.mindle.common.annotation.RequireAuth;
 import com.wholeseeds.mindle.common.util.ResponseTemplate;
 import com.wholeseeds.mindle.domain.complaint.dto.CommentDto;
 import com.wholeseeds.mindle.domain.complaint.dto.request.CommentRequestDto;
@@ -57,11 +59,13 @@ public class ComplaintController {
 		content = @Content(schema = @Schema(implementation = SaveComplaintResponseDto.class))
 	)
 	@PostMapping(value = "/save", consumes = MULTIPART_FORM_DATA_VALUE)
+	@RequireAuth
 	public ResponseEntity<Map<String, Object>> saveComplaint(
+		@CurrentMemberId Long memberId,
 		@RequestPart("meta") SaveComplaintRequestDto requestDto,
 		@RequestPart(value = "files", required = false) List<MultipartFile> imageList
 	) {
-		SaveComplaintResponseDto responseDto = complaintService.handleSaveComplaint(requestDto, imageList);
+		SaveComplaintResponseDto responseDto = complaintService.handleSaveComplaint(memberId, requestDto, imageList);
 		return responseTemplate.success(responseDto, HttpStatus.CREATED);
 	}
 
@@ -78,8 +82,8 @@ public class ComplaintController {
 		content = @Content(schema = @Schema(implementation = ComplaintDetailResponseDto.class))
 	)
 	@GetMapping("/detail/{complaintId}")
+	@RequireAuth
 	public ResponseEntity<Map<String, Object>> getComplaintDetail(@PathVariable Long complaintId) {
-		// TODO: 로그인 사용자 ID 연동 필요
 		ComplaintDetailResponseDto responseDto = complaintService.getComplaintDetailResponse(complaintId, 1L);
 		return responseTemplate.success(responseDto, HttpStatus.OK);
 	}
@@ -97,6 +101,7 @@ public class ComplaintController {
 		content = @Content(schema = @Schema(implementation = CommentRequestDto.class))
 	)
 	@GetMapping("/detail/comment")
+	@RequireAuth
 	public ResponseEntity<Map<String, Object>> getComplaintComments(@ModelAttribute CommentRequestDto requestDto) {
 		List<CommentDto> responseDtos = complaintService.getComplaintCommentsResponse(requestDto);
 		return responseTemplate.success(responseDtos, HttpStatus.OK);
@@ -115,6 +120,7 @@ public class ComplaintController {
 		content = @Content(schema = @Schema(implementation = ComplaintListResponseDto.class))
 	)
 	@GetMapping("/list")
+	@RequireAuth
 	public ResponseEntity<Map<String, Object>> getComplaintList(@ModelAttribute ComplaintListRequestDto requestDto) {
 		List<ComplaintListResponseDto> responseDtos = complaintService.getComplaintListResponse(requestDto);
 		return responseTemplate.success(responseDtos, HttpStatus.OK);
