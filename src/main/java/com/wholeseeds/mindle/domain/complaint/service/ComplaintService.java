@@ -18,49 +18,29 @@ import com.wholeseeds.mindle.domain.complaint.dto.response.ComplaintListResponse
 import com.wholeseeds.mindle.domain.complaint.dto.response.SaveComplaintResponseDto;
 import com.wholeseeds.mindle.domain.complaint.entity.Category;
 import com.wholeseeds.mindle.domain.complaint.entity.Complaint;
-import com.wholeseeds.mindle.domain.complaint.entity.ComplaintImage;
-import com.wholeseeds.mindle.domain.complaint.exception.CategoryNotFoundException;
 import com.wholeseeds.mindle.domain.complaint.exception.ComplaintNotFoundException;
 import com.wholeseeds.mindle.domain.complaint.exception.ImageUploadLimitExceeded;
 import com.wholeseeds.mindle.domain.complaint.mapper.ComplaintMapper;
-import com.wholeseeds.mindle.domain.complaint.repository.CategoryRepository;
-import com.wholeseeds.mindle.domain.complaint.repository.ComplaintImageRepository;
 import com.wholeseeds.mindle.domain.complaint.repository.ComplaintRepository;
-import com.wholeseeds.mindle.domain.location.entity.City;
 import com.wholeseeds.mindle.domain.location.entity.Subdistrict;
-import com.wholeseeds.mindle.domain.location.exception.CityNotFoundException;
-import com.wholeseeds.mindle.domain.location.exception.SubdistrictNotFoundException;
-import com.wholeseeds.mindle.domain.location.repository.CityRepository;
-import com.wholeseeds.mindle.domain.location.repository.SubdistrictRepository;
+import com.wholeseeds.mindle.domain.location.service.LocationService;
 import com.wholeseeds.mindle.domain.member.entity.Member;
 import com.wholeseeds.mindle.domain.member.service.MemberService;
 import com.wholeseeds.mindle.domain.place.entity.Place;
-import com.wholeseeds.mindle.domain.place.exception.PlaceNotFoundException;
-import com.wholeseeds.mindle.domain.place.repository.PlaceRepository;
-import com.wholeseeds.mindle.infra.service.NcpObjectStorageService;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
-/**
- * 민원 관련 비즈니스 로직을 담당하는 Service 클래스
- */
 @Service
 @RequiredArgsConstructor
 @Slf4j
 public class ComplaintService {
-
-	private static final String COMPLAINT_IMAGE_FOLDER = "complaint";
-
 	private final ComplaintRepository complaintRepository;
-	private final CategoryRepository categoryRepository;
-	private final CityRepository cityRepository;
-	private final SubdistrictRepository subdistrictRepository;
-	private final PlaceRepository placeRepository;
-	private final ComplaintImageRepository complaintImageRepository;
-	private final NcpObjectStorageService ncpObjectStorageService;
 	private final ComplaintMapper complaintMapper;
 	private final MemberService memberService;
+	private final LocationService locationService;
+	private final ComplaintImageService complaintImageService;
+	private final CategoryService categoryService;
 
 	/**
 	 * 민원 등록
@@ -80,6 +60,9 @@ public class ComplaintService {
 
 	/**
 	 * 민원 상세 정보 및 공감 정보 조회
+	 * @param complaintId 민원 ID
+	 * @param memberId 회원 ID
+	 * @return 민원 상세 정보 DTO
 	 */
 	@Transactional(readOnly = true)
 	public ComplaintDetailResponseDto getComplaintDetailResponse(Long complaintId, Long memberId) {
@@ -153,10 +136,10 @@ public class ComplaintService {
 		SaveComplaintRequestDto requestDto,
 		List<MultipartFile> imageList
 	) {
-		Category category = findCategory(requestDto.getCategoryId());
+		Category category = categoryService.findCategory(requestDto.getCategoryId());
 		Member member = memberService.getMember(memberId);
-		Subdistrict subdistrict = findSubdistrict(requestDto);
-		Place place = findPlace(requestDto.getPlaceId());
+		Subdistrict subdistrict = locationService.findSubdistrict(requestDto);
+		Place place = locationService.findPlace(requestDto.getPlaceId());
 
 		Complaint complaint = Complaint.builder()
 			.category(category)
@@ -170,28 +153,8 @@ public class ComplaintService {
 			.build();
 
 		Complaint saved = complaintRepository.save(complaint);
-		saveComplaintImages(saved, imageList);
+		complaintImageService.saveComplaintImages(saved, imageList);
 		return saved;
-	}
-
-	/**
-	 * 민원 이미지 저장
-	 * @param complaint 민원 객체
-	 * @param imageList 이미지 파일 목록
-	 */
-	private void saveComplaintImages(Complaint complaint, List<MultipartFile> imageList) {
-		if (ObjectUtils.objectIsNullOrEmpty(imageList)) {
-			return;
-		}
-
-		for (MultipartFile imageFile : imageList) {
-			String imageUrl = ncpObjectStorageService.uploadFile(COMPLAINT_IMAGE_FOLDER, imageFile);
-			ComplaintImage complaintImage = ComplaintImage.builder()
-				.complaint(complaint)
-				.imageUrl(imageUrl)
-				.build();
-			complaintImageRepository.save(complaintImage);
-		}
 	}
 
 	/**
@@ -213,43 +176,5 @@ public class ComplaintService {
 	private ReactionDto findComplaintReaction(Long complaintId, Long memberId) {
 		return complaintRepository.getReaction(complaintId, memberId)
 			.orElseThrow(ComplaintNotFoundException::new);
-	}
-
-	/**
-	 * 카테고리 조회
-	 * @param categoryId 카테고리 ID
-	 * @return Category 객체
-	 */
-	private Category findCategory(Long categoryId) {
-		return categoryRepository.findById(categoryId)
-			.orElseThrow(CategoryNotFoundException::new);
-	}
-
-	/**
-	 * 하위 행정구역(읍/면/동) 조회
-	 * @param dto 민원 요청 DTO
-	 * @return Subdistrict 객체
-	 */
-	private Subdistrict findSubdistrict(SaveComplaintRequestDto dto) {
-		if (dto.getCityName() == null || dto.getSubdistrictName() == null) {
-			return null;
-		}
-		City city = cityRepository.findByName(dto.getCityName())
-			.orElseThrow(CityNotFoundException::new);
-		return subdistrictRepository.findByNameAndCity(dto.getSubdistrictName(), city)
-			.orElseThrow(SubdistrictNotFoundException::new);
-	}
-
-	/**
-	 * 장소 조회
-	 * @param placeId 장소 ID
-	 * @return Place 객체
-	 */
-	private Place findPlace(String placeId) {
-		if (placeId == null) {
-			return null;
-		}
-		return placeRepository.findByPlaceId(placeId)
-			.orElseThrow(PlaceNotFoundException::new);
 	}
 }
