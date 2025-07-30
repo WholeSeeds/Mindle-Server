@@ -29,6 +29,7 @@ import com.wholeseeds.mindle.domain.complaint.dto.response.SaveComplaintResponse
 import com.wholeseeds.mindle.domain.complaint.service.ComplaintService;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -61,7 +62,7 @@ public class ComplaintController {
 	@PostMapping(value = "/save", consumes = MULTIPART_FORM_DATA_VALUE)
 	@RequireAuth
 	public ResponseEntity<Map<String, Object>> saveComplaint(
-		@CurrentMemberId Long memberId,
+		@Parameter(hidden = true) @CurrentMemberId Long memberId,
 		@RequestPart("meta") SaveComplaintRequestDto requestDto,
 		@RequestPart(value = "files", required = false) List<MultipartFile> imageList
 	) {
@@ -98,7 +99,7 @@ public class ComplaintController {
 	@ApiResponse(
 		responseCode = "200",
 		description = "댓글 목록 반환",
-		content = @Content(schema = @Schema(implementation = CommentRequestDto.class))
+		content = @Content(schema = @Schema(implementation = CommentDto.class))
 	)
 	@GetMapping("/detail/comment")
 	@RequireAuth

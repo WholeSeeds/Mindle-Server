@@ -89,7 +89,6 @@ public class ComplaintService {
 		);
 	}
 
-
 	/**
 	 * 민원 목록 조회 (커서 기반)
 	 * @param dto 요청 DTO
@@ -131,7 +130,7 @@ public class ComplaintService {
 	 * @param imageList 이미지 파일 목록
 	 * @return 저장된 Complaint 객체
 	 */
-	protected Complaint createAndSaveComplaint(
+	private Complaint createAndSaveComplaint(
 		Long memberId,
 		SaveComplaintRequestDto requestDto,
 		List<MultipartFile> imageList
