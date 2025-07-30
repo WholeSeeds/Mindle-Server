@@ -15,8 +15,6 @@ import lombok.ToString;
 public class SaveComplaintRequestDto {
 	@NotNull
 	private Long categoryId;
-	@NotNull
-	private Long memberId;
 	private String cityName;
 	private String districtName;
 	private String subdistrictName;

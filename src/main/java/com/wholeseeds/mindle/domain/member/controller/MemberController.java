@@ -34,10 +34,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
 
-@Tag(
-	name = "회원",
-	description = "회원 API (로그인 또는 회원가입, 내 정보 조회, 닉네임 설정, 회원 동네 설정, 알림 설정 변경, 회원 탈퇴)"
-)
+@Tag(name = "회원")
 @RestController
 @RequestMapping("/api/member")
 @RequiredArgsConstructor
