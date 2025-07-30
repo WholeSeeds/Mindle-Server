@@ -1,6 +1,8 @@
 package com.wholeseeds.mindle.domain.location.entity;
 
 import com.wholeseeds.mindle.common.entity.BaseEntity;
+import com.wholeseeds.mindle.domain.location.entity.type.SubdistrictType;
+import com.wholeseeds.mindle.domain.location.exception.InvalidSubdistrictReferenceException;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -10,6 +12,7 @@ import jakarta.persistence.FetchType;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import jakarta.persistence.UniqueConstraint;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -17,7 +20,10 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Entity
-@Table(name = "subdistrict")
+@Table(
+	name = "subdistrict",
+	uniqueConstraints = @UniqueConstraint(columnNames = {"city_id", "district_id", "name"})
+)
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
@@ -25,21 +31,34 @@ import lombok.NoArgsConstructor;
 public class Subdistrict extends BaseEntity {
 
 	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "city_id", nullable = false)
+	@JoinColumn(name = "city_id")
 	private City city;
 
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "district_id")
 	private District district;
 
-	@Column(length = 100, nullable = false, unique = true)
+	@Column(length = 100, nullable = false)
 	private String name;
 
 	@Enumerated(EnumType.STRING)
 	@Column(nullable = false)
-	private Type type;
+	private SubdistrictType type;
 
-	public enum Type {
-		EUP, MYEON, DONG, RI  // 향후 변경 필요
+	@Override
+	protected void onPrePersist() {
+		validateReferences();
+	}
+
+	@Override
+	protected void onPreUpdate() {
+		validateReferences();
+	}
+
+	// City 또는 District 중 하나만 참조하도록 검증
+	private void validateReferences() {
+		if ((city == null && district == null) || (city != null && district != null)) {
+			throw new InvalidSubdistrictReferenceException();
+		}
 	}
 }

@@ -51,6 +51,9 @@ public abstract class BaseEntity {
 	protected void onPrePersist() {
 	}
 
+	protected void onPreUpdate() {
+	}
+
 	@PreUpdate
 	protected void onUpdate() {
 		this.updatedAt = LocalDateTime.now();
