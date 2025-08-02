@@ -1,7 +1,7 @@
 package com.wholeseeds.mindle.domain.member.entity;
 
 import com.wholeseeds.mindle.common.entity.BaseEntity;
-import com.wholeseeds.mindle.domain.location.entity.Subdistrict;
+import com.wholeseeds.mindle.domain.region.entity.Subdistrict;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -24,7 +24,7 @@ import lombok.NoArgsConstructor;
 public class Member extends BaseEntity {
 
 	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "subdistrict_id")
+	@JoinColumn(name = "subdistrict_code", referencedColumnName = "code")
 	private Subdistrict subdistrict;
 
 	@Column(name = "firebase_uid", nullable = false, unique = true)

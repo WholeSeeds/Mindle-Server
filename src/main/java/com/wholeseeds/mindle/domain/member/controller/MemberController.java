@@ -137,7 +137,7 @@ public class MemberController {
 		)
 		@Valid @RequestBody UpdateSubdistrictRequestDto dto
 	) {
-		Member updatedMember = memberService.updateSubdistrict(memberId, dto.getSubdistrictId());
+		Member updatedMember = memberService.updateSubdistrict(memberId, dto.getSubdistrictCode());
 		MemberResponseDto responseDto = memberMapper.toMemberResponseDto(updatedMember);
 		return responseTemplate.success(responseDto, HttpStatus.OK);
 	}

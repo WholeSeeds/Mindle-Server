@@ -1,6 +1,6 @@
-package com.wholeseeds.mindle.domain.location.entity;
+package com.wholeseeds.mindle.domain.region.entity;
 
-import com.wholeseeds.mindle.common.entity.BaseEntity;
+import com.wholeseeds.mindle.domain.region.entity.type.DistrictType;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -10,6 +10,7 @@ import jakarta.persistence.FetchType;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import jakarta.persistence.UniqueConstraint;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -17,29 +18,21 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Entity
-@Table(name = "subdistrict")
+@Table(
+	name = "district",
+	uniqueConstraints = @UniqueConstraint(columnNames = {"city_code", "name"})
+)
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 @Builder
-public class Subdistrict extends BaseEntity {
+public class District extends AdministrativeRegion {
 
 	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "city_id", nullable = false)
+	@JoinColumn(name = "city_code", referencedColumnName = "code", nullable = false)
 	private City city;
-
-	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "district_id")
-	private District district;
-
-	@Column(length = 100, nullable = false, unique = true)
-	private String name;
 
 	@Enumerated(EnumType.STRING)
 	@Column(nullable = false)
-	private Type type;
-
-	public enum Type {
-		EUP, MYEON, DONG, RI  // 향후 변경 필요
-	}
+	private DistrictType type;
 }

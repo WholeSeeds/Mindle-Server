@@ -7,14 +7,14 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.google.firebase.auth.FirebaseToken;
-import com.wholeseeds.mindle.domain.location.entity.Subdistrict;
-import com.wholeseeds.mindle.domain.location.exception.SubdistrictNotFoundException;
-import com.wholeseeds.mindle.domain.location.repository.SubdistrictRepository;
 import com.wholeseeds.mindle.domain.member.entity.Member;
 import com.wholeseeds.mindle.domain.member.enums.NotificationType;
 import com.wholeseeds.mindle.domain.member.exception.DuplicateNicknameException;
 import com.wholeseeds.mindle.domain.member.exception.MemberNotFoundException;
 import com.wholeseeds.mindle.domain.member.repository.MemberRepository;
+import com.wholeseeds.mindle.domain.region.entity.Subdistrict;
+import com.wholeseeds.mindle.domain.region.exception.SubdistrictNotFoundException;
+import com.wholeseeds.mindle.domain.region.repository.SubdistrictRepository;
 
 import lombok.RequiredArgsConstructor;
 
@@ -94,12 +94,12 @@ public class MemberService {
 	/**
 	 * 기본 동네 설정
 	 * @param memberId 회원 ID
-	 * @param subdistrictId 동네 ID
+	 * @param subdistrictCode 동네 행정동코드
 	 * @return 업데이트된 Member 객체
 	 */
 	@Transactional
-	public Member updateSubdistrict(Long memberId, Long subdistrictId) {
-		Subdistrict subdistrict = subdistrictRepository.findByIdNotDeleted(subdistrictId)
+	public Member updateSubdistrict(Long memberId, String subdistrictCode) {
+		Subdistrict subdistrict = subdistrictRepository.findById(subdistrictCode)
 			.orElseThrow(SubdistrictNotFoundException::new);
 		Member member = getMember(memberId);
 		member.updateSubdistrict(subdistrict);

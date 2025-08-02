@@ -8,6 +8,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class UpdateSubdistrictRequestDto {
 
-	@NotNull(message = "subdistrictId는 필수입니다.")
-	private Long subdistrictId;
+	@NotNull(message = "subdistrictCode는 필수입니다.")
+	private String subdistrictCode;
 }

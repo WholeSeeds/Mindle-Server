@@ -1,10 +1,8 @@
-package com.wholeseeds.mindle.common.entity;
+package com.wholeseeds.mindle.domain.region.entity;
 
 import java.time.LocalDateTime;
 
 import jakarta.persistence.Column;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.MappedSuperclass;
 import jakarta.persistence.PrePersist;
@@ -13,14 +11,20 @@ import lombok.Getter;
 
 @Getter
 @MappedSuperclass
-public abstract class BaseEntity {
+public abstract class AdministrativeRegion {
 
 	/**
-	 * ID
+	 * 행정구역 코드
 	 */
 	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private Long id;
+	@Column(length = 10, nullable = false, unique = true)
+	protected String code;
+
+	/**
+	 * 행정구역 이름
+	 */
+	@Column(length = 100, nullable = false)
+	protected String name;
 
 	/**
 	 * 생성일시
@@ -34,11 +38,11 @@ public abstract class BaseEntity {
 	@Column(name = "updated_at")
 	protected LocalDateTime updatedAt;
 
-	/**
-	 * 삭제일시 (soft delete)
-	 */
-	@Column(name = "deleted_at")
-	protected LocalDateTime deletedAt;
+	protected void onPrePersist() {
+	}
+
+	protected void onPreUpdate() {
+	}
 
 	@PrePersist
 	protected void onCreate() {
@@ -47,28 +51,9 @@ public abstract class BaseEntity {
 		onPrePersist();
 	}
 
-	/* 하위 클래스에서 초기값 줘야 하는 경우 override 해서 사용 */
-	protected void onPrePersist() {
-	}
-
-	protected void onPreUpdate() {
-	}
-
 	@PreUpdate
 	protected void onUpdate() {
 		onPreUpdate();
 		this.updatedAt = LocalDateTime.now();
-	}
-
-	public void softDelete() {
-		this.deletedAt = LocalDateTime.now();
-	}
-
-	public void restore() {
-		this.deletedAt = null;
-	}
-
-	public boolean isDeleted() {
-		return this.deletedAt != null;
 	}
 }
