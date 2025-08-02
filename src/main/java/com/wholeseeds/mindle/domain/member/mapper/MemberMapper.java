@@ -14,6 +14,6 @@ public interface MemberMapper {
 	@Mapping(source = "subdistrict", target = "subdistrict")
 	MemberResponseDto toMemberResponseDto(Member member);
 
-	@Mapping(target = "administrativeCode", source = "administrativeCode")
+	@Mapping(target = "code", source = "code")
 	SubdistrictDto toSubdistrictDto(Subdistrict subdistrict);
 }

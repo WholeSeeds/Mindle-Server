@@ -28,7 +28,7 @@ public class Place extends BaseEntity {
 	private PlaceType type;
 
 	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "subdistrict_id")
+	@JoinColumn(name = "subdistrict_code", referencedColumnName = "code")
 	private Subdistrict subdistrict;
 
 	@Column(nullable = false, unique = true)

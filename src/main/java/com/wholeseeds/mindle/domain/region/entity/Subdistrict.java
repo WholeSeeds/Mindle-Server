@@ -21,7 +21,7 @@ import lombok.NoArgsConstructor;
 @Entity
 @Table(
 	name = "subdistrict",
-	uniqueConstraints = @UniqueConstraint(columnNames = {"city_id", "district_id", "name"})
+	uniqueConstraints = @UniqueConstraint(columnNames = {"city_code", "district_code", "name"})
 )
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -30,11 +30,11 @@ import lombok.NoArgsConstructor;
 public class Subdistrict extends AdministrativeRegion {
 
 	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "city_code", referencedColumnName = "administrativeCode")
+	@JoinColumn(name = "city_code", referencedColumnName = "code")
 	private City city;
 
 	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "district_code", referencedColumnName = "administrativeCode")
+	@JoinColumn(name = "district_code", referencedColumnName = "code")
 	private District district;
 
 	@Enumerated(EnumType.STRING)

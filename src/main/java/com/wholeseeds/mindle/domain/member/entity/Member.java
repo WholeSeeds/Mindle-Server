@@ -24,7 +24,7 @@ import lombok.NoArgsConstructor;
 public class Member extends BaseEntity {
 
 	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "subdistrict_id")
+	@JoinColumn(name = "subdistrict_code", referencedColumnName = "code")
 	private Subdistrict subdistrict;
 
 	@Column(name = "firebase_uid", nullable = false, unique = true)

@@ -18,7 +18,7 @@ public abstract class AdministrativeRegion {
 	 */
 	@Id
 	@Column(length = 10, nullable = false, unique = true)
-	protected String administrativeCode;
+	protected String code;
 
 	/**
 	 * 행정구역 이름

@@ -166,8 +166,8 @@ public class ComplaintRepositoryImpl extends JpaBaseRepositoryImpl<Complaint, Lo
 			)
 			.where(
 				categoryId != null ? C.category.id.eq(categoryId) : null,
-				cityCode != null ? C.subdistrict.city.administrativeCode.eq(cityCode) : null,
-				districtCode != null ? C.subdistrict.district.administrativeCode.eq(districtCode) : null
+				cityCode != null ? C.subdistrict.city.code.eq(cityCode) : null,
+				districtCode != null ? C.subdistrict.district.code.eq(districtCode) : null
 			)
 			.orderBy(C.id.desc())
 			.limit(pageSize)
