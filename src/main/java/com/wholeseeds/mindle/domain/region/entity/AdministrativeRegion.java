@@ -53,6 +53,7 @@ public abstract class AdministrativeRegion {
 
 	@PreUpdate
 	protected void onUpdate() {
+		onPreUpdate();
 		this.updatedAt = LocalDateTime.now();
 	}
 }
