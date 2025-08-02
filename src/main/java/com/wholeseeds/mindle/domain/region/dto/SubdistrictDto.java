@@ -10,7 +10,7 @@ import lombok.Getter;
 @AllArgsConstructor
 @Builder
 public class SubdistrictDto {
-	private Long code;
+	private String code;
 	private String name;
 	private SubdistrictType type;
 }

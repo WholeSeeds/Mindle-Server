@@ -17,7 +17,7 @@ public class SaveComplaintResponseDto {
 	private Long id;
 	private Long categoryId;
 	private Long memberId;
-	private Long subdistrictCode;
+	private String subdistrictCode;
 	private Long placeId;
 	private String title;
 	private String content;
