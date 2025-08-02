@@ -94,12 +94,12 @@ public class MemberService {
 	/**
 	 * 기본 동네 설정
 	 * @param memberId 회원 ID
-	 * @param subdistrictId 동네 ID
+	 * @param subdistrictCode 동네 행정동코드
 	 * @return 업데이트된 Member 객체
 	 */
 	@Transactional
-	public Member updateSubdistrict(Long memberId, Long subdistrictId) {
-		Subdistrict subdistrict = subdistrictRepository.findById(subdistrictId)
+	public Member updateSubdistrict(Long memberId, String subdistrictCode) {
+		Subdistrict subdistrict = subdistrictRepository.findById(subdistrictCode)
 			.orElseThrow(SubdistrictNotFoundException::new);
 		Member member = getMember(memberId);
 		member.updateSubdistrict(subdistrict);

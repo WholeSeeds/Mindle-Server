@@ -6,6 +6,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 import com.wholeseeds.mindle.domain.region.entity.District;
 
-public interface DistrictRepository extends JpaRepository<District, Long> {
+public interface DistrictRepository extends JpaRepository<District, String> {
 	Optional<District> findByName(String name);
 }
