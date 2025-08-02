@@ -1,6 +1,6 @@
-package com.wholeseeds.mindle.domain.location.dto;
+package com.wholeseeds.mindle.domain.region.dto;
 
-import com.wholeseeds.mindle.domain.location.entity.type.SubdistrictType;
+import com.wholeseeds.mindle.domain.region.entity.type.SubdistrictType;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

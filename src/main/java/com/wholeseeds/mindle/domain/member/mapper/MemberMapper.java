@@ -3,8 +3,8 @@ package com.wholeseeds.mindle.domain.member.mapper;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
-import com.wholeseeds.mindle.domain.location.dto.SubdistrictDto;
-import com.wholeseeds.mindle.domain.location.entity.Subdistrict;
+import com.wholeseeds.mindle.domain.region.dto.SubdistrictDto;
+import com.wholeseeds.mindle.domain.region.entity.Subdistrict;
 import com.wholeseeds.mindle.domain.member.dto.response.MemberResponseDto;
 import com.wholeseeds.mindle.domain.member.entity.Member;
 

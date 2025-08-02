@@ -7,9 +7,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.google.firebase.auth.FirebaseToken;
-import com.wholeseeds.mindle.domain.location.entity.Subdistrict;
-import com.wholeseeds.mindle.domain.location.exception.SubdistrictNotFoundException;
-import com.wholeseeds.mindle.domain.location.repository.SubdistrictRepository;
+import com.wholeseeds.mindle.domain.region.entity.Subdistrict;
+import com.wholeseeds.mindle.domain.region.exception.SubdistrictNotFoundException;
+import com.wholeseeds.mindle.domain.region.repository.SubdistrictRepository;
 import com.wholeseeds.mindle.domain.member.entity.Member;
 import com.wholeseeds.mindle.domain.member.enums.NotificationType;
 import com.wholeseeds.mindle.domain.member.exception.DuplicateNicknameException;

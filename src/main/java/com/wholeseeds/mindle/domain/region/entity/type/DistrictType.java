@@ -1,4 +1,4 @@
-package com.wholeseeds.mindle.domain.location.entity.type;
+package com.wholeseeds.mindle.domain.region.entity.type;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;

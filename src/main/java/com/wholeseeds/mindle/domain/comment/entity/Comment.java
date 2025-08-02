@@ -45,6 +45,7 @@ public class Comment extends BaseEntity {
 
 	@OneToMany(mappedBy = "parent", cascade = CascadeType.ALL, orphanRemoval = true)
 	@OrderBy("createdAt ASC")
+	@Builder.Default
 	private List<Comment> children = new ArrayList<>();
 
 	@Column(nullable = false, columnDefinition = "TEXT")

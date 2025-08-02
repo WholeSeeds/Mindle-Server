@@ -1,7 +1,7 @@
 package com.wholeseeds.mindle.domain.member.entity;
 
 import com.wholeseeds.mindle.common.entity.BaseEntity;
-import com.wholeseeds.mindle.domain.location.entity.Subdistrict;
+import com.wholeseeds.mindle.domain.region.entity.Subdistrict;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;

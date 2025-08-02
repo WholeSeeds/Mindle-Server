@@ -42,6 +42,7 @@ public class ComplaintReport extends BaseEntity {
 
 	@Enumerated(EnumType.STRING)
 	@Column(nullable = false)
+	@Builder.Default
 	private Status status = Status.PENDING;
 
 	public enum Status {

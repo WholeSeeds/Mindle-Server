@@ -22,8 +22,8 @@ import com.wholeseeds.mindle.domain.complaint.exception.ComplaintNotFoundExcepti
 import com.wholeseeds.mindle.domain.complaint.exception.ImageUploadLimitExceeded;
 import com.wholeseeds.mindle.domain.complaint.mapper.ComplaintMapper;
 import com.wholeseeds.mindle.domain.complaint.repository.ComplaintRepository;
-import com.wholeseeds.mindle.domain.location.entity.Subdistrict;
-import com.wholeseeds.mindle.domain.location.service.LocationService;
+import com.wholeseeds.mindle.domain.region.entity.Subdistrict;
+import com.wholeseeds.mindle.domain.region.service.LocationService;
 import com.wholeseeds.mindle.domain.member.entity.Member;
 import com.wholeseeds.mindle.domain.member.service.MemberService;
 import com.wholeseeds.mindle.domain.place.entity.Place;

@@ -1,4 +1,4 @@
-package com.wholeseeds.mindle.domain.location.exception;
+package com.wholeseeds.mindle.domain.region.exception;
 
 import com.wholeseeds.mindle.common.exception.BusinessException;
 import com.wholeseeds.mindle.common.response.ErrorCode;

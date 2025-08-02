@@ -2,7 +2,7 @@ package com.wholeseeds.mindle.domain.member.dto.response;
 
 import java.time.LocalDateTime;
 
-import com.wholeseeds.mindle.domain.location.dto.SubdistrictDto;
+import com.wholeseeds.mindle.domain.region.dto.SubdistrictDto;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

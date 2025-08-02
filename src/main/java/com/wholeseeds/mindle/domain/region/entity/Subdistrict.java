@@ -1,8 +1,8 @@
-package com.wholeseeds.mindle.domain.location.entity;
+package com.wholeseeds.mindle.domain.region.entity;
 
 import com.wholeseeds.mindle.common.entity.BaseEntity;
-import com.wholeseeds.mindle.domain.location.entity.type.SubdistrictType;
-import com.wholeseeds.mindle.domain.location.exception.InvalidSubdistrictReferenceException;
+import com.wholeseeds.mindle.domain.region.entity.type.SubdistrictType;
+import com.wholeseeds.mindle.domain.region.exception.InvalidSubdistrictReferenceException;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;

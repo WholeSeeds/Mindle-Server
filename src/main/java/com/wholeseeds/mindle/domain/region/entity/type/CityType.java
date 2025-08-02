@@ -1,14 +1,13 @@
-package com.wholeseeds.mindle.domain.location.entity.type;
+package com.wholeseeds.mindle.domain.region.entity.type;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
 @Getter
 @RequiredArgsConstructor
-public enum SubdistrictType {
-	EUP("읍"),
-	MYEON("면"),
-	DONG("동");
+public enum CityType {
+	SI("시"),
+	GOON("군");
 
 	private final String displayName;
 }

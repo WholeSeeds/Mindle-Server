@@ -35,6 +35,12 @@ checkstyle {
     ignoreFailures = true // warning 만 띄우고 build 되도록
 }
 
+tasks.withType(Checkstyle).configureEach {
+    exclude { fileTreeElement ->
+        fileTreeElement.file.path.contains("/build/generated/")
+    }
+}
+
 dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-web'
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'

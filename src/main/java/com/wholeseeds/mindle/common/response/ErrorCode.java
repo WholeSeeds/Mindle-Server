@@ -37,7 +37,7 @@ public enum ErrorCode {
 	IMAGE_UPLOAD_LIMIT_EXCEEDED(400, "이미지는 최대 3장까지 업로드 가능합니다"),
 	COMPLAINT_NOT_FOUND(404, "해당 민원을 찾을 수 없습니다"),
 
-	// location
+	// region
 	CITY_NOT_FOUND(404, "해당 (시/군)를 찾을 수 없습니다"),
 	DISTRICT_NOT_FOUND(404, "해당 (구)를 찾을 수 없습니다"),
 	SUBDISTRICT_NOT_FOUND(404, "해당 (읍/면/동)를 찾을 수 없습니다"),
