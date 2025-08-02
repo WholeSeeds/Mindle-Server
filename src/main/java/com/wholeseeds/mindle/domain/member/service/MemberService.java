@@ -7,14 +7,14 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.google.firebase.auth.FirebaseToken;
-import com.wholeseeds.mindle.domain.region.entity.Subdistrict;
-import com.wholeseeds.mindle.domain.region.exception.SubdistrictNotFoundException;
-import com.wholeseeds.mindle.domain.region.repository.SubdistrictRepository;
 import com.wholeseeds.mindle.domain.member.entity.Member;
 import com.wholeseeds.mindle.domain.member.enums.NotificationType;
 import com.wholeseeds.mindle.domain.member.exception.DuplicateNicknameException;
 import com.wholeseeds.mindle.domain.member.exception.MemberNotFoundException;
 import com.wholeseeds.mindle.domain.member.repository.MemberRepository;
+import com.wholeseeds.mindle.domain.region.entity.Subdistrict;
+import com.wholeseeds.mindle.domain.region.exception.SubdistrictNotFoundException;
+import com.wholeseeds.mindle.domain.region.repository.SubdistrictRepository;
 
 import lombok.RequiredArgsConstructor;
 
@@ -99,7 +99,7 @@ public class MemberService {
 	 */
 	@Transactional
 	public Member updateSubdistrict(Long memberId, Long subdistrictId) {
-		Subdistrict subdistrict = subdistrictRepository.findByIdNotDeleted(subdistrictId)
+		Subdistrict subdistrict = subdistrictRepository.findById(subdistrictId)
 			.orElseThrow(SubdistrictNotFoundException::new);
 		Member member = getMember(memberId);
 		member.updateSubdistrict(subdistrict);

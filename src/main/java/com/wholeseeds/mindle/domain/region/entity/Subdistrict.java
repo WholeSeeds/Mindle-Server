@@ -1,6 +1,5 @@
 package com.wholeseeds.mindle.domain.region.entity;
 
-import com.wholeseeds.mindle.common.entity.BaseEntity;
 import com.wholeseeds.mindle.domain.region.entity.type.SubdistrictType;
 import com.wholeseeds.mindle.domain.region.exception.InvalidSubdistrictReferenceException;
 
@@ -28,18 +27,15 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 @Builder
-public class Subdistrict extends BaseEntity {
+public class Subdistrict extends AdministrativeRegion {
 
 	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "city_id")
+	@JoinColumn(name = "city_code", referencedColumnName = "administrativeCode")
 	private City city;
 
 	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "district_id")
+	@JoinColumn(name = "district_code", referencedColumnName = "administrativeCode")
 	private District district;
-
-	@Column(length = 100, nullable = false)
-	private String name;
 
 	@Enumerated(EnumType.STRING)
 	@Column(nullable = false)

@@ -1,6 +1,5 @@
 package com.wholeseeds.mindle.domain.region.entity;
 
-import com.wholeseeds.mindle.common.entity.BaseEntity;
 import com.wholeseeds.mindle.domain.region.entity.type.DistrictType;
 
 import jakarta.persistence.Column;
@@ -27,14 +26,11 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 @Builder
-public class District extends BaseEntity {
+public class District extends AdministrativeRegion {
 
 	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "city_id", nullable = false)
+	@JoinColumn(name = "city_code", referencedColumnName = "administrativeCode", nullable = false)
 	private City city;
-
-	@Column(length = 100, nullable = false)
-	private String name;
 
 	@Enumerated(EnumType.STRING)
 	@Column(nullable = false)

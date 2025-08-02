@@ -1,6 +1,5 @@
 package com.wholeseeds.mindle.domain.region.entity;
 
-import com.wholeseeds.mindle.common.entity.BaseEntity;
 import com.wholeseeds.mindle.domain.region.entity.type.CityType;
 
 import jakarta.persistence.Column;
@@ -20,10 +19,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 @Builder
-public class City extends BaseEntity {
-
-	@Column(length = 100, nullable = false, unique = true)
-	private String name;
+public class City extends AdministrativeRegion {
 
 	@Enumerated(EnumType.STRING)
 	@Column(nullable = false)

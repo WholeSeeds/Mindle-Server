@@ -4,15 +4,15 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.wholeseeds.mindle.domain.complaint.dto.request.SaveComplaintRequestDto;
+import com.wholeseeds.mindle.domain.place.entity.Place;
+import com.wholeseeds.mindle.domain.place.exception.PlaceNotFoundException;
+import com.wholeseeds.mindle.domain.place.repository.PlaceRepository;
 import com.wholeseeds.mindle.domain.region.entity.City;
 import com.wholeseeds.mindle.domain.region.entity.Subdistrict;
 import com.wholeseeds.mindle.domain.region.exception.CityNotFoundException;
 import com.wholeseeds.mindle.domain.region.exception.SubdistrictNotFoundException;
 import com.wholeseeds.mindle.domain.region.repository.CityRepository;
 import com.wholeseeds.mindle.domain.region.repository.SubdistrictRepository;
-import com.wholeseeds.mindle.domain.place.entity.Place;
-import com.wholeseeds.mindle.domain.place.exception.PlaceNotFoundException;
-import com.wholeseeds.mindle.domain.place.repository.PlaceRepository;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -20,7 +20,7 @@ import lombok.extern.slf4j.Slf4j;
 @Service
 @RequiredArgsConstructor
 @Slf4j
-public class LocationService {
+public class RegionService {
 	private final CityRepository cityRepository;
 	private final SubdistrictRepository subdistrictRepository;
 	private final PlaceRepository placeRepository;

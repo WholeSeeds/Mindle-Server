@@ -22,11 +22,11 @@ import com.wholeseeds.mindle.domain.complaint.exception.ComplaintNotFoundExcepti
 import com.wholeseeds.mindle.domain.complaint.exception.ImageUploadLimitExceeded;
 import com.wholeseeds.mindle.domain.complaint.mapper.ComplaintMapper;
 import com.wholeseeds.mindle.domain.complaint.repository.ComplaintRepository;
-import com.wholeseeds.mindle.domain.region.entity.Subdistrict;
-import com.wholeseeds.mindle.domain.region.service.LocationService;
 import com.wholeseeds.mindle.domain.member.entity.Member;
 import com.wholeseeds.mindle.domain.member.service.MemberService;
 import com.wholeseeds.mindle.domain.place.entity.Place;
+import com.wholeseeds.mindle.domain.region.entity.Subdistrict;
+import com.wholeseeds.mindle.domain.region.service.RegionService;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -38,7 +38,7 @@ public class ComplaintService {
 	private final ComplaintRepository complaintRepository;
 	private final ComplaintMapper complaintMapper;
 	private final MemberService memberService;
-	private final LocationService locationService;
+	private final RegionService regionService;
 	private final ComplaintImageService complaintImageService;
 	private final CategoryService categoryService;
 
@@ -99,8 +99,8 @@ public class ComplaintService {
 		return complaintRepository.findListWithCursor(
 			dto.getCursorComplaintId(),
 			dto.getPageSize(),
-			dto.getCityId(),
-			dto.getDistrictId(),
+			dto.getCityCode(),
+			dto.getDistrictCode(),
 			dto.getCategoryId()
 		);
 	}
@@ -137,8 +137,8 @@ public class ComplaintService {
 	) {
 		Category category = categoryService.findCategory(requestDto.getCategoryId());
 		Member member = memberService.getMember(memberId);
-		Subdistrict subdistrict = locationService.findSubdistrict(requestDto);
-		Place place = locationService.findPlace(requestDto.getPlaceId());
+		Subdistrict subdistrict = regionService.findSubdistrict(requestDto);
+		Place place = regionService.findPlace(requestDto.getPlaceId());
 
 		Complaint complaint = Complaint.builder()
 			.category(category)

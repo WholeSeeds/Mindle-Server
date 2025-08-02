@@ -1,9 +1,9 @@
 package com.wholeseeds.mindle.domain.complaint.entity;
 
 import com.wholeseeds.mindle.common.entity.BaseEntity;
-import com.wholeseeds.mindle.domain.region.entity.Subdistrict;
 import com.wholeseeds.mindle.domain.member.entity.Member;
 import com.wholeseeds.mindle.domain.place.entity.Place;
+import com.wholeseeds.mindle.domain.region.entity.Subdistrict;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;

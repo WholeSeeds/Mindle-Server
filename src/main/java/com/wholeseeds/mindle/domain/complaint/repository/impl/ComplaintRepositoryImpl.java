@@ -64,7 +64,7 @@ public class ComplaintRepositoryImpl extends JpaBaseRepositoryImpl<Complaint, Lo
 					)
 				)
 			);
-		// Map 에서 해당 id의 DTO 꺼냄
+
 		return Optional.ofNullable(resultMap.get(complaintId));
 	}
 
@@ -78,7 +78,11 @@ public class ComplaintRepositoryImpl extends JpaBaseRepositoryImpl<Complaint, Lo
 		BooleanExpression isReacted = JPAExpressions
 			.selectOne()
 			.from(R)
-			.where(R.complaint.id.eq(complaintId).and(R.member.id.eq(memberId)).and(R.deletedAt.isNull()))
+			.where(
+				R.complaint.id.eq(complaintId)
+					.and(R.member.id.eq(memberId))
+					.and(R.deletedAt.isNull())
+			)
 			.exists();
 
 		return Optional.ofNullable(queryFactory
@@ -94,7 +98,11 @@ public class ComplaintRepositoryImpl extends JpaBaseRepositoryImpl<Complaint, Lo
 
 	/* 댓글 조회 cursor 기반 페이지네이션 (최신순) */
 	@Override
-	public List<CommentDto> getComment(Long complaintId, LocalDateTime cursorCreatedAt, int pageSize) {
+	public List<CommentDto> getComment(
+		Long complaintId,
+		LocalDateTime cursorCreatedAt,
+		int pageSize
+	) {
 		// 주어진 시각 이전에 작성된 과거 댓글 조회 (페이지네이션)
 		BooleanExpression beforeCursor = cursorCreatedAt != null ? COMMENT.createdAt.lt(cursorCreatedAt) : null;
 
@@ -115,9 +123,13 @@ public class ComplaintRepositoryImpl extends JpaBaseRepositoryImpl<Complaint, Lo
 	}
 
 	@Override
-	public List<ComplaintListResponseDto> findListWithCursor(Long cursorComplaintId, int pageSize,
-		Long cityId, Long districtId, Long categoryId) {
-		// commentCount 서브쿼리
+	public List<ComplaintListResponseDto> findListWithCursor(
+		Long cursorComplaintId,
+		int pageSize,
+		String cityCode,
+		String districtCode,
+		Long categoryId
+	) {
 		SubQueryExpression<Long> commentCount = JPAExpressions
 			.select(COMMENT.id.count())
 			.from(COMMENT)
@@ -149,11 +161,13 @@ public class ComplaintRepositoryImpl extends JpaBaseRepositoryImpl<Complaint, Lo
 				imageUrl
 			))
 			.from(C)
-			.where(C.deletedAt.isNull(), cursorComplaintId != null ? C.id.lt(cursorComplaintId) : null)
+			.where(C.deletedAt.isNull(),
+				cursorComplaintId != null ? C.id.lt(cursorComplaintId) : null
+			)
 			.where(
 				categoryId != null ? C.category.id.eq(categoryId) : null,
-				cityId != null ? C.subdistrict.city.id.eq(cityId) : null,
-				districtId != null ? C.subdistrict.district.id.eq(districtId) : null
+				cityCode != null ? C.subdistrict.city.administrativeCode.eq(cityCode) : null,
+				districtCode != null ? C.subdistrict.district.administrativeCode.eq(districtCode) : null
 			)
 			.orderBy(C.id.desc())
 			.limit(pageSize)
