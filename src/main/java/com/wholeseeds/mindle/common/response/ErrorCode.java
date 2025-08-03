@@ -28,9 +28,6 @@ public enum ErrorCode {
 	MEMBER_NOT_FOUND(404, "해당 회원을 찾을 수 없습니다."),
 	DUPLICATE_NICKNAME(400, "이미 사용 중인 닉네임입니다."),
 
-	// develop
-	QUERYDSL_NOT_INITIALIZED(500, "QueryDSL 필드가 초기화되지 않았습니다."),
-
 	// complaint
 	CATEGORY_NOT_FOUND(404, "해당 카테고리를 찾을 수 없습니다"),
 	PLACE_NOT_FOUND(404, "해당 장소를 찾을 수 없습니다"),
@@ -44,7 +41,13 @@ public enum ErrorCode {
 	INVALID_SUBDISTRICT_REFERENCE(400, "Subdistrict는 하나의 City 또는 District만 참조해야 합니다."),
 
 	// NCP
-	NCP_FILE_UPLOAD_FAILED(500, "NCP 에 파일 저장 중 오류가 발생했습니다");
+	NCP_FILE_UPLOAD_FAILED(500, "NCP 에 파일 저장 중 오류가 발생했습니다"),
+
+	// QueryDSL
+	QUERYDSL_NOT_INITIALIZED(500, "QueryDSL 필드가 초기화되지 않았습니다."),
+
+	// CSV
+	CSV_LOAD_FAILED(500, "CSV 파일 로드 중 오류가 발생했습니다");
 
 	private final int status;
 	private final String message;
