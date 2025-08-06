@@ -10,7 +10,9 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.wholeseeds.mindle.common.util.ResponseTemplate;
-import com.wholeseeds.mindle.domain.region.dto.response.RegionDetailResponseDto;
+import com.wholeseeds.mindle.domain.region.dto.response.CityResponseDto;
+import com.wholeseeds.mindle.domain.region.dto.response.DistrictResponseDto;
+import com.wholeseeds.mindle.domain.region.dto.response.SubdistrictResponseDto;
 import com.wholeseeds.mindle.domain.region.enums.RegionType;
 import com.wholeseeds.mindle.domain.region.service.RegionService;
 
@@ -37,7 +39,7 @@ public class RegionController {
 	@GetMapping("/detail")
 	@Operation(
 		summary = "행정구역 상세 및 하위 목록 조회",
-		description = "입력받은 regionType(city|district|subdistrict)과 code를 기준으로, 해당 행정구역의 상세 정보 및 하위 목록을 조회합니다.",
+		description = "입력받은 regionType(city | district | subdistrict)과 code를 기준으로, 해당 행정구역의 상세 정보 및 하위 목록을 조회합니다.",
 		parameters = {
 			@Parameter(name = "regionType", description = "행정구역 종류 (city, district, subdistrict)", required = true),
 			@Parameter(name = "code", description = "행정구역 코드", required = true)
@@ -45,8 +47,14 @@ public class RegionController {
 	)
 	@ApiResponse(
 		responseCode = "200",
-		description = "행정구역 상세 및 하위 목록 반환",
-		content = @Content(schema = @Schema(implementation = RegionDetailResponseDto.class))
+		description = "행정구역 상세 정보 반환",
+		content = @Content(schema = @Schema(
+			oneOf = {
+				CityResponseDto.class,
+				DistrictResponseDto.class,
+				SubdistrictResponseDto.class
+			}
+		))
 	)
 	public ResponseEntity<Map<String, Object>> getRegionDetail(
 		@RequestParam String regionType,
