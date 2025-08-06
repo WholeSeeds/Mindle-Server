@@ -39,7 +39,11 @@ public class RegionController {
 	@GetMapping("/detail")
 	@Operation(
 		summary = "행정구역 상세 및 하위 목록 조회",
-		description = "입력받은 regionType(city | district | subdistrict)과 code를 기준으로, 해당 행정구역의 상세 정보 및 하위 목록을 조회합니다.",
+		description = """
+		입력받은 regionType(city | district | subdistrict)과 code를 기준으로, 해당 행정구역의 상세 정보 및 하위 목록을 조회합니다.
+
+		city는 시/군, district는 구, subdistrict는 읍/면/동을 의미합니다.
+		""",
 		parameters = {
 			@Parameter(name = "regionType", description = "행정구역 종류 (city, district, subdistrict)", required = true),
 			@Parameter(name = "code", description = "행정구역 코드", required = true)

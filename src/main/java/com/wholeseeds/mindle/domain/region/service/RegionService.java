@@ -40,6 +40,7 @@ public class RegionService {
 
 	/**
 	 * 하위 행정구역(읍/면/동) 조회
+	 *
 	 * @param dto 민원 요청 DTO
 	 * @return Subdistrict 객체
 	 */
@@ -56,6 +57,7 @@ public class RegionService {
 
 	/**
 	 * 장소 조회
+	 *
 	 * @param placeId 장소 ID
 	 * @return Place 객체
 	 */
@@ -68,6 +70,13 @@ public class RegionService {
 			.orElseThrow(PlaceNotFoundException::new);
 	}
 
+	/**
+	 * 시/군(City) 상세 정보 및 하위 행정구역 목록 조회
+	 *
+	 * @param code 조회할 시/군의 행정구역 코드
+	 * @return CityResponseDto - 시/군 정보 + 하위 district/subdistrict 목록
+	 * @throws CityNotFoundException 해당 코드에 대응하는 시/군이 존재하지 않을 경우
+	 */
 	@Transactional(readOnly = true)
 	public CityResponseDto getCityDetail(String code) {
 		City city = cityRepository.findById(code).orElseThrow(CityNotFoundException::new);
@@ -81,6 +90,13 @@ public class RegionService {
 			.build();
 	}
 
+	/**
+	 * 구/군(District) 상세 정보 및 하위 행정구역 목록 조회
+	 *
+	 * @param code 조회할 구/군의 행정구역 코드
+	 * @return DistrictResponseDto - 구/군 정보 + 하위 subdistrict 목록
+	 * @throws DistrictNotFoundException 해당 코드에 대응하는 구/군이 존재하지 않을 경우
+	 */
 	@Transactional(readOnly = true)
 	public DistrictResponseDto getDistrictDetail(String code) {
 		District district = districtRepository.findById(code).orElseThrow(DistrictNotFoundException::new);
@@ -92,6 +108,13 @@ public class RegionService {
 			.build();
 	}
 
+	/**
+	 * 읍/면/동(Subdistrict) 상세 정보 조회
+	 *
+	 * @param code 조회할 읍/면/동의 행정구역 코드
+	 * @return SubdistrictResponseDto - 읍/면/동 단일 정보
+	 * @throws SubdistrictNotFoundException 해당 코드에 대응하는 읍/면/동이 존재하지 않을 경우
+	 */
 	@Transactional(readOnly = true)
 	public SubdistrictResponseDto getSubdistrictDetail(String code) {
 		Subdistrict subdistrict = subdistrictRepository.findById(code).orElseThrow(SubdistrictNotFoundException::new);
