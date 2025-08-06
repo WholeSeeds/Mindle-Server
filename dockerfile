@@ -1,10 +1,11 @@
-# 1단계: 소스 → 빌드
-FROM gradle:7.5.1-jdk17 AS builder
+# 1단계: 소스 빌드해서 jar 파일 생성
+FROM eclipse-temurin:17-jdk AS builder
 WORKDIR /workspace
 COPY . .
-RUN gradle clean build --no-daemon
+RUN chmod +x gradlew \
+ && ./gradlew clean build --no-daemon
 
-# 2단계: 런타임 이미지
+# 2단계: 런타임만 추출
 FROM eclipse-temurin:17-jdk
 WORKDIR /app
 COPY --from=builder /workspace/build/libs/*.jar app.jar
