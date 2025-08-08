@@ -20,4 +20,5 @@ jobs:
           git remote add sc https://${{ secrets.NCP_SOURCECOMMIT_ACCESS_KEY }}:${{ secrets.NCP_SOURCECOMMIT_SECRET_KEY }}@devtools.ncloud.com/3067145/mindle.git
       - name: Push to SourceCommit
         run: |
-          git push --mirror sc
+          git push sc --all
+          git push sc --tags
