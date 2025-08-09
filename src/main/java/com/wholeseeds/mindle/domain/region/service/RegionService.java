@@ -11,12 +11,11 @@ import com.wholeseeds.mindle.domain.place.exception.PlaceNotFoundException;
 import com.wholeseeds.mindle.domain.place.repository.PlaceRepository;
 import com.wholeseeds.mindle.domain.region.dto.DistrictDto;
 import com.wholeseeds.mindle.domain.region.dto.SubdistrictDto;
-import com.wholeseeds.mindle.domain.region.dto.response.CityResponseDto;
-import com.wholeseeds.mindle.domain.region.dto.response.DistrictResponseDto;
-import com.wholeseeds.mindle.domain.region.dto.response.SubdistrictResponseDto;
+import com.wholeseeds.mindle.domain.region.dto.response.RegionDetailResponseDto;
 import com.wholeseeds.mindle.domain.region.entity.City;
 import com.wholeseeds.mindle.domain.region.entity.District;
 import com.wholeseeds.mindle.domain.region.entity.Subdistrict;
+import com.wholeseeds.mindle.domain.region.enums.RegionType;
 import com.wholeseeds.mindle.domain.region.exception.CityNotFoundException;
 import com.wholeseeds.mindle.domain.region.exception.DistrictNotFoundException;
 import com.wholeseeds.mindle.domain.region.exception.SubdistrictNotFoundException;
@@ -71,54 +70,36 @@ public class RegionService {
 	}
 
 	/**
-	 * 시/군(City) 상세 정보 및 하위 행정구역 목록 조회
+	 * 행정구역 상세 정보 조회
 	 *
-	 * @param code 조회할 시/군의 행정구역 코드
-	 * @return CityResponseDto - 시/군 정보 + 하위 district/subdistrict 목록
-	 * @throws CityNotFoundException 해당 코드에 대응하는 시/군이 존재하지 않을 경우
+	 * @param regionType 행정구역 타입
+	 * @param code 행정구역 코드
+	 * @return RegionDetailResponseDto - 행정구역 상세 정보 응답 DTO
 	 */
 	@Transactional(readOnly = true)
-	public CityResponseDto getCityDetail(String code) {
-		City city = cityRepository.findById(code).orElseThrow(CityNotFoundException::new);
-		List<DistrictDto> districtDtos = regionMapper.toDistrictDtoList(districtRepository.findAllByCityCode(code));
-		List<SubdistrictDto> subdistrictDtos = regionMapper.toSubdistrictDtoList(subdistrictRepository.findAllByCityCode(code));
-
-		return CityResponseDto.builder()
-			.region(regionMapper.toCityDto(city))
-			.districts(districtDtos)
-			.subdistricts(subdistrictDtos)
-			.build();
-	}
-
-	/**
-	 * 구/군(District) 상세 정보 및 하위 행정구역 목록 조회
-	 *
-	 * @param code 조회할 구/군의 행정구역 코드
-	 * @return DistrictResponseDto - 구/군 정보 + 하위 subdistrict 목록
-	 * @throws DistrictNotFoundException 해당 코드에 대응하는 구/군이 존재하지 않을 경우
-	 */
-	@Transactional(readOnly = true)
-	public DistrictResponseDto getDistrictDetail(String code) {
-		District district = districtRepository.findById(code).orElseThrow(DistrictNotFoundException::new);
-		List<SubdistrictDto> subdistrictDtos = regionMapper.toSubdistrictDtoList(subdistrictRepository.findAllByDistrictCode(code));
-
-		return DistrictResponseDto.builder()
-			.region(regionMapper.toDistrictDto(district))
-			.subdistricts(subdistrictDtos)
-			.build();
-	}
-
-	/**
-	 * 읍/면/동(Subdistrict) 상세 정보 조회
-	 *
-	 * @param code 조회할 읍/면/동의 행정구역 코드
-	 * @return SubdistrictResponseDto - 읍/면/동 단일 정보
-	 * @throws SubdistrictNotFoundException 해당 코드에 대응하는 읍/면/동이 존재하지 않을 경우
-	 */
-	@Transactional(readOnly = true)
-	public SubdistrictResponseDto getSubdistrictDetail(String code) {
-		Subdistrict subdistrict = subdistrictRepository.findById(code).orElseThrow(SubdistrictNotFoundException::new);
-
-		return new SubdistrictResponseDto(regionMapper.toSubdistrictDto(subdistrict));
+	public RegionDetailResponseDto getRegionDetail(RegionType regionType, String code) {
+		return switch (regionType) {
+			case CITY -> {
+				City city = cityRepository.findById(code)
+					.orElseThrow(CityNotFoundException::new);
+				List<DistrictDto> districtDtos =
+					regionMapper.toDistrictDtoList(districtRepository.findAllByCityCode(code));
+				List<SubdistrictDto> subdistrictDtos =
+					regionMapper.toSubdistrictDtoList(subdistrictRepository.findAllByCityCode(code));
+				yield RegionDetailResponseDto.forCity(regionMapper.toCityDto(city), districtDtos, subdistrictDtos);
+			}
+			case DISTRICT -> {
+				District district = districtRepository.findById(code)
+					.orElseThrow(DistrictNotFoundException::new);
+				List<SubdistrictDto> subdistrictDtos =
+					regionMapper.toSubdistrictDtoList(subdistrictRepository.findAllByDistrictCode(code));
+				yield RegionDetailResponseDto.forDistrict(regionMapper.toDistrictDto(district), subdistrictDtos);
+			}
+			case SUBDISTRICT -> {
+				Subdistrict subdistrict = subdistrictRepository.findById(code)
+					.orElseThrow(SubdistrictNotFoundException::new);
+				yield RegionDetailResponseDto.forSubdistrict(regionMapper.toSubdistrictDto(subdistrict));
+			}
+		};
 	}
 }

@@ -10,9 +10,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.wholeseeds.mindle.common.util.ResponseTemplate;
-import com.wholeseeds.mindle.domain.region.dto.response.CityResponseDto;
-import com.wholeseeds.mindle.domain.region.dto.response.DistrictResponseDto;
-import com.wholeseeds.mindle.domain.region.dto.response.SubdistrictResponseDto;
+import com.wholeseeds.mindle.domain.region.dto.response.RegionDetailResponseDto;
 import com.wholeseeds.mindle.domain.region.enums.RegionType;
 import com.wholeseeds.mindle.domain.region.service.RegionService;
 
@@ -43,6 +41,12 @@ public class RegionController {
 		입력받은 regionType(city | district | subdistrict)과 code를 기준으로, 해당 행정구역의 상세 정보 및 하위 목록을 조회합니다.
 
 		city는 시/군, district는 구, subdistrict는 읍/면/동을 의미합니다.
+
+		응답 구조는 모든 regionType에 대해 일관성을 유지합니다:
+		- regionType: 요청한 행정구역 타입
+		- region: 해당 행정구역 정보 (CityDto / DistrictDto / SubdistrictDto)
+		- districts: 하위 구 목록 (city인 경우에만 포함, 이외의 경우는 null)
+		- subdistricts: 하위 읍/면/동 목록 (city, district인 경우 포함, 이외의 경우는 null)
 		""",
 		parameters = {
 			@Parameter(name = "regionType", description = "행정구역 종류 (city, district, subdistrict)", required = true),
@@ -52,26 +56,14 @@ public class RegionController {
 	@ApiResponse(
 		responseCode = "200",
 		description = "행정구역 상세 정보 반환",
-		content = @Content(schema = @Schema(
-			oneOf = {
-				CityResponseDto.class,
-				DistrictResponseDto.class,
-				SubdistrictResponseDto.class
-			}
-		))
+		content = @Content(schema = @Schema(implementation = RegionDetailResponseDto.class))
 	)
 	public ResponseEntity<Map<String, Object>> getRegionDetail(
 		@RequestParam String regionType,
 		@RequestParam String code
 	) {
 		RegionType type = RegionType.from(regionType);
-
-		Object response = switch (type) {
-			case CITY -> regionService.getCityDetail(code);
-			case DISTRICT -> regionService.getDistrictDetail(code);
-			case SUBDISTRICT -> regionService.getSubdistrictDetail(code);
-		};
-
+		RegionDetailResponseDto response = regionService.getRegionDetail(type, code);
 		return responseTemplate.success(response, HttpStatus.OK);
 	}
 }
