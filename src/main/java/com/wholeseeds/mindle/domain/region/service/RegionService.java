@@ -1,7 +1,5 @@
 package com.wholeseeds.mindle.domain.region.service;
 
-import java.util.List;
-
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -9,11 +7,8 @@ import com.wholeseeds.mindle.domain.complaint.dto.request.SaveComplaintRequestDt
 import com.wholeseeds.mindle.domain.place.entity.Place;
 import com.wholeseeds.mindle.domain.place.exception.PlaceNotFoundException;
 import com.wholeseeds.mindle.domain.place.repository.PlaceRepository;
-import com.wholeseeds.mindle.domain.region.dto.DistrictDto;
-import com.wholeseeds.mindle.domain.region.dto.SubdistrictDto;
 import com.wholeseeds.mindle.domain.region.dto.response.RegionDetailResponseDto;
 import com.wholeseeds.mindle.domain.region.entity.City;
-import com.wholeseeds.mindle.domain.region.entity.District;
 import com.wholeseeds.mindle.domain.region.entity.Subdistrict;
 import com.wholeseeds.mindle.domain.region.enums.RegionType;
 import com.wholeseeds.mindle.domain.region.exception.CityNotFoundException;
@@ -70,36 +65,36 @@ public class RegionService {
 	}
 
 	/**
-	 * 행정구역 상세 정보 조회
+	 * 통합 행정구역 상세 정보 조회
 	 *
 	 * @param regionType 행정구역 타입
 	 * @param code 행정구역 코드
-	 * @return RegionDetailResponseDto - 행정구역 상세 정보 응답 DTO
+	 * @return RegionDetailResponseDto - 일관된 구조의 응답 DTO
 	 */
 	@Transactional(readOnly = true)
-	public RegionDetailResponseDto getRegionDetail(RegionType regionType, String code) {
+	public RegionDetailResponseDto<?> getRegionDetail(RegionType regionType, String code) {
 		return switch (regionType) {
-			case CITY -> {
-				City city = cityRepository.findById(code)
-					.orElseThrow(CityNotFoundException::new);
-				List<DistrictDto> districtDtos =
-					regionMapper.toDistrictDtoList(districtRepository.findAllByCityCode(code));
-				List<SubdistrictDto> subdistrictDtos =
-					regionMapper.toSubdistrictDtoList(subdistrictRepository.findAllByCityCode(code));
-				yield RegionDetailResponseDto.forCity(regionMapper.toCityDto(city), districtDtos, subdistrictDtos);
-			}
-			case DISTRICT -> {
-				District district = districtRepository.findById(code)
-					.orElseThrow(DistrictNotFoundException::new);
-				List<SubdistrictDto> subdistrictDtos =
-					regionMapper.toSubdistrictDtoList(subdistrictRepository.findAllByDistrictCode(code));
-				yield RegionDetailResponseDto.forDistrict(regionMapper.toDistrictDto(district), subdistrictDtos);
-			}
-			case SUBDISTRICT -> {
-				Subdistrict subdistrict = subdistrictRepository.findById(code)
-					.orElseThrow(SubdistrictNotFoundException::new);
-				yield RegionDetailResponseDto.forSubdistrict(regionMapper.toSubdistrictDto(subdistrict));
-			}
+			case CITY -> RegionDetailResponseDto.forCity(
+				regionMapper.toCityDto(
+					cityRepository.findById(code)
+						.orElseThrow(CityNotFoundException::new)),
+				regionMapper.toDistrictDtoList(
+					districtRepository.findAllByCityCode(code)),
+				regionMapper.toSubdistrictDtoList(
+					subdistrictRepository.findAllByCityCode(code))
+			);
+			case DISTRICT -> RegionDetailResponseDto.forDistrict(
+				regionMapper.toDistrictDto(
+					districtRepository.findById(code)
+						.orElseThrow(DistrictNotFoundException::new)),
+				regionMapper.toSubdistrictDtoList(
+					subdistrictRepository.findAllByDistrictCode(code))
+			);
+			case SUBDISTRICT -> RegionDetailResponseDto.forSubdistrict(
+				regionMapper.toSubdistrictDto(
+					subdistrictRepository.findById(code)
+						.orElseThrow(SubdistrictNotFoundException::new))
+			);
 		};
 	}
 }

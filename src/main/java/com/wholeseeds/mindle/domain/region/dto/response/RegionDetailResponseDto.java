@@ -12,9 +12,9 @@ import lombok.Getter;
 
 @Getter
 @Builder
-public class RegionDetailResponseDto {
+public class RegionDetailResponseDto<T> {
 	private final RegionType regionType;
-	private final Object region;
+	private final T region;
 	private final List<DistrictDto> districts;
 	private final List<SubdistrictDto> subdistricts;
 
@@ -26,12 +26,12 @@ public class RegionDetailResponseDto {
 	 * @param subdistricts 하위 읍/면/동 목록
 	 * @return City 타입의 RegionDetailResponseDto
 	 */
-	public static RegionDetailResponseDto forCity(
+	public static RegionDetailResponseDto<CityDto> forCity(
 		CityDto city,
 		List<DistrictDto> districts,
 		List<SubdistrictDto> subdistricts
 	) {
-		return RegionDetailResponseDto.builder()
+		return RegionDetailResponseDto.<CityDto>builder()
 			.regionType(RegionType.CITY)
 			.region(city)
 			.districts(districts)
@@ -45,11 +45,11 @@ public class RegionDetailResponseDto {
 	 * @param subdistricts 하위 읍/면/동 목록
 	 * @return District 타입의 RegionDetailResponseDto
 	 */
-	public static RegionDetailResponseDto forDistrict(
+	public static RegionDetailResponseDto<DistrictDto> forDistrict(
 		DistrictDto district,
 		List<SubdistrictDto> subdistricts
 	) {
-		return RegionDetailResponseDto.builder()
+		return RegionDetailResponseDto.<DistrictDto>builder()
 			.regionType(RegionType.DISTRICT)
 			.region(district)
 			.districts(null)
@@ -62,10 +62,10 @@ public class RegionDetailResponseDto {
 	 * @param subdistrict 읍/면/동 정보
 	 * @return Subdistrict 타입의 RegionDetailResponseDto
 	 */
-	public static RegionDetailResponseDto forSubdistrict(
+	public static RegionDetailResponseDto<SubdistrictDto> forSubdistrict(
 		SubdistrictDto subdistrict
 	) {
-		return RegionDetailResponseDto.builder()
+		return RegionDetailResponseDto.<SubdistrictDto>builder()
 			.regionType(RegionType.SUBDISTRICT)
 			.region(subdistrict)
 			.districts(null)

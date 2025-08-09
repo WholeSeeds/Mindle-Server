@@ -38,7 +38,7 @@ public class RegionController {
 	@Operation(
 		summary = "행정구역 상세 및 하위 목록 조회",
 		description = """
-		입력받은 regionType(city | district | subdistrict)과 code를 기준으로, 해당 행정구역의 상세 정보 및 하위 목록을 조회합니다.
+		입력받은 regionType(city / district / subdistrict)과 code를 기준으로, 해당 행정구역의 상세 정보 및 하위 목록을 조회합니다.
 
 		city는 시/군, district는 구, subdistrict는 읍/면/동을 의미합니다.
 
@@ -63,7 +63,7 @@ public class RegionController {
 		@RequestParam String code
 	) {
 		RegionType type = RegionType.from(regionType);
-		RegionDetailResponseDto response = regionService.getRegionDetail(type, code);
+		RegionDetailResponseDto<?> response = regionService.getRegionDetail(type, code);
 		return responseTemplate.success(response, HttpStatus.OK);
 	}
 }
