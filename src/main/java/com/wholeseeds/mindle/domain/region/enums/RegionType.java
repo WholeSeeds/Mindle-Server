@@ -11,7 +11,7 @@ public enum RegionType {
 	public static RegionType from(String value) {
 		try {
 			return RegionType.valueOf(value.trim().toUpperCase());
-		} catch (Exception e) {
+		} catch (IllegalArgumentException | NullPointerException e) {
 			throw new InvalidRegionTypeException();
 		}
 	}
