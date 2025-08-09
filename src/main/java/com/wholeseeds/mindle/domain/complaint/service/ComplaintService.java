@@ -25,6 +25,7 @@ import com.wholeseeds.mindle.domain.complaint.repository.ComplaintRepository;
 import com.wholeseeds.mindle.domain.member.entity.Member;
 import com.wholeseeds.mindle.domain.member.service.MemberService;
 import com.wholeseeds.mindle.domain.place.entity.Place;
+import com.wholeseeds.mindle.domain.place.service.PlaceService;
 import com.wholeseeds.mindle.domain.region.entity.Subdistrict;
 import com.wholeseeds.mindle.domain.region.service.RegionService;
 
@@ -39,6 +40,7 @@ public class ComplaintService {
 	private final ComplaintMapper complaintMapper;
 	private final MemberService memberService;
 	private final RegionService regionService;
+	private final PlaceService placeService;
 	private final ComplaintImageService complaintImageService;
 	private final CategoryService categoryService;
 
@@ -138,7 +140,7 @@ public class ComplaintService {
 		Category category = categoryService.findCategory(requestDto.getCategoryId());
 		Member member = memberService.getMember(memberId);
 		Subdistrict subdistrict = regionService.findSubdistrict(requestDto.getSubdistrictCode());
-		Place place = regionService.findPlace(requestDto.getPlaceId());
+		Place place = placeService.findPlace(requestDto.getPlaceId());
 
 		Complaint complaint = Complaint.builder()
 			.category(category)

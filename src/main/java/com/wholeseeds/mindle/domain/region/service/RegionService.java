@@ -3,9 +3,6 @@ package com.wholeseeds.mindle.domain.region.service;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.wholeseeds.mindle.domain.place.entity.Place;
-import com.wholeseeds.mindle.domain.place.exception.PlaceNotFoundException;
-import com.wholeseeds.mindle.domain.place.repository.PlaceRepository;
 import com.wholeseeds.mindle.domain.region.dto.response.RegionDetailResponseDto;
 import com.wholeseeds.mindle.domain.region.entity.City;
 import com.wholeseeds.mindle.domain.region.entity.District;
@@ -26,10 +23,10 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor
 @Slf4j
 public class RegionService {
+
 	private final CityRepository cityRepository;
 	private final DistrictRepository districtRepository;
 	private final SubdistrictRepository subdistrictRepository;
-	private final PlaceRepository placeRepository;
 	private final RegionMapper regionMapper;
 
 	/**
@@ -75,21 +72,6 @@ public class RegionService {
 		}
 		return subdistrictRepository.findById(subdistrictCode)
 			.orElseThrow(SubdistrictNotFoundException::new);
-	}
-
-	/**
-	 * 장소 조회
-	 *
-	 * @param placeId 장소 ID
-	 * @return Place 객체
-	 */
-	@Transactional(readOnly = true)
-	public Place findPlace(String placeId) {
-		if (placeId == null) {
-			return null;
-		}
-		return placeRepository.findByPlaceId(placeId)
-			.orElseThrow(PlaceNotFoundException::new);
 	}
 
 	/**
