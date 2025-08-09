@@ -3,12 +3,12 @@ package com.wholeseeds.mindle.domain.region.service;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.wholeseeds.mindle.domain.complaint.dto.request.SaveComplaintRequestDto;
 import com.wholeseeds.mindle.domain.place.entity.Place;
 import com.wholeseeds.mindle.domain.place.exception.PlaceNotFoundException;
 import com.wholeseeds.mindle.domain.place.repository.PlaceRepository;
 import com.wholeseeds.mindle.domain.region.dto.response.RegionDetailResponseDto;
 import com.wholeseeds.mindle.domain.region.entity.City;
+import com.wholeseeds.mindle.domain.region.entity.District;
 import com.wholeseeds.mindle.domain.region.entity.Subdistrict;
 import com.wholeseeds.mindle.domain.region.enums.RegionType;
 import com.wholeseeds.mindle.domain.region.exception.CityNotFoundException;
@@ -33,19 +33,47 @@ public class RegionService {
 	private final RegionMapper regionMapper;
 
 	/**
-	 * 하위 행정구역(읍/면/동) 조회
+	 * City(시/도) 조회
 	 *
-	 * @param dto 민원 요청 DTO
+	 * @param cityCode 시/도 코드
+	 * @return City 객체
+	 */
+	@Transactional(readOnly = true)
+	public City findCity(String cityCode) {
+		if (cityCode == null) {
+			return null;
+		}
+		return cityRepository.findById(cityCode)
+			.orElseThrow(CityNotFoundException::new);
+	}
+
+	/**
+	 * District(시/군/구) 조회
+	 *
+	 * @param districtCode 시/군/구 코드
+	 * @return District 객체
+	 */
+	@Transactional(readOnly = true)
+	public District findDistrict(String districtCode) {
+		if (districtCode == null) {
+			return null;
+		}
+		return districtRepository.findById(districtCode)
+			.orElseThrow(DistrictNotFoundException::new);
+	}
+
+	/**
+	 * Subdistrict(읍/면/동) 조회
+	 *
+	 * @param subdistrictCode 읍/면/동 코드
 	 * @return Subdistrict 객체
 	 */
 	@Transactional(readOnly = true)
-	public Subdistrict findSubdistrict(SaveComplaintRequestDto dto) {
-		if (dto.getCityName() == null || dto.getSubdistrictName() == null) {
+	public Subdistrict findSubdistrict(String subdistrictCode) {
+		if (subdistrictCode == null) {
 			return null;
 		}
-		City city = cityRepository.findByName(dto.getCityName())
-			.orElseThrow(CityNotFoundException::new);
-		return subdistrictRepository.findByNameAndCity(dto.getSubdistrictName(), city)
+		return subdistrictRepository.findById(subdistrictCode)
 			.orElseThrow(SubdistrictNotFoundException::new);
 	}
 

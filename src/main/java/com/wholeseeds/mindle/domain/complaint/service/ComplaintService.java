@@ -137,7 +137,7 @@ public class ComplaintService {
 	) {
 		Category category = categoryService.findCategory(requestDto.getCategoryId());
 		Member member = memberService.getMember(memberId);
-		Subdistrict subdistrict = regionService.findSubdistrict(requestDto);
+		Subdistrict subdistrict = regionService.findSubdistrict(requestDto.getSubdistrictCode());
 		Place place = regionService.findPlace(requestDto.getPlaceId());
 
 		Complaint complaint = Complaint.builder()
