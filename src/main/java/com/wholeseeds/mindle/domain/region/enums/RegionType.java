@@ -1,5 +1,7 @@
 package com.wholeseeds.mindle.domain.region.enums;
 
+import com.wholeseeds.mindle.domain.region.exception.InvalidRegionTypeException;
+
 import lombok.Getter;
 
 @Getter
@@ -10,7 +12,7 @@ public enum RegionType {
 		try {
 			return RegionType.valueOf(value.trim().toUpperCase());
 		} catch (Exception e) {
-			throw new IllegalArgumentException("올바르지 않은 regionType 값입니다: " + value);
+			throw new InvalidRegionTypeException();
 		}
 	}
 }
