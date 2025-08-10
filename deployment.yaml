@@ -1,7 +1,7 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: spring-app               # 고정 이름 (blue/green 따로 만들지 않음)
+  name: spring-app
 spec:
   replicas: 1
   selector:
@@ -21,14 +21,6 @@ spec:
           ports: [ { containerPort: 8080 } ]
           volumeMounts:
             - { name: firebase-config, mountPath: /etc/firebase/mindle-secret.json, subPath: mindle-secret.json }
-          readinessProbe:
-            httpGet: { path: /actuator/health, port: 8080 }
-            initialDelaySeconds: 10
-            periodSeconds: 5
-          livenessProbe:
-            httpGet: { path: /actuator/health, port: 8080 }
-            initialDelaySeconds: 30
-            periodSeconds: 10
           env:
             - { name: SPRING_PROFILES_ACTIVE, value: prod }
             - { name: DB_HOST,         valueFrom: { configMapKeyRef: { name: app-config, key: DB_HOST } } }
