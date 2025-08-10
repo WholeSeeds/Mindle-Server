@@ -2,11 +2,13 @@ apiVersion: v1
 kind: Service
 metadata:
   name: spring-svc
+  labels:
+    app: spring-app
 spec:
   type: LoadBalancer
   selector:
     app: spring-app
-    color: green            # 현재 트래픽을 보낼 색상(blue↔green 전환 시 여기만 교체)
+    color: green        # 전환 시 blue로 바꿉니다
   ports:
     - port: 80
       targetPort: 8080

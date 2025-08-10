@@ -1,0 +1,33 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: spring-app-green
+spec:
+  replicas: 1
+  selector:
+    matchLabels: { app: spring-app, color: green }
+  template:
+    metadata:
+      labels: { app: spring-app, color: green }
+    spec:
+      imagePullSecrets: [ { name: ncr-registry-secret } ]
+      volumes:
+        - name: firebase-config
+          secret: { secretName: firebase-config-secret }
+      containers:
+        - name: spring
+          image: mindle.kr.ncr.ntruss.com/my-spring-app:1.0.40   # 새 버전 시 여기만 변경
+          imagePullPolicy: Always
+          ports: [ { containerPort: 8080 } ]
+          volumeMounts:
+            - { name: firebase-config, mountPath: /etc/firebase/mindle-secret.json, subPath: mindle-secret.json }
+          env:
+            - { name: SPRING_PROFILES_ACTIVE, value: prod }
+            - { name: DB_HOST,         valueFrom: { configMapKeyRef: { name: app-config, key: DB_HOST } } }
+            - { name: DB_PORT,         valueFrom: { configMapKeyRef: { name: app-config, key: DB_PORT } } }
+            - { name: DB_NAME,         valueFrom: { configMapKeyRef: { name: app-config, key: DB_NAME } } }
+            - { name: DB_USER,         valueFrom: { configMapKeyRef: { name: app-config, key: DB_USER } } }
+            - { name: NCP_BUCKET_NAME, valueFrom: { configMapKeyRef: { name: app-config, key: NCP_BUCKET_NAME } } }
+            - { name: DB_PASSWORD,     valueFrom: { secretKeyRef: { name: app-secret, key: DB_PASSWORD } } }
+            - { name: NCP_ACCESS_KEY,  valueFrom: { secretKeyRef: { name: app-secret, key: NCP_ACCESS_KEY } } }
+            - { name: NCP_SECRET_KEY,  valueFrom: { secretKeyRef: { name: app-secret, key: NCP_SECRET_KEY } } }
