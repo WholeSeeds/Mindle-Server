@@ -71,6 +71,9 @@ dependencies {
 
     // OpenCSV
     implementation 'com.opencsv:opencsv:5.11'
+
+    // health check
+    implementation 'org.springframework.boot:spring-boot-starter-actuator'
 }
 
 //tasks.named('test') {
