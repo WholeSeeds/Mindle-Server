@@ -2,17 +2,14 @@ package com.wholeseeds.mindle.domain.complaint.dto.request;
 
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Getter;
-import lombok.RequiredArgsConstructor;
-import lombok.ToString;
+import lombok.NoArgsConstructor;
 
 @Getter
-@Builder
-@RequiredArgsConstructor
+@NoArgsConstructor
 @AllArgsConstructor
-@ToString
 public class SaveComplaintRequestDto {
+
 	@NotNull
 	private Long categoryId;
 	private String cityCode;
