@@ -22,7 +22,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 
-@Tag(name = "행정구역", description = "행정구역 조회 API (시/군, 구, 읍/면/동)")
+@Tag(name = "행정구역")
 @RestController
 @RequestMapping("/api/region")
 @RequiredArgsConstructor
