@@ -2,7 +2,7 @@ name: SourceCommit 에 코드 미러링
 on:
   push:
     branches:
-      - '#41-ncp'       # 혹은 미러할 브랜치
+      - 'ncp'       # 혹은 미러할 브랜치
 jobs:
   mirror:
     runs-on: ubuntu-latest
