@@ -9,8 +9,8 @@ import lombok.Builder;
 import lombok.Getter;
 
 @Getter
-@AllArgsConstructor
 @Builder
+@AllArgsConstructor
 public class MemberResponseDto {
 
 	private Long id;

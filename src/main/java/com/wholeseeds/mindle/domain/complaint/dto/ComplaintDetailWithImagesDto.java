@@ -6,14 +6,10 @@ import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
-import lombok.RequiredArgsConstructor;
-import lombok.ToString;
 
 @Getter
 @Builder
-@RequiredArgsConstructor
 @AllArgsConstructor
-@ToString
 public class ComplaintDetailWithImagesDto {
 	private Long id;
 	private String title;
