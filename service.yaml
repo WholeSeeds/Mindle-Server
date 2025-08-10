@@ -1,14 +1,11 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: spring-svc
-  labels:
-    app: spring-app
+  name: spring-svc               # 고정 이름
 spec:
   type: LoadBalancer
   selector:
-    app: spring-app
-    color: green        # 전환 시 blue로 바꿉니다
+    app: spring-app              # 색 라벨 불필요 (SourceDeploy가 내부에서 관리)
   ports:
     - port: 80
       targetPort: 8080
