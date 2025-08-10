@@ -1,15 +1,12 @@
 apiVersion: v1
-kind: Service # service 리소스
+kind: Service
 metadata:
-  name: spring-svc # service 이름
+  name: spring-svc
 spec:
-  type: LoadBalancer # service 타입 (외부 노출 방식)
+  type: LoadBalancer
   selector:
-    app: spring-app # 트래픽을 보낼 pod 레벨
+    app: spring-app
+    color: green            # 현재 트래픽을 보낼 색상(blue↔green 전환 시 여기만 교체)
   ports:
-    - port: 80 # 외부인터넷에서 80 포트로 접근하면 8080 포트로 포트포워딩 해줌
+    - port: 80
       targetPort: 8080
-  template:
-    spec:
-      containers:
-        - image: mindle.kr.ncr.ntruss.com/my-spring-app:1.0.40
