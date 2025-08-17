@@ -15,7 +15,7 @@ import lombok.extern.slf4j.Slf4j;
 @RestController
 @RequestMapping("/api")
 @Slf4j
-@Tag(name = "샘플컨트롤러", description = "책 추천 / 지난달 키워드")
+@Tag(name = "샘플컨트롤러2", description = "책 추천 / 지난달 키워드")
 public class SampleController {
 
 	@Operation(summary = "책 추천", description = "특정 책 코드를 입력으로 받아 해당 책 기반 추천 책 list를 반환합니다.",
