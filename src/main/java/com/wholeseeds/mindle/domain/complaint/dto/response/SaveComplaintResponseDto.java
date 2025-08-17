@@ -5,15 +5,12 @@ import com.wholeseeds.mindle.domain.complaint.entity.Complaint;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
-import lombok.RequiredArgsConstructor;
-import lombok.ToString;
 
 @Getter
 @Builder
-@RequiredArgsConstructor
 @AllArgsConstructor
-@ToString
 public class SaveComplaintResponseDto {
+
 	private Long id;
 	private Long categoryId;
 	private Long memberId;

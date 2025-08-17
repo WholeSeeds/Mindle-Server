@@ -39,6 +39,7 @@ public enum ErrorCode {
 	DISTRICT_NOT_FOUND(404, "해당 (구)를 찾을 수 없습니다"),
 	SUBDISTRICT_NOT_FOUND(404, "해당 (읍/면/동)를 찾을 수 없습니다"),
 	INVALID_SUBDISTRICT_REFERENCE(400, "Subdistrict는 하나의 City 또는 District만 참조해야 합니다."),
+	INVALID_REGION_TYPE(400, "올바르지 않은 regionType 값입니다. (city, district, subdistrict 중 하나여야 합니다)"),
 
 	// NCP
 	NCP_FILE_UPLOAD_FAILED(500, "NCP 에 파일 저장 중 오류가 발생했습니다"),
