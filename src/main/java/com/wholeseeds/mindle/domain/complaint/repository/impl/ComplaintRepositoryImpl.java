@@ -40,32 +40,48 @@ public class ComplaintRepositoryImpl extends JpaBaseRepositoryImpl<Complaint, Lo
 	/* 민원상세, 이미지 URL 조회 */
 	@Override
 	public Optional<ComplaintDetailWithImagesDto> getComplaintWithImages(Long complaintId) {
-		// transform 결과 Map<Id, DTO> 여서 맵핑
-		Map<Long, ComplaintDetailWithImagesDto> resultMap = queryFactory
-			.from(C)
-			.leftJoin(I).on(I.complaint.id.eq(C.id))
+		// 먼저 Complaint 엔티티를 이미지와 함께 조회
+		Complaint complaint = queryFactory
+			.selectFrom(C)
+			.leftJoin(C.place).fetchJoin()
+			.leftJoin(C.place.type).fetchJoin()
+			.leftJoin(C.subdistrict).fetchJoin()
+			.leftJoin(C.subdistrict.district).fetchJoin()
+			.leftJoin(C.subdistrict.city).fetchJoin()
+			.leftJoin(C.category).fetchJoin()
+			.leftJoin(C.member).fetchJoin()
 			.where(C.id.eq(complaintId)
 				.and(C.deletedAt.isNull()))
-			.transform(
-				GroupBy.groupBy(C.id).as(
-					Projections.constructor(
-						ComplaintDetailWithImagesDto.class,
-						C.id,
-						C.title,
-						C.content,
-						C.category.name,
-						C.member.nickname,
-						C.place.name,
-						C.subdistrict.city.name,
-						C.subdistrict.district.name,
-						C.subdistrict.name,
-						C.createdAt,
-						GroupBy.list(I.imageUrl)
-					)
-				)
-			);
+			.fetchOne();
 
-		return Optional.ofNullable(resultMap.get(complaintId));
+		if (complaint == null) {
+			return Optional.empty();
+		}
+
+		// 이미지 URL 목록 조회
+		List<String> imageUrls = queryFactory
+			.select(I.imageUrl)
+			.from(I)
+			.where(I.complaint.id.eq(complaintId))
+			.fetch();
+
+		// DTO 변환은 서비스에서 처리하도록 데이터만 전달
+		// 임시로 기존 방식 유지하되 DTO 객체 생성 부분만 수정
+		ComplaintDetailWithImagesDto dto = ComplaintDetailWithImagesDto.builder()
+			.id(complaint.getId())
+			.title(complaint.getTitle())
+			.content(complaint.getContent())
+			.categoryName(complaint.getCategory().getName())
+			.memberNickname(complaint.getMember().getNickname())
+			.place(null) // 매퍼에서 처리
+			.city(null) // 매퍼에서 처리
+			.district(null) // 매퍼에서 처리
+			.subdistrict(null) // 매퍼에서 처리
+			.createdAt(complaint.getCreatedAt())
+			.imageUrlList(imageUrls)
+			.build();
+
+		return Optional.of(dto);
 	}
 
 	/* '특정 민원의 총 공감 수'와 '로그인 사용자의 해당 글 공감 여부' 조회 */
