@@ -23,16 +23,31 @@ public class CategoryInitializer implements CommandLineRunner {
 	@Override
 	@Transactional
 	public void run(String... args) {
-		List<CategoryCsvDto> categories =
-			csvLoader.loadCsv("/data/category.csv", CategoryCsvDto.class);
+		List<CategoryCsvDto> rows = csvLoader.loadCsv("/data/category.csv", CategoryCsvDto.class);
 
-		for (CategoryCsvDto category : categories) {
-			if (!categoryRepository.existsById(category.getId())) {
-				categoryRepository.save(Category.builder()
-					.name(category.getName())
-					.description(category.getDescription())
-					.build());
+		// 1) 먼저 모든 카테고리를 생성/저장하고, CSV의 id → 실제 엔티티 매핑을 보관
+		java.util.Map<Long, Category> csvIdToEntity = new java.util.HashMap<>();
+		for (CategoryCsvDto dto : rows) {
+			Category created = Category.builder()
+				.name(dto.getName())
+				.description(dto.getDescription())
+				.build();
+			categoryRepository.save(created);
+			csvIdToEntity.put(dto.getId(), created);
+		}
+
+		// 2) 부모-자식 연결 (CSV의 parent_id를 이용해 메모리 상 매핑으로 연결)
+		for (CategoryCsvDto dto : rows) {
+			Long parentId = dto.getParentId();
+			if (parentId == null || parentId == 0L)
+				continue; // 루트는 스킵
+
+			Category child = csvIdToEntity.get(dto.getId());
+			Category parent = csvIdToEntity.get(parentId);
+			if (child != null && parent != null && child.getParent() != parent) {
+				parent.addChild(child); // 양방향 동기화
 			}
 		}
+		// 트랜잭션 종료 시 flush
 	}
 }
