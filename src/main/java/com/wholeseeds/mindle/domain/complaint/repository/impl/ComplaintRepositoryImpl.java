@@ -2,10 +2,8 @@ package com.wholeseeds.mindle.domain.complaint.repository.impl;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 
-import com.querydsl.core.group.GroupBy;
 import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.SubQueryExpression;
 import com.querydsl.core.types.dsl.BooleanExpression;
@@ -22,6 +20,12 @@ import com.wholeseeds.mindle.domain.complaint.entity.QComplaint;
 import com.wholeseeds.mindle.domain.complaint.entity.QComplaintImage;
 import com.wholeseeds.mindle.domain.complaint.entity.QComplaintReaction;
 import com.wholeseeds.mindle.domain.complaint.repository.custom.ComplaintRepositoryCustom;
+import com.wholeseeds.mindle.domain.region.dto.CityDto;
+import com.wholeseeds.mindle.domain.region.dto.DistrictDto;
+import com.wholeseeds.mindle.domain.region.dto.SubdistrictDto;
+import com.wholeseeds.mindle.domain.region.entity.City;
+import com.wholeseeds.mindle.domain.region.entity.District;
+import com.wholeseeds.mindle.domain.region.entity.Subdistrict;
 
 import jakarta.persistence.EntityManager;
 
@@ -65,6 +69,29 @@ public class ComplaintRepositoryImpl extends JpaBaseRepositoryImpl<Complaint, Lo
 			.where(I.complaint.id.eq(complaintId))
 			.fetch();
 
+		// 지역 정보 DTO 생성
+		CityDto cityDto = null;
+		DistrictDto districtDto = null;
+		SubdistrictDto subdistrictDto = null;
+
+		if (complaint.getSubdistrict() != null) {
+			Subdistrict subdistrict = complaint.getSubdistrict();
+			subdistrictDto = getSubdistrictDto(subdistrict);
+
+			if (subdistrict.getDistrict() != null) {
+				districtDto = getDistrictDto(subdistrict.getDistrict());
+
+				// subdistrict의 city가 null이면 district의 city를 사용
+				if (subdistrict.getCity() != null) {
+					cityDto = getCityDto(subdistrict.getCity());
+				} else if (subdistrict.getDistrict().getCity() != null) {
+					cityDto = getCityDto(subdistrict.getDistrict().getCity());
+				}
+			} else if (subdistrict.getCity() != null) {
+				cityDto = getCityDto(subdistrict.getCity());
+			}
+		}
+
 		// DTO 변환은 서비스에서 처리하도록 데이터만 전달
 		// 임시로 기존 방식 유지하되 DTO 객체 생성 부분만 수정
 		ComplaintDetailWithImagesDto dto = ComplaintDetailWithImagesDto.builder()
@@ -74,14 +101,41 @@ public class ComplaintRepositoryImpl extends JpaBaseRepositoryImpl<Complaint, Lo
 			.categoryName(complaint.getCategory().getName())
 			.memberNickname(complaint.getMember().getNickname())
 			.place(null) // 매퍼에서 처리
-			.city(null) // 매퍼에서 처리
-			.district(null) // 매퍼에서 처리
-			.subdistrict(null) // 매퍼에서 처리
+			.city(cityDto)
+			.district(districtDto)
+			.subdistrict(subdistrictDto)
 			.createdAt(complaint.getCreatedAt())
 			.imageUrlList(imageUrls)
 			.build();
 
 		return Optional.of(dto);
+	}
+
+	private SubdistrictDto getSubdistrictDto(Subdistrict subdistrict) {
+		return SubdistrictDto.builder()
+			.code(subdistrict.getCode())
+			.name(subdistrict.getName())
+			.type(subdistrict.getType())
+			.build();
+	}
+
+	private DistrictDto getDistrictDto(District district) {
+		DistrictDto districtDto;
+		districtDto = DistrictDto.builder()
+			.code(district.getCode())
+			.name(district.getName())
+			.type(district.getType())
+			.cityCode(district.getCity() != null ? district.getCity().getCode() : null)
+			.build();
+		return districtDto;
+	}
+
+	private CityDto getCityDto(City city) {
+		return CityDto.builder()
+			.code(city.getCode())
+			.name(city.getName())
+			.type(city.getType())
+			.build();
 	}
 
 	/* '특정 민원의 총 공감 수'와 '로그인 사용자의 해당 글 공감 여부' 조회 */
