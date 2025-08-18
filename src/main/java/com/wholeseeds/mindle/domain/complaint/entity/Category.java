@@ -21,7 +21,13 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Entity
-@Table(name = "category", indexes = @Index(name = "idx_category_parent", columnList = "parent_id"))
+@Table(
+	name = "category",
+	indexes = {
+		@Index(name = "idx_category_parent", columnList = "parent_id"),
+		@Index(name = "idx_category_parent_id", columnList = "parent_id,id")
+	}
+)
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor

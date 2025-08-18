@@ -44,7 +44,7 @@ public class CategoryInitializer implements CommandLineRunner {
 
 			Category child = csvIdToEntity.get(dto.getId());
 			Category parent = csvIdToEntity.get(parentId);
-			if (child != null && parent != null && child.getParent() != parent) {
+			if (child != null && parent != null) {
 				parent.addChild(child); // 양방향 동기화
 			}
 		}
