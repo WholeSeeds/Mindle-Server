@@ -12,9 +12,7 @@ public class SaveComplaintRequestDto {
 
 	@NotNull
 	private Long categoryId;
-	private String cityName;
-	private String districtName;
-	private String subdistrictName;
+	private String subdistrictCode;
 	private String placeId;
 	@NotNull
 	private String title;
