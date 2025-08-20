@@ -14,6 +14,7 @@ spec:
       volumes:
         - name: firebase-config
           secret: { secretName: firebase-config-secret }
+      terminationGracePeriodSeconds: 60
       containers:
         - name: spring
           image: mindle.kr.ncr.ntruss.com/my-spring-app:latest
@@ -31,3 +32,22 @@ spec:
             - { name: DB_PASSWORD,     valueFrom: { secretKeyRef: { name: app-secret,  key: DB_PASSWORD } } }
             - { name: NCP_ACCESS_KEY,  valueFrom: { secretKeyRef: { name: app-secret,  key: NCP_ACCESS_KEY } } }
             - { name: NCP_SECRET_KEY,  valueFrom: { secretKeyRef: { name: app-secret,  key: NCP_SECRET_KEY } } }
+          readinessProbe:
+            tcpSocket:
+              port: 8080
+            initialDelaySeconds: 30
+            periodSeconds: 5
+            timeoutSeconds: 2
+            failureThreshold: 12
+          livenessProbe:
+            tcpSocket:
+              port: 8080
+            initialDelaySeconds: 90
+            periodSeconds: 10
+            timeoutSeconds: 2
+          startupProbe:
+            tcpSocket:
+              port: 8080
+            failureThreshold: 30
+            periodSeconds: 10
+            timeoutSeconds: 2
