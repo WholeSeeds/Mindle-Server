@@ -1,33 +1,194 @@
+---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: spring-app
+  name: spring-app-blue
+  labels:
+    app: spring-app
+    color: blue
 spec:
+  revisionHistoryLimit: 1
   replicas: 1
   selector:
-    matchLabels: { app: spring-app }
+    matchLabels:
+      app: spring-app
+      color: blue
   template:
     metadata:
-      labels: { app: spring-app }
+      labels:
+        app: spring-app
+        color: blue
     spec:
-      imagePullSecrets: [ { name: ncr-registry-secret } ]
+      imagePullSecrets:
+        - name: ncr-registry-secret
       volumes:
         - name: firebase-config
-          secret: { secretName: firebase-config-secret }
+          secret:
+            secretName: firebase-config-secret
       containers:
         - name: spring
-          image: mindle.kr.ncr.ntruss.com/my-spring-app:latest
+          # 파이프라인에서 ${IMAGE_TAG}를 빌드마다 고유 태그로 치환하세요(예: 20250820-001 또는 커밋 SHA)
+          image: mindle.kr.ncr.ntruss.com/my-spring-app:${IMAGE_TAG}
           imagePullPolicy: Always
-          ports: [ { containerPort: 8080 } ]
+          ports:
+            - containerPort: 8080
           volumeMounts:
-            - { name: firebase-config, mountPath: /etc/firebase/mindle-secret.json, subPath: mindle-secret.json }
+            - name: firebase-config
+              mountPath: /etc/firebase/mindle-secret.json
+              subPath: mindle-secret.json
           env:
-            - { name: SPRING_PROFILES_ACTIVE, value: prod }
-            - { name: DB_HOST,         valueFrom: { configMapKeyRef: { name: app-config, key: DB_HOST } } }
-            - { name: DB_PORT,         valueFrom: { configMapKeyRef: { name: app-config, key: DB_PORT } } }
-            - { name: DB_NAME,         valueFrom: { configMapKeyRef: { name: app-config, key: DB_NAME } } }
-            - { name: DB_USER,         valueFrom: { configMapKeyRef: { name: app-config, key: DB_USER } } }
-            - { name: NCP_BUCKET_NAME, valueFrom: { configMapKeyRef: { name: app-config, key: NCP_BUCKET_NAME } } }
-            - { name: DB_PASSWORD,     valueFrom: { secretKeyRef: { name: app-secret,  key: DB_PASSWORD } } }
-            - { name: NCP_ACCESS_KEY,  valueFrom: { secretKeyRef: { name: app-secret,  key: NCP_ACCESS_KEY } } }
-            - { name: NCP_SECRET_KEY,  valueFrom: { secretKeyRef: { name: app-secret,  key: NCP_SECRET_KEY } } }
+            - name: SPRING_PROFILES_ACTIVE
+              value: prod
+            - name: DB_HOST
+              valueFrom:
+                configMapKeyRef:
+                  name: app-config
+                  key: DB_HOST
+            - name: DB_PORT
+              valueFrom:
+                configMapKeyRef:
+                  name: app-config
+                  key: DB_PORT
+            - name: DB_NAME
+              valueFrom:
+                configMapKeyRef:
+                  name: app-config
+                  key: DB_NAME
+            - name: DB_USER
+              valueFrom:
+                configMapKeyRef:
+                  name: app-config
+                  key: DB_USER
+            - name: NCP_BUCKET_NAME
+              valueFrom:
+                configMapKeyRef:
+                  name: app-config
+                  key: NCP_BUCKET_NAME
+            - name: DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: app-secret
+                  key: DB_PASSWORD
+            - name: NCP_ACCESS_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: app-secret
+                  key: NCP_ACCESS_KEY
+            - name: NCP_SECRET_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: app-secret
+                  key: NCP_SECRET_KEY
+          # 보편적으로 안전한 probe (보안으로 401이 떠도 포트 오픈 여부 확인 가능)
+          readinessProbe:
+            tcpSocket:
+              port: 8080
+            initialDelaySeconds: 5
+            periodSeconds: 5
+          livenessProbe:
+            tcpSocket:
+              port: 8080
+            initialDelaySeconds: 20
+            periodSeconds: 10
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: spring-app-green
+  labels:
+    app: spring-app
+    color: green
+spec:
+  revisionHistoryLimit: 1
+  replicas: 0 # 초기엔 0. 배포 시 GREEN을 1로 늘리고, 전환 후 BLUE를 0으로 줄이세요.
+  selector:
+    matchLabels:
+      app: spring-app
+      color: green
+  template:
+    metadata:
+      labels:
+        app: spring-app
+        color: green
+    spec:
+      imagePullSecrets:
+        - name: ncr-registry-secret
+      volumes:
+        - name: firebase-config
+          secret:
+            secretName: firebase-config-secret
+      containers:
+        - name: spring
+          image: mindle.kr.ncr.ntruss.com/my-spring-app:${IMAGE_TAG}
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 8080
+          volumeMounts:
+            - name: firebase-config
+              mountPath: /etc/firebase/mindle-secret.json
+              subPath: mindle-secret.json
+          env:
+            - name: SPRING_PROFILES_ACTIVE
+              value: prod
+            - name: DB_HOST
+              valueFrom:
+                configMapKeyRef:
+                  name: app-config
+                  key: DB_HOST
+            - name: DB_PORT
+              valueFrom:
+                configMapKeyRef:
+                  name: app-config
+                  key: DB_PORT
+            - name: DB_NAME
+              valueFrom:
+                configMapKeyRef:
+                  name: app-config
+                  key: DB_NAME
+            - name: DB_USER
+              valueFrom:
+                configMapKeyRef:
+                  name: app-config
+                  key: DB_USER
+            - name: NCP_BUCKET_NAME
+              valueFrom:
+                configMapKeyRef:
+                  name: app-config
+                  key: NCP_BUCKET_NAME
+            - name: DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: app-secret
+                  key: DB_PASSWORD
+            - name: NCP_ACCESS_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: app-secret
+                  key: NCP_ACCESS_KEY
+            - name: NCP_SECRET_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: app-secret
+                  key: NCP_SECRET_KEY
+          readinessProbe:
+            tcpSocket:
+              port: 8080
+            initialDelaySeconds: 5
+            periodSeconds: 5
+          livenessProbe:
+            tcpSocket:
+              port: 8080
+            initialDelaySeconds: 20
+            periodSeconds: 10
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: spring-app
+spec:
+  selector:
+    app: spring-app
+    color: blue   # 초기 트래픽은 BLUE. 전환 시 GREEN으로 변경.
+  ports:
+    - port: 80
+      targetPort: 8080
