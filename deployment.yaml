@@ -16,7 +16,7 @@ spec:
           secret: { secretName: firebase-config-secret }
       containers:
         - name: spring
-          image: mindle.kr.ncr.ntruss.com/my-spring-app:1.0.40
+          image: mindle.kr.ncr.ntruss.com/my-spring-app:latest
           imagePullPolicy: Always
           ports: [ { containerPort: 8080 } ]
           volumeMounts:
