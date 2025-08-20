@@ -2,10 +2,8 @@ package com.wholeseeds.mindle.domain.complaint.repository.impl;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 
-import com.querydsl.core.group.GroupBy;
 import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.SubQueryExpression;
 import com.querydsl.core.types.dsl.BooleanExpression;
@@ -22,6 +20,12 @@ import com.wholeseeds.mindle.domain.complaint.entity.QComplaint;
 import com.wholeseeds.mindle.domain.complaint.entity.QComplaintImage;
 import com.wholeseeds.mindle.domain.complaint.entity.QComplaintReaction;
 import com.wholeseeds.mindle.domain.complaint.repository.custom.ComplaintRepositoryCustom;
+import com.wholeseeds.mindle.domain.region.dto.CityDto;
+import com.wholeseeds.mindle.domain.region.dto.DistrictDto;
+import com.wholeseeds.mindle.domain.region.dto.SubdistrictDto;
+import com.wholeseeds.mindle.domain.region.entity.City;
+import com.wholeseeds.mindle.domain.region.entity.District;
+import com.wholeseeds.mindle.domain.region.entity.Subdistrict;
 
 import jakarta.persistence.EntityManager;
 
@@ -40,32 +44,98 @@ public class ComplaintRepositoryImpl extends JpaBaseRepositoryImpl<Complaint, Lo
 	/* 민원상세, 이미지 URL 조회 */
 	@Override
 	public Optional<ComplaintDetailWithImagesDto> getComplaintWithImages(Long complaintId) {
-		// transform 결과 Map<Id, DTO> 여서 맵핑
-		Map<Long, ComplaintDetailWithImagesDto> resultMap = queryFactory
-			.from(C)
-			.leftJoin(I).on(I.complaint.id.eq(C.id))
+		// 먼저 Complaint 엔티티를 이미지와 함께 조회
+		Complaint complaint = queryFactory
+			.selectFrom(C)
+			.leftJoin(C.place).fetchJoin()
+			.leftJoin(C.place.type).fetchJoin()
+			.leftJoin(C.subdistrict).fetchJoin()
+			.leftJoin(C.subdistrict.district).fetchJoin()
+			.leftJoin(C.subdistrict.city).fetchJoin()
+			.leftJoin(C.category).fetchJoin()
+			.leftJoin(C.member).fetchJoin()
 			.where(C.id.eq(complaintId)
 				.and(C.deletedAt.isNull()))
-			.transform(
-				GroupBy.groupBy(C.id).as(
-					Projections.constructor(
-						ComplaintDetailWithImagesDto.class,
-						C.id,
-						C.title,
-						C.content,
-						C.category.name,
-						C.member.nickname,
-						C.place.name,
-						C.subdistrict.city.name,
-						C.subdistrict.district.name,
-						C.subdistrict.name,
-						C.createdAt,
-						GroupBy.list(I.imageUrl)
-					)
-				)
-			);
+			.fetchOne();
 
-		return Optional.ofNullable(resultMap.get(complaintId));
+		if (complaint == null) {
+			return Optional.empty();
+		}
+
+		// 이미지 URL 목록 조회
+		List<String> imageUrls = queryFactory
+			.select(I.imageUrl)
+			.from(I)
+			.where(I.complaint.id.eq(complaintId))
+			.fetch();
+
+		// 지역 정보 DTO 생성
+		CityDto cityDto = null;
+		DistrictDto districtDto = null;
+		SubdistrictDto subdistrictDto = null;
+
+		if (complaint.getSubdistrict() != null) {
+			Subdistrict subdistrict = complaint.getSubdistrict();
+			subdistrictDto = getSubdistrictDto(subdistrict);
+
+			if (subdistrict.getDistrict() != null) {
+				districtDto = getDistrictDto(subdistrict.getDistrict());
+
+				// subdistrict의 city가 null이면 district의 city를 사용
+				if (subdistrict.getCity() != null) {
+					cityDto = getCityDto(subdistrict.getCity());
+				} else if (subdistrict.getDistrict().getCity() != null) {
+					cityDto = getCityDto(subdistrict.getDistrict().getCity());
+				}
+			} else if (subdistrict.getCity() != null) {
+				cityDto = getCityDto(subdistrict.getCity());
+			}
+		}
+
+		// DTO 변환은 서비스에서 처리하도록 데이터만 전달
+		// 임시로 기존 방식 유지하되 DTO 객체 생성 부분만 수정
+		ComplaintDetailWithImagesDto dto = ComplaintDetailWithImagesDto.builder()
+			.id(complaint.getId())
+			.title(complaint.getTitle())
+			.content(complaint.getContent())
+			.categoryName(complaint.getCategory().getName())
+			.memberNickname(complaint.getMember().getNickname())
+			.place(null) // 매퍼에서 처리
+			.city(cityDto)
+			.district(districtDto)
+			.subdistrict(subdistrictDto)
+			.createdAt(complaint.getCreatedAt())
+			.imageUrlList(imageUrls)
+			.build();
+
+		return Optional.of(dto);
+	}
+
+	private SubdistrictDto getSubdistrictDto(Subdistrict subdistrict) {
+		return SubdistrictDto.builder()
+			.code(subdistrict.getCode())
+			.name(subdistrict.getName())
+			.type(subdistrict.getType())
+			.build();
+	}
+
+	private DistrictDto getDistrictDto(District district) {
+		DistrictDto districtDto;
+		districtDto = DistrictDto.builder()
+			.code(district.getCode())
+			.name(district.getName())
+			.type(district.getType())
+			.cityCode(district.getCity() != null ? district.getCity().getCode() : null)
+			.build();
+		return districtDto;
+	}
+
+	private CityDto getCityDto(City city) {
+		return CityDto.builder()
+			.code(city.getCode())
+			.name(city.getName())
+			.type(city.getType())
+			.build();
 	}
 
 	/* '특정 민원의 총 공감 수'와 '로그인 사용자의 해당 글 공감 여부' 조회 */
