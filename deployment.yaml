@@ -28,7 +28,7 @@ spec:
       containers:
         - name: spring
           # 파이프라인에서 ${IMAGE_TAG}를 빌드마다 고유 태그로 치환하세요(예: 20250820-001 또는 커밋 SHA)
-          image: mindle.kr.ncr.ntruss.com/my-spring-app:${IMAGE_TAG}
+          image: mindle.kr.ncr.ntruss.com/my-spring-app:latest
           imagePullPolicy: Always
           ports:
             - containerPort: 8080
@@ -119,7 +119,7 @@ spec:
             secretName: firebase-config-secret
       containers:
         - name: spring
-          image: mindle.kr.ncr.ntruss.com/my-spring-app:${IMAGE_TAG}
+          image: mindle.kr.ncr.ntruss.com/my-spring-app:latest
           imagePullPolicy: Always
           ports:
             - containerPort: 8080
