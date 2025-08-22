@@ -4,6 +4,7 @@ metadata:
   name: spring-app-green
 spec:
   replicas: 1
+  progressDeadlineSeconds: 900
   selector:
     matchLabels: { app: spring-app, color: green }
   template:
