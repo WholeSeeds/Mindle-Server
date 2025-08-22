@@ -51,7 +51,7 @@ spec:
           startupProbe:
             tcpSocket:
               port: 8080
-            initialDelaySeconds: 30
-            failureThreshold: 30
+            initialDelaySeconds: 45
+            failureThreshold: 50
             periodSeconds: 10
-            timeoutSeconds: 5
+            timeoutSeconds: 10
