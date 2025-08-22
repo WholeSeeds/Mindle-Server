@@ -4,6 +4,7 @@ metadata:
   name: spring-app
 spec:
   replicas: 1
+  progressDeadlineSeconds: 900
   selector:
     matchLabels: { app: spring-app }
   template:
