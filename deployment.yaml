@@ -18,19 +18,7 @@ spec:
       terminationGracePeriodSeconds: 60
       containers:
         - name: spring
-          image: mindle.kr.ncr.ntruss.com/my-spring-app:latest
-          command: [ "/bin/sh" ]
-          args:
-              - "-c"
-              - |
-                JAR_FILE=$(find / -name "*.jar" -not -path "/proc/*" -not -path "/sys/*" 2>/dev/null | head -1)
-                echo "Found JAR: $JAR_FILE"
-                if [ -n "$JAR_FILE" ]; then
-                  java -jar "$JAR_FILE"
-                else
-                  echo "No JAR file found!"
-                  exit 1
-                fi
+          image: mindle.kr.ncr.ntruss.com/my-spring-app:my-spring-app@sha256:11bfdb06927dc3fea0a5206e6d0c1a2f7ab5a5f1b97b168abdf8dd58214fd646
           imagePullPolicy: Always
           ports: [ { containerPort: 8080 } ]
           volumeMounts:
