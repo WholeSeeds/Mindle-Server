@@ -19,8 +19,18 @@ spec:
       containers:
         - name: spring
           image: mindle.kr.ncr.ntruss.com/my-spring-app:latest
-          command: ["java"]
-          args: ["-jar", "/app/app.jar"]
+          command: [ "/bin/sh" ]
+          args:
+              - "-c"
+              - |
+                JAR_FILE=$(find / -name "*.jar" -not -path "/proc/*" -not -path "/sys/*" 2>/dev/null | head -1)
+                echo "Found JAR: $JAR_FILE"
+                if [ -n "$JAR_FILE" ]; then
+                  java -jar "$JAR_FILE"
+                else
+                  echo "No JAR file found!"
+                  exit 1
+                fi
           imagePullPolicy: Always
           ports: [ { containerPort: 8080 } ]
           volumeMounts:
