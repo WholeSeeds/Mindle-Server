@@ -1,4 +1,4 @@
-package com.wholeseeds.mindle.domain.complaint.dto.csv;
+package com.wholeseeds.mindle.domain.category.dto.csv;
 
 import com.opencsv.bean.CsvBindByName;
 

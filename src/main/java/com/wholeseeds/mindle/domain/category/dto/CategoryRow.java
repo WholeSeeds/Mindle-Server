@@ -1,4 +1,4 @@
-package com.wholeseeds.mindle.domain.complaint.dto;
+package com.wholeseeds.mindle.domain.category.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

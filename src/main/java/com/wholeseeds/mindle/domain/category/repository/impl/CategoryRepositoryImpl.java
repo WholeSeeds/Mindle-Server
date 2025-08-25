@@ -1,13 +1,13 @@
-package com.wholeseeds.mindle.domain.complaint.repository.impl;
+package com.wholeseeds.mindle.domain.category.repository.impl;
 
 import java.util.List;
 
 import com.querydsl.core.types.Projections;
 import com.wholeseeds.mindle.common.repository.JpaBaseRepositoryImpl;
-import com.wholeseeds.mindle.domain.complaint.dto.CategoryRow;
-import com.wholeseeds.mindle.domain.complaint.entity.Category;
-import com.wholeseeds.mindle.domain.complaint.entity.QCategory;
-import com.wholeseeds.mindle.domain.complaint.repository.custom.CategoryRepositoryCustom;
+import com.wholeseeds.mindle.domain.category.dto.CategoryRow;
+import com.wholeseeds.mindle.domain.category.entity.Category;
+import com.wholeseeds.mindle.domain.category.entity.QCategory;
+import com.wholeseeds.mindle.domain.category.repository.custom.CategoryRepositoryCustom;
 
 import jakarta.persistence.EntityManager;
 

@@ -1,4 +1,4 @@
-package com.wholeseeds.mindle.domain.complaint.controller;
+package com.wholeseeds.mindle.domain.category.controller;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
@@ -13,8 +13,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.wholeseeds.mindle.common.annotation.RequireAuth;
 import com.wholeseeds.mindle.common.util.ResponseTemplate;
-import com.wholeseeds.mindle.domain.complaint.dto.response.CategoryDto;
-import com.wholeseeds.mindle.domain.complaint.service.CategoryService;
+import com.wholeseeds.mindle.domain.category.dto.response.CategoryDto;
+import com.wholeseeds.mindle.domain.category.service.CategoryService;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;

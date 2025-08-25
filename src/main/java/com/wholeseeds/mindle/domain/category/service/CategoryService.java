@@ -1,4 +1,4 @@
-package com.wholeseeds.mindle.domain.complaint.service;
+package com.wholeseeds.mindle.domain.category.service;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -9,11 +9,11 @@ import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.wholeseeds.mindle.domain.complaint.dto.CategoryRow;
-import com.wholeseeds.mindle.domain.complaint.dto.response.CategoryDto;
-import com.wholeseeds.mindle.domain.complaint.entity.Category;
+import com.wholeseeds.mindle.domain.category.dto.CategoryRow;
+import com.wholeseeds.mindle.domain.category.dto.response.CategoryDto;
+import com.wholeseeds.mindle.domain.category.entity.Category;
+import com.wholeseeds.mindle.domain.category.repository.CategoryRepository;
 import com.wholeseeds.mindle.domain.complaint.exception.CategoryNotFoundException;
-import com.wholeseeds.mindle.domain.complaint.repository.CategoryRepository;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

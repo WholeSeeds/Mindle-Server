@@ -1,4 +1,4 @@
-package com.wholeseeds.mindle.domain.complaint.dto.response;
+package com.wholeseeds.mindle.domain.category.dto.response;
 
 import java.util.ArrayList;
 import java.util.List;
