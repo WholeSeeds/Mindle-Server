@@ -19,6 +19,8 @@ spec:
       containers:
         - name: spring
           image: mindle.kr.ncr.ntruss.com/my-spring-app:latest
+          command: ["java"]
+          args: ["-jar", "/app/app.jar"]
           imagePullPolicy: Always
           ports: [ { containerPort: 8080 } ]
           volumeMounts:
