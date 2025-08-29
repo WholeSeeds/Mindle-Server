@@ -8,12 +8,13 @@ import java.util.Map;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.wholeseeds.mindle.common.annotation.RequireAuth;
 import com.wholeseeds.mindle.common.util.ResponseTemplate;
-import com.wholeseeds.mindle.domain.category.dto.response.CategoryDto;
+import com.wholeseeds.mindle.domain.category.dto.response.CategoryTreeDto;
 import com.wholeseeds.mindle.domain.category.service.CategoryService;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -41,7 +42,22 @@ public class CategoryController {
 	@GetMapping("/all")
 	@RequireAuth
 	public ResponseEntity<Map<String, Object>> getCategoryTree() {
-		List<CategoryDto> categoryAll = categoryService.getCategoryAll();
+		List<CategoryTreeDto> categoryAll = categoryService.getCategoryAll();
 		return responseTemplate.success(categoryAll, HttpStatus.OK);
+	}
+
+	/**
+	 * 카테고리 서브트리 조회
+	 */
+	@Operation(
+		summary = "카테고리 서브트리 조회",
+		description = "특정 카테고리 id를 루트로 하는 계층 구조를 반환합니다."
+	)
+	@ApiResponse(responseCode = "200", description = "카테고리 서브트리 반환")
+	@GetMapping("/{categoryId}")
+	@RequireAuth
+	public ResponseEntity<Map<String, Object>> getCategorySubtree(@PathVariable Long categoryId) {
+		CategoryTreeDto subtree = categoryService.getCategorySubtree(categoryId);
+		return responseTemplate.success(subtree, HttpStatus.OK);
 	}
 }
