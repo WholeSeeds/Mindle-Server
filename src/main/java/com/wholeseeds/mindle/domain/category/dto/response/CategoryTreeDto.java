@@ -12,11 +12,11 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class CategoryDto {
+public class CategoryTreeDto {
 	private Long id;
 	private String name;
 	private String description;
 
 	@Builder.Default
-	private List<CategoryDto> children = new ArrayList<>();
+	private List<CategoryTreeDto> children = new ArrayList<>();
 }
