@@ -30,6 +30,7 @@ import com.wholeseeds.mindle.domain.complaint.service.ComplaintService;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -84,8 +85,11 @@ public class ComplaintController {
 	)
 	@GetMapping("/detail/{complaintId}")
 	@RequireAuth
-	public ResponseEntity<Map<String, Object>> getComplaintDetail(@PathVariable Long complaintId) {
-		ComplaintDetailResponseDto responseDto = complaintService.getComplaintDetailResponse(complaintId, 1L);
+	public ResponseEntity<Map<String, Object>> getComplaintDetail(
+		@PathVariable Long complaintId,
+		@Parameter(hidden = true) @CurrentMemberId Long memberId
+	) {
+		ComplaintDetailResponseDto responseDto = complaintService.getComplaintDetailResponse(complaintId, memberId);
 		return responseTemplate.success(responseDto, HttpStatus.OK);
 	}
 
@@ -99,7 +103,10 @@ public class ComplaintController {
 	@ApiResponse(
 		responseCode = "200",
 		description = "댓글 목록 반환",
-		content = @Content(schema = @Schema(implementation = CommentDto.class))
+		content = @Content(
+			mediaType = "application/json",
+			array = @ArraySchema(schema = @Schema(implementation = CommentDto.class))
+		)
 	)
 	@GetMapping("/detail/comment")
 	@RequireAuth
@@ -118,7 +125,10 @@ public class ComplaintController {
 	@ApiResponse(
 		responseCode = "200",
 		description = "민원 목록 반환",
-		content = @Content(schema = @Schema(implementation = ComplaintListResponseDto.class))
+		content = @Content(
+			mediaType = "application/json",
+			array = @ArraySchema(schema = @Schema(implementation = ComplaintListResponseDto.class))
+		)
 	)
 	@GetMapping("/list")
 	@RequireAuth
