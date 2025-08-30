@@ -12,8 +12,8 @@ import org.springframework.transaction.annotation.Transactional;
 import com.wholeseeds.mindle.domain.category.dto.CategoryRow;
 import com.wholeseeds.mindle.domain.category.dto.response.CategoryTreeDto;
 import com.wholeseeds.mindle.domain.category.entity.Category;
+import com.wholeseeds.mindle.domain.category.exception.CategoryNotFoundException;
 import com.wholeseeds.mindle.domain.category.repository.CategoryRepository;
-import com.wholeseeds.mindle.domain.complaint.exception.CategoryNotFoundException;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
