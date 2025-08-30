@@ -7,6 +7,8 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.wholeseeds.mindle.common.util.ObjectUtils;
+import com.wholeseeds.mindle.domain.category.entity.Category;
+import com.wholeseeds.mindle.domain.category.service.CategoryService;
 import com.wholeseeds.mindle.domain.complaint.dto.CommentDto;
 import com.wholeseeds.mindle.domain.complaint.dto.ComplaintDetailWithImagesDto;
 import com.wholeseeds.mindle.domain.complaint.dto.ReactionDto;
@@ -16,7 +18,6 @@ import com.wholeseeds.mindle.domain.complaint.dto.request.SaveComplaintRequestDt
 import com.wholeseeds.mindle.domain.complaint.dto.response.ComplaintDetailResponseDto;
 import com.wholeseeds.mindle.domain.complaint.dto.response.ComplaintListResponseDto;
 import com.wholeseeds.mindle.domain.complaint.dto.response.SaveComplaintResponseDto;
-import com.wholeseeds.mindle.domain.complaint.entity.Category;
 import com.wholeseeds.mindle.domain.complaint.entity.Complaint;
 import com.wholeseeds.mindle.domain.complaint.exception.ComplaintNotFoundException;
 import com.wholeseeds.mindle.domain.complaint.exception.ImageUploadLimitExceeded;

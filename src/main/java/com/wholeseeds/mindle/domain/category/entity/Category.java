@@ -1,4 +1,4 @@
-package com.wholeseeds.mindle.domain.complaint.entity;
+package com.wholeseeds.mindle.domain.category.entity;
 
 import java.util.ArrayList;
 import java.util.List;

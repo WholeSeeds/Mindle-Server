@@ -7,9 +7,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.wholeseeds.mindle.common.util.CsvLoader;
-import com.wholeseeds.mindle.domain.complaint.dto.csv.CategoryCsvDto;
-import com.wholeseeds.mindle.domain.complaint.entity.Category;
-import com.wholeseeds.mindle.domain.complaint.repository.CategoryRepository;
+import com.wholeseeds.mindle.domain.category.dto.csv.CategoryCsvDto;
+import com.wholeseeds.mindle.domain.category.entity.Category;
+import com.wholeseeds.mindle.domain.category.repository.CategoryRepository;
 
 import lombok.RequiredArgsConstructor;
 
@@ -39,8 +39,9 @@ public class CategoryInitializer implements CommandLineRunner {
 		// 2) 부모-자식 연결 (CSV의 parent_id를 이용해 메모리 상 매핑으로 연결)
 		for (CategoryCsvDto dto : rows) {
 			Long parentId = dto.getParentId();
-			if (parentId == null || parentId == 0L)
+			if (parentId == null || parentId == 0L) {
 				continue; // 루트는 스킵
+			}
 
 			Category child = csvIdToEntity.get(dto.getId());
 			Category parent = csvIdToEntity.get(parentId);
