@@ -50,6 +50,9 @@ ncp:
     secret-key: ${NCP_SECRET_KEY}
     bucket-name: ${NCP_BUCKET_NAME}
 
+category:
+  max-depth: 3
+
 ---
 # prod 환경일 때 아래 코드 실행됨
 spring:
