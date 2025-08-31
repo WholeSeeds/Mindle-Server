@@ -34,7 +34,7 @@ import lombok.NoArgsConstructor;
 @Builder
 public class Category extends BaseEntity {
 
-	@Column(length = 100, nullable = false)
+	@Column(length = 100, nullable = false, unique = true)
 	private String name;
 
 	@Column(columnDefinition = "TEXT")
