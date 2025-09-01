@@ -1,6 +1,7 @@
 package com.wholeseeds.mindle.domain.complaint.entity;
 
 import com.wholeseeds.mindle.common.entity.BaseEntity;
+import com.wholeseeds.mindle.domain.category.entity.Category;
 import com.wholeseeds.mindle.domain.member.entity.Member;
 import com.wholeseeds.mindle.domain.place.entity.Place;
 import com.wholeseeds.mindle.domain.region.entity.Subdistrict;

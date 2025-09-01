@@ -1,4 +1,4 @@
-package com.wholeseeds.mindle.domain.complaint.entity;
+package com.wholeseeds.mindle.domain.category.entity;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -34,7 +34,7 @@ import lombok.NoArgsConstructor;
 @Builder
 public class Category extends BaseEntity {
 
-	@Column(length = 100, nullable = false)
+	@Column(length = 100, nullable = false, unique = true)
 	private String name;
 
 	@Column(columnDefinition = "TEXT")

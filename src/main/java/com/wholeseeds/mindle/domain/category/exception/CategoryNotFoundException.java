@@ -1,4 +1,4 @@
-package com.wholeseeds.mindle.domain.complaint.exception;
+package com.wholeseeds.mindle.domain.category.exception;
 
 import com.wholeseeds.mindle.common.exception.BusinessException;
 import com.wholeseeds.mindle.common.response.ErrorCode;
