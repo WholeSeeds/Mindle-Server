@@ -20,18 +20,17 @@ public class CategoryRepositoryImpl extends JpaBaseRepositoryImpl<Category, Long
 
 	@Override
 	public List<CategoryRow> findAllFlat() {
-		QCategory c = QCategory.category;
 		return queryFactory
 			.select(Projections.constructor(
 				CategoryRow.class,
-				c.id,
-				c.name,
-				c.description,
-				c.parent.id
+				category.id,
+				category.name,
+				category.description,
+				category.parent.id
 			))
-			.from(c)
-			.where(c.deletedAt.isNull())
-			.orderBy(c.id.asc())
+			.from(category)
+			.where(category.deletedAt.isNull())
+			.orderBy(category.id.asc())
 			.fetch();
 	}
 }

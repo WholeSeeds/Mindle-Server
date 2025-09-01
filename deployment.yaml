@@ -21,7 +21,7 @@ spec:
             secretName: firebase-config-secret
       containers:
         - name: spring # 컨테이너 이름
-          image: mindle.kr.ncr.ntruss.com/my-spring-app:1.0.44
+          image: mindle.kr.ncr.ntruss.com/my-spring-app:1.0.45
           imagePullPolicy: Always # 항상 최신 이미지 풀링
           ports:
             - containerPort: 8080 # 컨테이너 내부 포트
