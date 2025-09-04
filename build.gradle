@@ -71,6 +71,9 @@ dependencies {
 
     // OpenCSV
     implementation 'com.opencsv:opencsv:5.11'
+
+    // Aho-Corasick
+    implementation 'org.ahocorasick:ahocorasick:0.6.3'
 }
 
 //tasks.named('test') {
