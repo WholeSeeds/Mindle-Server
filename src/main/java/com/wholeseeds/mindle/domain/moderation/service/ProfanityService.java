@@ -1,8 +1,11 @@
+// src/main/java/com/wholeseeds/mindle/domain/moderation/service/ProfanityService.java
 package com.wholeseeds.mindle.domain.moderation.service;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -14,6 +17,8 @@ import org.springframework.transaction.annotation.Transactional;
 import com.wholeseeds.mindle.domain.moderation.dto.request.ProfanityCheckRequestDto;
 import com.wholeseeds.mindle.domain.moderation.dto.response.ProfanityCheckResponseDto;
 import com.wholeseeds.mindle.domain.moderation.dto.response.ProfanityHitDto;
+import com.wholeseeds.mindle.domain.moderation.support.NormalizedText;
+import com.wholeseeds.mindle.domain.moderation.support.ProfanityNormalizer;
 import com.wholeseeds.mindle.domain.moderation.support.ProfanityState;
 
 import lombok.extern.slf4j.Slf4j;
@@ -26,9 +31,8 @@ public class ProfanityService {
 		new AtomicReference<>(ProfanityState.disabled());
 
 	/**
-	 * 주어진 비속어 목록으로 Aho–Corasick 자동자를 재구성하고,
-	 * 탐지 엔진 상태(자동자 + 사전)를 원자적으로 교체한다.
-	 * <p>입력 리스트는 null, 공백을 제거하고 중복을 제거한 뒤 불변 리스트로 유지된다.</p>
+	 * 주어진 비속어 사전을 정규화하여 Aho–Corasick 자동자를 재구성하고,
+	 * 상태(트라이, 표준 단어 목록, 정규화 매핑)를 원자적으로 교체한다.
 	 *
 	 * @param profanities 비속어 단어 목록
 	 */
@@ -37,34 +41,57 @@ public class ProfanityService {
 			profanities = Collections.emptyList();
 		}
 
-		List<String> normalized = profanities.stream()
+		// 표준 단어 정제
+		List<String> canonical = profanities.stream()
 			.filter(Objects::nonNull)
 			.map(String::trim)
 			.filter(s -> !s.isEmpty())
 			.distinct()
 			.toList();
 
-		if (normalized.isEmpty()) {
+		if (canonical.isEmpty()) {
 			log.warn("Profanity list is empty. Automaton will be disabled.");
 			stateRef.set(ProfanityState.disabled());
 			return;
 		}
 
+		// 정규화 키와 매핑 생성
+		List<String> normalizedKeys = new ArrayList<>(canonical.size());
+		Map<String, String> normToCanon = new HashMap<>(canonical.size() * 2);
+
+		for (String w : canonical) {
+			String key = ProfanityNormalizer.normalizeToken(w);
+			if (key.isEmpty()) {
+				continue;
+			}
+			normalizedKeys.add(key);
+			// 동일 키에 여러 단어가 매핑될 수 있음 → 첫 항목 유지
+			normToCanon.putIfAbsent(key, w);
+		}
+
+		if (normalizedKeys.isEmpty()) {
+			log.warn("All profanities collapsed to empty after normalization. Disabling automaton.");
+			stateRef.set(ProfanityState.disabled());
+			return;
+		}
+
+		// AC 빌드
 		Trie trie = Trie.builder()
-			.ignoreCase()
 			.ignoreOverlaps()
-			.addKeywords(normalized)
+			.addKeywords(normalizedKeys)
 			.build();
 
-		stateRef.set(ProfanityState.of(trie, normalized));
-		log.info("Profanity automaton built with {} terms.", normalized.size());
+		stateRef.set(ProfanityState.of(trie, canonical, normToCanon));
+		log.info("Profanity automaton built with {} normalized keys ({} canonical).",
+			normalizedKeys.size(), canonical.size());
 	}
 
 	/**
-	 * 본문 텍스트에 대한 비속어 탐지
-	 * <p>자동자가 비활성화되어 있거나 본문이 비어 있으면 통과(passed=true)를 반환한다.</p>
+	 * 본문 텍스트에 대해 비속어를 탐지한다.
+	 * - 본문을 정규화(분리문자 제거/자모 분해/소문자화)하고 AC로 매칭
+	 * - 매칭 시작 인덱스는 정규화 인덱스를 **원문 인덱스로 역매핑**하여 반환
 	 *
-	 * @param req 검사 요청 DTO (본문 텍스트 포함)
+	 * @param req 검사 요청 DTO
 	 * @return 탐지 결과(passed, hits[])
 	 */
 	@Transactional(readOnly = true)
@@ -81,12 +108,31 @@ public class ProfanityService {
 				.build();
 		}
 
-		Iterable<Emit> emits = trie.parseText(text);
+		// 본문 정규화 + 역매핑 생성
+		NormalizedText nt = ProfanityNormalizer.normalizeForDetection(text);
+		String norm = nt.normalized();
+		int[] map = nt.indexMap();
+
+		if (norm.isEmpty()) {
+			return ProfanityCheckResponseDto.builder()
+				.passed(true)
+				.hits(Collections.emptyList())
+				.build();
+		}
+
+		Iterable<Emit> emits = trie.parseText(norm);
 		List<ProfanityHitDto> hits = new ArrayList<>();
+
 		for (Emit e : emits) {
+			int normStart = e.getStart();
+			int origStart = (normStart >= 0 && normStart < map.length) ? map[normStart] : 0;
+
+			// 표준 단어명(사전 단어) 복원
+			String canonical = state.normToCanon().getOrDefault(e.getKeyword(), e.getKeyword());
+
 			hits.add(ProfanityHitDto.builder()
-				.profanity(e.getKeyword())
-				.index(e.getStart()) // 0-base 시작 인덱스
+				.profanity(canonical)
+				.index(origStart) // 원문 0-base 인덱스
 				.build());
 		}
 
