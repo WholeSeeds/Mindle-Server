@@ -1,4 +1,3 @@
-// src/main/java/com/wholeseeds/mindle/domain/moderation/service/ProfanityService.java
 package com.wholeseeds.mindle.domain.moderation.service;
 
 import java.util.ArrayList;
@@ -124,15 +123,23 @@ public class ProfanityService {
 		List<ProfanityHitDto> hits = new ArrayList<>();
 
 		for (Emit e : emits) {
-			int normStart = e.getStart();
-			int origStart = (normStart >= 0 && normStart < map.length) ? map[normStart] : 0;
+			int normStart = e.getStart(); // 정규화 문자열 기준
+			int normEnd   = e.getEnd();   // 정규화 문자열 기준
 
-			// 표준 단어명(사전 단어) 복원
-			String canonical = state.normToCanon().getOrDefault(e.getKeyword(), e.getKeyword());
+			// 원문 인덱스로 역매핑
+			int origStart = (normStart >= 0 && normStart < map.length) ? map[normStart] : 0;
+			int origEnd   = (normEnd   >= 0 && normEnd   < map.length) ? map[normEnd]   : (text.length() - 1);
+			if (origEnd < origStart) {
+				int t = origStart;
+				origStart = origEnd;
+				origEnd = t;
+			}
+
+			String raw = text.substring(origStart, Math.min(origEnd + 1, text.length()));
 
 			hits.add(ProfanityHitDto.builder()
-				.profanity(canonical)
-				.index(origStart) // 원문 0-base 인덱스
+				.profanity(raw)
+				.index(origStart)
 				.build());
 		}
 

@@ -3,7 +3,6 @@ package com.wholeseeds.mindle.domain.moderation.support;
 import java.text.Normalizer;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.IntStream;
 
 /**
  * 비속어 탐지를 위한 텍스트 정규화 유틸.
@@ -17,18 +16,6 @@ public final class ProfanityNormalizer {
 	private ProfanityNormalizer() {
 	}
 
-	// 한글 분해 테이블 (호환 자모)
-	private static final char[] L_TABLE = new char[] {
-		'ㄱ', 'ㄲ', 'ㄴ', 'ㄷ', 'ㄸ', 'ㄹ', 'ㅁ', 'ㅂ', 'ㅃ', 'ㅅ', 'ㅆ', 'ㅇ', 'ㅈ', 'ㅉ', 'ㅊ', 'ㅋ', 'ㅌ', 'ㅍ', 'ㅎ'
-	};
-	private static final char[] V_TABLE = new char[] {
-		'ㅏ', 'ㅐ', 'ㅑ', 'ㅒ', 'ㅓ', 'ㅔ', 'ㅕ', 'ㅖ', 'ㅗ', 'ㅘ', 'ㅙ', 'ㅚ', 'ㅛ', 'ㅜ', 'ㅝ', 'ㅞ', 'ㅟ', 'ㅠ', 'ㅡ', 'ㅢ', 'ㅣ'
-	};
-	private static final char[] T_TABLE = new char[] {
-		'\0', 'ㄱ', 'ㄲ', 'ㄳ', 'ㄴ', 'ㄵ', 'ㄶ', 'ㄷ', 'ㄹ', 'ㄺ', 'ㄻ', 'ㄼ', 'ㄽ', 'ㄾ', 'ㄿ', 'ㅀ', 'ㅁ', 'ㅂ', 'ㅄ', 'ㅅ',
-		'ㅆ', 'ㅇ', 'ㅈ', 'ㅊ', 'ㅋ', 'ㅌ', 'ㅍ', 'ㅎ'
-	};
-
 	/**
 	 * 입력 본문을 탐지용으로 정규화하고 인덱스 역매핑 정보를 생성한다.
 	 *
@@ -40,33 +27,32 @@ public final class ProfanityNormalizer {
 			return new NormalizedText("", new int[0]);
 		}
 
-		// 유니코드 정규화로 결합문자/악센트 분리
-		String normalized = Normalizer.normalize(text, Normalizer.Form.NFKD);
+		StringBuilder sb = new StringBuilder(text.length() * 2);
+		List<Integer> map = new ArrayList<>(text.length() * 2);
 
-		StringBuilder sb = new StringBuilder(normalized.length() * 2);
-		List<Integer> map = new ArrayList<>(normalized.length() * 2);
+		// 원문을 글자 단위로 순회하며, 각 글자를 NFKD로 전개하고
+		// 전개된 각 문자에 대해 "원문 인덱스 j"를 저장
+		for (int j = 0; j < text.length(); j++) {
+			char c = text.charAt(j);
+			String d = Normalizer.normalize(String.valueOf(c), Normalizer.Form.NFKD);
 
-		// 결합 기호/분리 문자 제거, 영문 소문자화, 한글 분해, 그 외는 그대로 유지
-		IntStream.range(0, normalized.length()).forEach(i -> {
-			char ch = normalized.charAt(i);
-			if (Character.getType(ch) == Character.NON_SPACING_MARK) {
-				return;
+			for (int k = 0; k < d.length(); k++) {
+				char ch = d.charAt(k);
+
+				// 결합 기호(악센트 등) 또는 공백/구두점/기호 등은 스킵
+				if (Character.getType(ch) == Character.NON_SPACING_MARK || isSkippableSeparator(ch)) {
+					continue;
+				}
+
+				// ASCII는 소문자화
+				if (ch <= 0x7F) {
+					ch = Character.toLowerCase(ch);
+				}
+
+				sb.append(ch);
+				map.add(j);
 			}
-			if (isSkippableSeparator(ch)) {
-				return;
-			}
-			if (ch <= 0x7F) {
-				sb.append(Character.toLowerCase(ch));
-				map.add(i);
-				return;
-			}
-			if (isHangulSyllable(ch)) {
-				decomposeHangulSyllable(ch, sb, map, i);
-				return;
-			}
-			sb.append(ch);
-			map.add(i);
-		});
+		}
 
 		int[] indexMap = map.stream().mapToInt(Integer::intValue).toArray();
 		return new NormalizedText(sb.toString(), indexMap);
@@ -80,16 +66,6 @@ public final class ProfanityNormalizer {
 	 */
 	public static String normalizeToken(String token) {
 		return normalizeForDetection(token).normalized();
-	}
-
-	/**
-	 * 주어진 문자가 한글 음절 블록(가~힣)에 속하는지 판단한다.
-	 *
-	 * @param ch 검사할 문자
-	 * @return 한글 음절이면 {@code true}, 아니면 {@code false}
-	 */
-	private static boolean isHangulSyllable(char ch) {
-		return (ch >= 0xAC00 && ch <= 0xD7A3);
 	}
 
 	/**
@@ -116,37 +92,5 @@ public final class ProfanityNormalizer {
 				Character.FORMAT -> true;
 			default -> false;
 		};
-	}
-
-	/**
-	 * 한글 음절(가~힣)을 호환 자모(초성/중성/종성)로 분해하여 출력 버퍼에 추가하고,
-	 * 각 추가된 문자에 대해 원문 인덱스를 매핑 테이블에 기록한다.
-	 *
-	 * @param ch      분해할 한글 음절
-	 * @param out     정규화 결과를 누적할 출력 버퍼
-	 * @param map     정규화 인덱스 → 원문 인덱스 매핑 테이블
-	 * @param origIdx 원문에서의 문자 인덱스
-	 */
-	private static void decomposeHangulSyllable(
-		char ch,
-		StringBuilder out,
-		List<Integer> map,
-		int origIdx
-	) {
-		int sIndex = ch - 0xAC00;
-		int l = sIndex / (21 * 28);
-		int v = (sIndex % (21 * 28)) / 28;
-		int t = sIndex % 28;
-
-		out.append(L_TABLE[l]);
-		map.add(origIdx);
-
-		out.append(V_TABLE[v]);
-		map.add(origIdx);
-
-		if (t != 0) {
-			out.append(T_TABLE[t]);
-			map.add(origIdx);
-		}
 	}
 }
