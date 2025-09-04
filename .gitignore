@@ -46,3 +46,6 @@ src/main/resources/mindle-secret.json
 ### NCP SECRET ###
 configmap.yaml
 secret.yaml
+
+### Profanity Dataset ###
+/src/main/resources/data/profanity.csv
