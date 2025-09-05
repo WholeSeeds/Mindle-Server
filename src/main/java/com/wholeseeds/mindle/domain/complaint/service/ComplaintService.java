@@ -15,12 +15,14 @@ import com.wholeseeds.mindle.domain.complaint.dto.ReactionDto;
 import com.wholeseeds.mindle.domain.complaint.dto.request.CommentRequestDto;
 import com.wholeseeds.mindle.domain.complaint.dto.request.ComplaintListRequestDto;
 import com.wholeseeds.mindle.domain.complaint.dto.request.SaveComplaintRequestDto;
+import com.wholeseeds.mindle.domain.complaint.dto.request.UpdateComplaintRequestDto;
 import com.wholeseeds.mindle.domain.complaint.dto.response.ComplaintDetailResponseDto;
 import com.wholeseeds.mindle.domain.complaint.dto.response.ComplaintListResponseDto;
 import com.wholeseeds.mindle.domain.complaint.dto.response.SaveComplaintResponseDto;
 import com.wholeseeds.mindle.domain.complaint.entity.Complaint;
 import com.wholeseeds.mindle.domain.complaint.exception.ComplaintNotFoundException;
 import com.wholeseeds.mindle.domain.complaint.exception.ImageUploadLimitExceeded;
+import com.wholeseeds.mindle.domain.complaint.exception.NotComplaintOwnerException;
 import com.wholeseeds.mindle.domain.complaint.mapper.ComplaintMapper;
 import com.wholeseeds.mindle.domain.complaint.repository.ComplaintRepository;
 import com.wholeseeds.mindle.domain.member.entity.Member;
@@ -178,5 +180,60 @@ public class ComplaintService {
 	private ReactionDto findComplaintReaction(Long complaintId, Long memberId) {
 		return complaintRepository.getReaction(complaintId, memberId)
 			.orElseThrow(ComplaintNotFoundException::new);
+	}
+
+	/**
+	 * 민원 수정
+	 */
+	@Transactional
+	public SaveComplaintResponseDto handleUpdateComplaint(
+		Long memberId,
+		Long complaintId,
+		UpdateComplaintRequestDto dto,
+		List<MultipartFile> imageList
+	) {
+		Complaint complaint = complaintRepository.findByIdNotDeleted(complaintId)
+			.orElseThrow(ComplaintNotFoundException::new);
+
+		// 작성자 검증
+		if (!complaint.getMember().getId().equals(memberId)) {
+			throw new NotComplaintOwnerException();
+		}
+
+		// 필드별 부분 업데이트
+		if (dto.getCategoryId() != null) {
+			Category category = categoryService.findCategory(dto.getCategoryId());
+			complaint.changeCategory(category);
+		}
+		if (dto.getSubdistrictCode() != null) {
+			Subdistrict subdistrict = regionService.findSubdistrict(dto.getSubdistrictCode());
+			complaint.changeSubdistrict(subdistrict);
+		}
+		if (dto.getPlaceId() != null) {
+			Place place = placeService.findPlace(dto.getPlaceId());
+			complaint.changePlace(place);
+		}
+		if (dto.getTitle() != null) {
+			complaint.changeTitle(dto.getTitle());
+		}
+		if (dto.getContent() != null) {
+			complaint.changeContent(dto.getContent());
+		}
+		if (dto.getLatitude() != null || dto.getLongitude() != null) {
+			Double lat = dto.getLatitude() != null ? dto.getLatitude() : complaint.getLatitude();
+			Double lng = dto.getLongitude() != null ? dto.getLongitude() : complaint.getLongitude();
+			complaint.changeLatLng(lat, lng);
+		}
+
+		// 이미지 처리
+		Boolean replace = dto.getReplaceImages();
+		if (Boolean.TRUE.equals(replace)) {
+			complaintImageService.replaceImages(complaint, imageList);
+		} else {
+			complaintImageService.appendImages(complaint, imageList);
+		}
+
+		// JPA dirty checking으로 업데이트 반영
+		return complaintMapper.toSaveComplaintResponseDto(complaint);
 	}
 }

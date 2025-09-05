@@ -79,4 +79,29 @@ public class Complaint extends BaseEntity {
 			isResolved = false;
 		}
 	}
+
+	public void changeCategory(Category category) {
+		this.category = category;
+	}
+
+	public void changeSubdistrict(Subdistrict subdistrict) {
+		this.subdistrict = subdistrict;
+	}
+
+	public void changePlace(Place place) {
+		this.place = place;
+	}
+
+	public void changeTitle(String title) {
+		this.title = title;
+	}
+
+	public void changeContent(String content) {
+		this.content = content;
+	}
+
+	public void changeLatLng(Double lat, Double lng) {
+		this.latitude = lat;
+		this.longitude = lng;
+	}
 }
