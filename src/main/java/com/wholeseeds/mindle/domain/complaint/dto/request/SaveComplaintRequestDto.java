@@ -18,7 +18,7 @@ public class SaveComplaintRequestDto {
 	private String title;
 	@NotNull
 	private String content;
-	private double latitude;
-	private double longitude;
+	private Double latitude;
+	private Double longitude;
 	// private String photoUrl; // TODO 이미지 파일
 }

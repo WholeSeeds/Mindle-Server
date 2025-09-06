@@ -66,7 +66,8 @@ public class ComplaintRepositoryImpl extends JpaBaseRepositoryImpl<Complaint, Lo
 		List<String> imageUrls = queryFactory
 			.select(I.imageUrl)
 			.from(I)
-			.where(I.complaint.id.eq(complaintId))
+			.where(I.complaint.id.eq(complaintId)
+				.and(I.deletedAt.isNull()))
 			.fetch();
 
 		// 지역 정보 DTO 생성
