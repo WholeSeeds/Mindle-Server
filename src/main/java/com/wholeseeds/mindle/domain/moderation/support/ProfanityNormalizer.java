@@ -30,27 +30,25 @@ public final class ProfanityNormalizer {
 		StringBuilder sb = new StringBuilder(text.length() * 2);
 		List<Integer> map = new ArrayList<>(text.length() * 2);
 
-		// 원문을 글자 단위로 순회하며, 각 글자를 NFKD로 전개하고
-		// 전개된 각 문자에 대해 "원문 인덱스 j"를 저장
-		for (int j = 0; j < text.length(); j++) {
-			char c = text.charAt(j);
-			String d = Normalizer.normalize(String.valueOf(c), Normalizer.Form.NFKD);
+		for (int i = 0; i < text.length(); i = Character.offsetByCodePoints(text, i, 1)) {
+			int cp = text.codePointAt(i);
 
-			for (int k = 0; k < d.length(); k++) {
-				char ch = d.charAt(k);
+			// 코드 포인트 단위로 NFKD
+			String decomposed = Normalizer.normalize(new String(Character.toChars(cp)), Normalizer.Form.NFKD);
 
+			// 분해 결과도 코드 포인트 단위로 순회
+			for (int j = 0; j < decomposed.length(); j = Character.offsetByCodePoints(decomposed, j, 1)) {
+				int dcp = decomposed.codePointAt(j);
+
+				int type = Character.getType(dcp);
 				// 결합 기호(악센트 등) 또는 공백/구두점/기호 등은 스킵
-				if (Character.getType(ch) == Character.NON_SPACING_MARK || isSkippableSeparator(ch)) {
+				if (type == Character.NON_SPACING_MARK || isSkippableSeparator(dcp)) {
 					continue;
 				}
 
-				// ASCII는 소문자화
-				if (ch <= 0x7F) {
-					ch = Character.toLowerCase(ch);
-				}
-
-				sb.append(ch);
-				map.add(j);
+				dcp = Character.toLowerCase(dcp);
+				sb.appendCodePoint(dcp);
+				map.add(i);
 			}
 		}
 
@@ -72,11 +70,11 @@ public final class ProfanityNormalizer {
 	 * 탐지 품질을 위해 제거할 분리 문자인지 여부를 판단한다.
 	 * <p>공백/구두점/기호/제어문자/포맷 문자 등을 제거 대상으로 본다.</p>
 	 *
-	 * @param ch 검사할 문자
+	 * @param codePoint 대상 코드 포인트
 	 * @return 제거 대상이면 {@code true}, 유지하면 {@code false}
 	 */
-	private static boolean isSkippableSeparator(char ch) {
-		int type = Character.getType(ch);
+	private static boolean isSkippableSeparator(int codePoint) {
+		int type = Character.getType(codePoint);
 		return switch (type) {
 			case Character.SPACE_SEPARATOR,
 				Character.CONNECTOR_PUNCTUATION,
