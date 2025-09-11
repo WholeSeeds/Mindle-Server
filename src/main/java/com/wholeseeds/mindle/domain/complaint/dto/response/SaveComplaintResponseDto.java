@@ -1,6 +1,7 @@
 package com.wholeseeds.mindle.domain.complaint.dto.response;
 
 import com.wholeseeds.mindle.domain.complaint.entity.Complaint;
+import com.wholeseeds.mindle.domain.place.dto.PlaceDto;
 import com.wholeseeds.mindle.domain.region.dto.SubdistrictDto;
 
 import lombok.AllArgsConstructor;
@@ -16,7 +17,7 @@ public class SaveComplaintResponseDto {
 	private Long categoryId;
 	private Long memberId;
 	private SubdistrictDto subdistrictDto;
-	private Long placeId;
+	private PlaceDto placeDto;
 	private String title;
 	private String content;
 	private Double latitude;
