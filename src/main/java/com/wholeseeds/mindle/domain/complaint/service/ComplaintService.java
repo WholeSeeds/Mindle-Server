@@ -27,6 +27,7 @@ import com.wholeseeds.mindle.domain.complaint.mapper.ComplaintMapper;
 import com.wholeseeds.mindle.domain.complaint.repository.ComplaintRepository;
 import com.wholeseeds.mindle.domain.member.entity.Member;
 import com.wholeseeds.mindle.domain.member.service.MemberService;
+import com.wholeseeds.mindle.domain.place.dto.command.PlaceUpsertCmd;
 import com.wholeseeds.mindle.domain.place.entity.Place;
 import com.wholeseeds.mindle.domain.place.service.PlaceService;
 import com.wholeseeds.mindle.domain.region.entity.Subdistrict;
@@ -143,7 +144,21 @@ public class ComplaintService {
 		Category category = categoryService.findCategory(requestDto.getCategoryId());
 		Member member = memberService.getMember(memberId);
 		Subdistrict subdistrict = regionService.findSubdistrict(requestDto.getSubdistrictCode());
-		Place place = placeService.findPlace(requestDto.getPlaceId());
+
+		Place place = null;
+		if (requestDto.getPlaceId() != null && !requestDto.getPlaceId().isBlank()) {
+			place = placeService.findOrCreatePlace(
+				PlaceUpsertCmd.builder()
+					.placeId(requestDto.getPlaceId())
+					.placeTypeName(requestDto.getPlaceType())
+					.placeName(requestDto.getPlaceName())
+					.description(requestDto.getPlaceDescription())
+					.latitude(requestDto.getLatitude())
+					.longitude(requestDto.getLongitude())
+					.subdistrictCode(requestDto.getSubdistrictCode())
+					.build()
+			);
+		}
 
 		Complaint complaint = Complaint.builder()
 			.category(category)
@@ -209,8 +224,21 @@ public class ComplaintService {
 			Subdistrict subdistrict = regionService.findSubdistrict(dto.getSubdistrictCode());
 			complaint.changeSubdistrict(subdistrict);
 		}
-		if (dto.getPlaceId() != null) {
-			Place place = placeService.findPlace(dto.getPlaceId());
+		// 장소 해제 우선
+		if (Boolean.TRUE.equals(dto.getClearPlace())) {
+			complaint.changePlace(null);
+		} else if (dto.getPlaceId() != null) {
+			Place place = placeService.findOrCreatePlace(
+				PlaceUpsertCmd.builder()
+					.placeId(dto.getPlaceId())
+					.placeTypeName(dto.getPlaceType())
+					.placeName(dto.getPlaceName())
+					.description(dto.getPlaceDescription())
+					.latitude(dto.getLatitude())
+					.longitude(dto.getLongitude())
+					.subdistrictCode(dto.getSubdistrictCode())
+					.build()
+			);
 			complaint.changePlace(place);
 		}
 		if (dto.getTitle() != null) {

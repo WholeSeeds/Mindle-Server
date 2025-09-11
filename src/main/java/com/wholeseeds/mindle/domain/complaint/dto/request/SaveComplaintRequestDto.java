@@ -12,13 +12,26 @@ public class SaveComplaintRequestDto {
 
 	@NotNull
 	private Long categoryId;
+
 	private String subdistrictCode;
+
 	private String placeId;
+
+	private String placeType;
+
+	private String placeName;
+
+	private String placeDescription;
+
 	@NotNull
 	private String title;
+
 	@NotNull
 	private String content;
+
 	private Double latitude;
+
 	private Double longitude;
+
 	// private String photoUrl; // TODO 이미지 파일
 }
