@@ -7,6 +7,7 @@ import java.util.Map;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -162,5 +163,26 @@ public class ComplaintController {
 		SaveComplaintResponseDto responseDto =
 			complaintService.handleUpdateComplaint(memberId, complaintId, requestDto, imageList);
 		return responseTemplate.success(responseDto, HttpStatus.OK);
+	}
+
+	/**
+	 * 민원 삭제 API
+	 */
+	@Operation(
+		summary = "민원 삭제",
+		description = "민원을 soft delete 합니다. 작성자 본인만 삭제할 수 있습니다."
+	)
+	@ApiResponse(
+		responseCode = "204",
+		description = "민원 삭제 성공"
+	)
+	@DeleteMapping("/{complaintId}")
+	@RequireAuth
+	public ResponseEntity<Map<String, Object>> deleteComplaint(
+		@PathVariable Long complaintId,
+		@Parameter(hidden = true) @CurrentMemberId Long memberId
+	) {
+		complaintService.handleDeleteComplaint(memberId, complaintId);
+		return responseTemplate.success(null, HttpStatus.OK);
 	}
 }

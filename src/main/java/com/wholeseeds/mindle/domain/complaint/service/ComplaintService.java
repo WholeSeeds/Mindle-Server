@@ -157,6 +157,30 @@ public class ComplaintService {
 	}
 
 	/**
+	 * 민원을 삭제(soft delete)한다.
+	 * <p>작성자 본인만 삭제 가능하며, 연결된 이미지도 함께 soft delete 처리한다.</p>
+	 *
+	 * @param memberId   요청자 회원 ID(소유자 검증)
+	 * @param complaintId 민원 ID
+	 * @throws ComplaintNotFoundException 대상 민원이 없거나 이미 삭제된 경우
+	 * @throws NotComplaintOwnerException 소유자가 아닐 때
+	 */
+	@Transactional
+	public void handleDeleteComplaint(Long memberId, Long complaintId) {
+		Complaint complaint = complaintRepository.findByIdNotDeleted(complaintId)
+			.orElseThrow(ComplaintNotFoundException::new);
+
+		ensureOwner(complaint, memberId);
+
+		// 연결 이미지 soft delete
+		complaintImageService.softDeleteAllForComplaint(complaint);
+
+		// 본문 soft delete
+		complaint.softDelete();
+		complaintRepository.save(complaint);
+	}
+
+	/**
 	 * 이미지 개수를 검증한다(최대 3장).
 	 *
 	 * @param imageList 업로드 이미지 목록

@@ -82,6 +82,19 @@ public class ComplaintImageService {
 		saveComplaintImages(complaint, newImages);
 	}
 
+	/** 모든 활성 이미지를 soft delete 처리한다. */
+	@Transactional
+	public void softDeleteAllForComplaint(Complaint complaint) {
+		List<ComplaintImage> all = complaintImageRepository.findAllByComplaintId(complaint.getId());
+		for (ComplaintImage img : all) {
+			if (!img.isDeleted()) {
+				img.softDelete();
+				complaintImageRepository.save(img);
+				// TODO: 필요 시 NCP 실제 파일 삭제 호출
+			}
+		}
+	}
+
 	private List<ComplaintImage> findActiveImages(Long complaintId) {
 		return complaintImageRepository.findAllByComplaintId(complaintId).stream()
 			.filter(img -> !img.isDeleted())
