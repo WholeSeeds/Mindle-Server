@@ -3,9 +3,11 @@ package com.wholeseeds.mindle.domain.moderation.service;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 import java.util.concurrent.atomic.AtomicReference;
 
 import org.ahocorasick.trie.Emit;
@@ -55,7 +57,7 @@ public class ProfanityService {
 		}
 
 		// 정규화 키와 매핑 생성
-		List<String> normalizedKeys = new ArrayList<>(canonical.size());
+		Set<String> normalizedSet = new LinkedHashSet<>(canonical.size());
 		Map<String, String> normToCanon = new HashMap<>(canonical.size() * 2);
 
 		for (String w : canonical) {
@@ -63,12 +65,11 @@ public class ProfanityService {
 			if (key.isEmpty()) {
 				continue;
 			}
-			normalizedKeys.add(key);
-			// 동일 키에 여러 단어가 매핑될 수 있음 → 첫 항목 유지
 			normToCanon.putIfAbsent(key, w);
+			normalizedSet.add(key);
 		}
 
-		if (normalizedKeys.isEmpty()) {
+		if (normalizedSet.isEmpty()) {
 			log.warn("All profanities collapsed to empty after normalization. Disabling automaton.");
 			stateRef.set(ProfanityState.disabled());
 			return;
@@ -77,12 +78,10 @@ public class ProfanityService {
 		// AC 빌드
 		Trie trie = Trie.builder()
 			.ignoreOverlaps()
-			.addKeywords(normalizedKeys)
+			.addKeywords(normalizedSet)
 			.build();
 
 		stateRef.set(ProfanityState.of(trie, canonical, normToCanon));
-		log.info("Profanity automaton built with {} normalized keys ({} canonical).",
-			normalizedKeys.size(), canonical.size());
 	}
 
 	/**
