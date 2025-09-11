@@ -45,4 +45,21 @@ public class Place extends BaseEntity {
 
 	@Column
 	private Double longitude;
+
+	public void changeName(String name) {
+		this.name = name;
+	}
+
+	public void changeDescription(String description) {
+		this.description = description;
+	}
+
+	public void changeLatLng(Double latitude, Double longitude) {
+		this.latitude = latitude;
+		this.longitude = longitude;
+	}
+
+	public void changeSubdistrict(Subdistrict subdistrict) {
+		this.subdistrict = subdistrict;
+	}
 }

@@ -30,17 +30,21 @@ public enum ErrorCode {
 
 	// complaint
 	CATEGORY_NOT_FOUND(404, "해당 카테고리를 찾을 수 없습니다"),
-	PLACE_NOT_FOUND(404, "해당 장소를 찾을 수 없습니다"),
 	IMAGE_UPLOAD_LIMIT_EXCEEDED(400, "이미지는 최대 3장까지 업로드 가능합니다"),
 	COMPLAINT_NOT_FOUND(404, "해당 민원을 찾을 수 없습니다"),
 	NOT_COMPLAINT_OWNER(403, "해당 민원의 작성자가 아닙니다"),
 
-	// region
+	// region,
 	CITY_NOT_FOUND(404, "해당 (시/군)를 찾을 수 없습니다"),
 	DISTRICT_NOT_FOUND(404, "해당 (구)를 찾을 수 없습니다"),
 	SUBDISTRICT_NOT_FOUND(404, "해당 (읍/면/동)를 찾을 수 없습니다"),
 	INVALID_SUBDISTRICT_REFERENCE(400, "Subdistrict는 하나의 City 또는 District만 참조해야 합니다."),
 	INVALID_REGION_TYPE(400, "올바르지 않은 regionType 값입니다. (city, district, subdistrict 중 하나여야 합니다)"),
+
+	// place
+	PLACE_NOT_FOUND(404, "해당 장소를 찾을 수 없습니다"),
+	PLACE_TYPE_REQUIRED(400, "신규 장소 생성을 위해 placeType이 필요합니다."),
+	PLACE_NAME_REQUIRED(400, "신규 장소 생성을 위해 placeName이 필요합니다."),
 
 	// NCP
 	NCP_FILE_UPLOAD_FAILED(500, "NCP 에 파일 저장 중 오류가 발생했습니다"),

@@ -34,4 +34,11 @@ public class ObjectUtils {
 		}
 		return LocalDateTime.parse(dateTimeString);
 	}
+
+	/**
+	 * null/빈문자열을 제외한 텍스트 여부를 확인
+	 */
+	public boolean hasText(String s) {
+		return s != null && !s.isBlank();
+	}
 }
