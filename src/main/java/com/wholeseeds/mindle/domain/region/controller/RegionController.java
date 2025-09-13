@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.wholeseeds.mindle.common.util.ResponseTemplate;
 import com.wholeseeds.mindle.domain.region.dto.request.RegionDetailRequestDto;
+import com.wholeseeds.mindle.domain.region.dto.request.RegionNameRequestDto;
 import com.wholeseeds.mindle.domain.region.dto.response.RegionDetailResponseDto;
 import com.wholeseeds.mindle.domain.region.enums.RegionType;
 import com.wholeseeds.mindle.domain.region.service.RegionService;
@@ -64,6 +65,36 @@ public class RegionController {
 	) {
 		RegionType type = RegionType.from(request.getRegionType());
 		RegionDetailResponseDto<?> response = regionService.getRegionDetail(type, request.getCode());
+		return responseTemplate.success(response, HttpStatus.OK);
+	}
+
+	@Operation(
+		summary = "행정구역 이름으로 상세 조회",
+		description = """
+		cityName(필수), districtName(선택), subdistrictName(선택)을 조합하여 상세 정보를 반환합니다.
+		허용되는 조합:
+		1) cityName
+		2) cityName + districtName
+		3) cityName + districtName + subdistrictName
+		그 외 조합은 400 에러로 처리됩니다.
+		응답은 RegionDetailResponseDto 형태로, 하위 목록이 포함될 수 있습니다.
+		""",
+		requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(
+			required = true,
+			content = @Content(schema = @Schema(implementation = RegionNameRequestDto.class))
+		)
+	)
+	@ApiResponse(
+		responseCode = "200",
+		description = "행정구역 상세 정보 반환",
+		content = @Content(schema = @Schema(implementation = RegionDetailResponseDto.class))
+	)
+	@PostMapping("/by-name")
+	public ResponseEntity<Map<String, Object>> getRegionDetailByNames(
+		@RequestBody @jakarta.validation.Valid RegionNameRequestDto request
+	) {
+		RegionDetailResponseDto<?> response =
+			regionService.getRegionDetailByNames(request);
 		return responseTemplate.success(response, HttpStatus.OK);
 	}
 }
