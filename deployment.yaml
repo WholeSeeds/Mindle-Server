@@ -18,7 +18,7 @@ spec:
       terminationGracePeriodSeconds: 60
       containers:
         - name: spring
-          image: mindle.kr.ncr.ntruss.com/my-spring-app:my-spring-app@sha256:11bfdb06927dc3fea0a5206e6d0c1a2f7ab5a5f1b97b168abdf8dd58214fd646
+          image: mindle.kr.ncr.ntruss.com/my-spring-app:latest
           imagePullPolicy: Always
           ports: [ { containerPort: 8080 } ]
           volumeMounts:
