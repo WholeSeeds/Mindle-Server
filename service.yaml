@@ -5,7 +5,8 @@ metadata:
 spec:
   type: LoadBalancer
   selector:
-    app: spring-app              # 색 라벨 불필요 (SourceDeploy가 내부에서 관리)
+    app: spring-app   # 색 라벨 불필요 (SourceDeploy가 내부에서 관리)
+    color: blue
   ports:
     - port: 80
       targetPort: 8080
