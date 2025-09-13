@@ -77,7 +77,6 @@ public class RegionController {
 		2) cityName + districtName
 		3) cityName + districtName + subdistrictName
 		그 외 조합은 400 에러로 처리됩니다.
-		응답은 RegionDetailResponseDto 형태로, 하위 목록이 포함될 수 있습니다.
 		""",
 		requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(
 			required = true,
