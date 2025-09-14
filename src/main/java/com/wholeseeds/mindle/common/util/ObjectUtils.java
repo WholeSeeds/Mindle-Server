@@ -34,4 +34,14 @@ public class ObjectUtils {
 		}
 		return LocalDateTime.parse(dateTimeString);
 	}
+
+	/**
+	 * 입력 문자열을 trim 하여 정규화한다. null 입력은 null을 유지.
+	 */
+	public String normalize(String s) {
+		if (s == null) {
+			return null;
+		}
+		return s.trim();
+	}
 }
