@@ -19,6 +19,6 @@ import lombok.NoArgsConstructor;
 @Builder
 public class PlaceType extends BaseEntity {
 
-	@Column(length = 100)
+	@Column(length = 100, nullable = false, unique = true)
 	private String name;
 }

@@ -7,8 +7,10 @@ import java.util.Map;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -23,6 +25,7 @@ import com.wholeseeds.mindle.domain.complaint.dto.CommentDto;
 import com.wholeseeds.mindle.domain.complaint.dto.request.CommentRequestDto;
 import com.wholeseeds.mindle.domain.complaint.dto.request.ComplaintListRequestDto;
 import com.wholeseeds.mindle.domain.complaint.dto.request.SaveComplaintRequestDto;
+import com.wholeseeds.mindle.domain.complaint.dto.request.UpdateComplaintRequestDto;
 import com.wholeseeds.mindle.domain.complaint.dto.response.ComplaintDetailResponseDto;
 import com.wholeseeds.mindle.domain.complaint.dto.response.ComplaintListResponseDto;
 import com.wholeseeds.mindle.domain.complaint.dto.response.SaveComplaintResponseDto;
@@ -135,5 +138,51 @@ public class ComplaintController {
 	public ResponseEntity<Map<String, Object>> getComplaintList(@ModelAttribute ComplaintListRequestDto requestDto) {
 		List<ComplaintListResponseDto> responseDtos = complaintService.getComplaintListResponse(requestDto);
 		return responseTemplate.success(responseDtos, HttpStatus.OK);
+	}
+
+	/**
+	 * 민원 수정 API
+	 */
+	@Operation(
+		summary = "민원 수정",
+		description = "민원 일부 필드를 수정합니다. replaceImages=true일 경우 기존 이미지를 모두 교체합니다."
+	)
+	@ApiResponse(
+		responseCode = "200",
+		description = "민원 수정 성공",
+		content = @Content(schema = @Schema(implementation = SaveComplaintResponseDto.class))
+	)
+	@PatchMapping(value = "/{complaintId}", consumes = MULTIPART_FORM_DATA_VALUE)
+	@RequireAuth
+	public ResponseEntity<Map<String, Object>> updateComplaint(
+		@PathVariable Long complaintId,
+		@Parameter(hidden = true) @CurrentMemberId Long memberId,
+		@RequestPart("meta") UpdateComplaintRequestDto requestDto,
+		@RequestPart(value = "files", required = false) List<MultipartFile> imageList
+	) {
+		SaveComplaintResponseDto responseDto =
+			complaintService.handleUpdateComplaint(memberId, complaintId, requestDto, imageList);
+		return responseTemplate.success(responseDto, HttpStatus.OK);
+	}
+
+	/**
+	 * 민원 삭제 API
+	 */
+	@Operation(
+		summary = "민원 삭제",
+		description = "민원을 soft delete 합니다. 작성자 본인만 삭제할 수 있습니다."
+	)
+	@ApiResponse(
+		responseCode = "204",
+		description = "민원 삭제 성공"
+	)
+	@DeleteMapping("/{complaintId}")
+	@RequireAuth
+	public ResponseEntity<Map<String, Object>> deleteComplaint(
+		@PathVariable Long complaintId,
+		@Parameter(hidden = true) @CurrentMemberId Long memberId
+	) {
+		complaintService.handleDeleteComplaint(memberId, complaintId);
+		return responseTemplate.success(null, HttpStatus.OK);
 	}
 }

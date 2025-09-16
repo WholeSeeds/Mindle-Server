@@ -1,6 +1,5 @@
 package com.wholeseeds.mindle.domain.complaint.dto.request;
 
-import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -8,9 +7,8 @@ import lombok.NoArgsConstructor;
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-public class SaveComplaintRequestDto {
+public class UpdateComplaintRequestDto {
 
-	@NotNull
 	private Long categoryId;
 
 	private String subdistrictCode;
@@ -23,15 +21,15 @@ public class SaveComplaintRequestDto {
 
 	private String placeDescription;
 
-	@NotNull
 	private String title;
 
-	@NotNull
 	private String content;
 
 	private Double latitude;
 
 	private Double longitude;
 
-	// private String photoUrl; // TODO 이미지 파일
+	private Boolean clearPlace;
+
+	private Boolean replaceImages;
 }

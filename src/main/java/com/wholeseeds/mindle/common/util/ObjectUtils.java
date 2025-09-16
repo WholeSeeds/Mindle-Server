@@ -36,6 +36,13 @@ public class ObjectUtils {
 	}
 
 	/**
+	 * null/빈문자열을 제외한 텍스트 여부를 확인
+	 */
+	public boolean hasText(String s) {
+		return s != null && !s.isBlank();
+  }
+ 
+  /**
 	 * 입력 문자열을 trim 하여 정규화한다. null 입력은 null을 유지.
 	 */
 	public String normalize(String s) {
