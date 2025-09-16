@@ -40,6 +40,7 @@ public enum ErrorCode {
 	SUBDISTRICT_NOT_FOUND(404, "해당 (읍/면/동)를 찾을 수 없습니다"),
 	INVALID_SUBDISTRICT_REFERENCE(400, "Subdistrict는 하나의 City 또는 District만 참조해야 합니다."),
 	INVALID_REGION_TYPE(400, "올바르지 않은 regionType 값입니다. (city, district, subdistrict 중 하나여야 합니다)"),
+	INVALID_REGION_NAME_COMBINATION(400, "입력받은 city, district, subdistrict 이름 조합이 유효하지 않습니다."),
 
 	// place
 	PLACE_NOT_FOUND(404, "해당 장소를 찾을 수 없습니다"),

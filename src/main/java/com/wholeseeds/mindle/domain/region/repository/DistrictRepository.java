@@ -12,4 +12,6 @@ public interface DistrictRepository extends JpaRepository<District, String> {
 	Optional<District> findByName(String name);
 
 	List<District> findAllByCityCode(String cityCode);
+
+	Optional<District> findByCityCodeAndName(String cityCode, String name);
 }

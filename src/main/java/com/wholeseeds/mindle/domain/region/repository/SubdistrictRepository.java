@@ -15,4 +15,6 @@ public interface SubdistrictRepository extends JpaRepository<Subdistrict, String
 	List<Subdistrict> findAllByDistrictCode(String districtCode);
 
 	List<Subdistrict> findAllByCityCode(String cityCode);
+
+	Optional<Subdistrict> findByDistrictCodeAndName(String districtCode, String name);
 }
