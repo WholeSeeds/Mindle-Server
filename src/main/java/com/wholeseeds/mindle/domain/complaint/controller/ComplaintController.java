@@ -142,7 +142,9 @@ public class ComplaintController {
 	)
 	@GetMapping("/list")
 	@RequireAuth
-	public ResponseEntity<Map<String, Object>> getComplaintList(@ModelAttribute ComplaintListRequestDto requestDto) {
+	public ResponseEntity<Map<String, Object>> getComplaintList(
+		@Valid @ModelAttribute ComplaintListRequestDto requestDto
+	) {
 		List<ComplaintListResponseDto> responseDtos = complaintService.getComplaintListResponse(requestDto);
 		return responseTemplate.success(responseDtos, HttpStatus.OK);
 	}
