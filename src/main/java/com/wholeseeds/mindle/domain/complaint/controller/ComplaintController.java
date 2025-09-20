@@ -29,6 +29,7 @@ import com.wholeseeds.mindle.domain.complaint.dto.request.UpdateComplaintRequest
 import com.wholeseeds.mindle.domain.complaint.dto.response.ComplaintDetailResponseDto;
 import com.wholeseeds.mindle.domain.complaint.dto.response.ComplaintListResponseDto;
 import com.wholeseeds.mindle.domain.complaint.dto.response.SaveComplaintResponseDto;
+import com.wholeseeds.mindle.domain.complaint.dto.response.VoteResolvedResponseDto;
 import com.wholeseeds.mindle.domain.complaint.service.ComplaintService;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -196,7 +197,7 @@ public class ComplaintController {
 	@ApiResponse(
 		responseCode = "200",
 		description = "투표 반영 성공",
-		content = @Content(schema = @Schema(implementation = SaveComplaintResponseDto.class))
+		content = @Content(schema = @Schema(implementation = VoteResolvedResponseDto.class))
 	)
 	@PatchMapping("/{complaintId}/resolved-vote")
 	@RequireAuth
@@ -204,7 +205,7 @@ public class ComplaintController {
 		@PathVariable Long complaintId,
 		@Parameter(hidden = true) @CurrentMemberId Long memberId
 	) {
-		SaveComplaintResponseDto responseDto = complaintService.handleResolvedVote(memberId, complaintId);
+		VoteResolvedResponseDto responseDto = complaintService.handleResolvedVote(memberId, complaintId);
 		return responseTemplate.success(responseDto, HttpStatus.OK);
 	}
 }

@@ -19,6 +19,7 @@ import com.wholeseeds.mindle.domain.complaint.dto.request.UpdateComplaintRequest
 import com.wholeseeds.mindle.domain.complaint.dto.response.ComplaintDetailResponseDto;
 import com.wholeseeds.mindle.domain.complaint.dto.response.ComplaintListResponseDto;
 import com.wholeseeds.mindle.domain.complaint.dto.response.SaveComplaintResponseDto;
+import com.wholeseeds.mindle.domain.complaint.dto.response.VoteResolvedResponseDto;
 import com.wholeseeds.mindle.domain.complaint.entity.Complaint;
 import com.wholeseeds.mindle.domain.complaint.entity.ComplaintResolvedVote;
 import com.wholeseeds.mindle.domain.complaint.exception.ComplaintNotFoundException;
@@ -428,27 +429,40 @@ public class ComplaintService {
 	 * @return 변경된 민원 스냅샷 DTO(상태/카운트 확인용)
 	 */
 	@Transactional
-	public SaveComplaintResponseDto handleResolvedVote(Long memberId, Long complaintId) {
+	public VoteResolvedResponseDto handleResolvedVote(Long memberId, Long complaintId) {
 		Complaint complaint = complaintRepository.findByIdNotDeleted(complaintId)
 			.orElseThrow(ComplaintNotFoundException::new);
 
-		// 이미 RESOLVED면 그대로 반환(멱등)
-		if (complaint.getStatus() == Complaint.Status.RESOLVED) {
-			return complaintMapper.toSaveComplaintResponseDto(complaint);
+		boolean wasResolvedBefore = complaint.getStatus() == Complaint.Status.RESOLVED;
+
+		// 이미 RESOLVED면 멱등 처리: 증가/전환 모두 false
+		if (wasResolvedBefore) {
+			return VoteResolvedResponseDto.builder()
+				.incremented(false)
+				.transitionedToResolved(false)
+				.complaint(complaintMapper.toSaveComplaintResponseDto(complaint))
+				.build();
 		}
 
-		// 중복 투표 방지
 		boolean alreadyVoted = complaintResolvedVoteRepository
 			.existsByComplaintIdAndMemberId(complaintId, memberId);
 
+		boolean incremented = false;
 		if (!alreadyVoted) {
 			Member voter = memberService.getMember(memberId);
 			complaintResolvedVoteRepository.save(ComplaintResolvedVote.of(complaint, voter));
 
 			complaint.incrementResolvedVoteCount();
 			complaint.markResolvedIfThresholdReached(RESOLVE_THRESHOLD);
+			incremented = true;
 		}
 
-		return complaintMapper.toSaveComplaintResponseDto(complaint);
+		boolean transitionedToResolved = complaint.getStatus() == Complaint.Status.RESOLVED;
+
+		return VoteResolvedResponseDto.builder()
+			.incremented(incremented)
+			.transitionedToResolved(transitionedToResolved)
+			.complaint(complaintMapper.toSaveComplaintResponseDto(complaint))
+			.build();
 	}
 }
