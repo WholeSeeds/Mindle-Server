@@ -20,11 +20,13 @@ import com.wholeseeds.mindle.domain.complaint.dto.response.ComplaintDetailRespon
 import com.wholeseeds.mindle.domain.complaint.dto.response.ComplaintListResponseDto;
 import com.wholeseeds.mindle.domain.complaint.dto.response.SaveComplaintResponseDto;
 import com.wholeseeds.mindle.domain.complaint.entity.Complaint;
+import com.wholeseeds.mindle.domain.complaint.entity.ComplaintResolvedVote;
 import com.wholeseeds.mindle.domain.complaint.exception.ComplaintNotFoundException;
 import com.wholeseeds.mindle.domain.complaint.exception.ImageUploadLimitExceeded;
 import com.wholeseeds.mindle.domain.complaint.exception.NotComplaintOwnerException;
 import com.wholeseeds.mindle.domain.complaint.mapper.ComplaintMapper;
 import com.wholeseeds.mindle.domain.complaint.repository.ComplaintRepository;
+import com.wholeseeds.mindle.domain.complaint.repository.ComplaintResolvedVoteRepository;
 import com.wholeseeds.mindle.domain.member.entity.Member;
 import com.wholeseeds.mindle.domain.member.service.MemberService;
 import com.wholeseeds.mindle.domain.place.dto.command.PlaceUpsertCmd;
@@ -48,6 +50,9 @@ public class ComplaintService {
 	private final PlaceService placeService;
 	private final ComplaintImageService complaintImageService;
 	private final CategoryService categoryService;
+	private final ComplaintResolvedVoteRepository complaintResolvedVoteRepository;
+
+	private static final int RESOLVE_THRESHOLD = 5;
 
 	/**
 	 * 민원을 생성하고(필요 시 이미지 업로드 포함) 저장한다.
@@ -410,5 +415,40 @@ public class ComplaintService {
 	private ReactionDto findComplaintReaction(Long complaintId, Long memberId) {
 		return complaintRepository.getReaction(complaintId, memberId)
 			.orElseThrow(ComplaintNotFoundException::new);
+	}
+
+	/**
+	 * “해결됨” 투표 처리.
+	 * - 동일 회원의 중복 투표 방지
+	 * - 첫 투표일 때만 카운트 +1
+	 * - 누적 5표 도달 시 자동 RESOLVED 전환
+	 *
+	 * @param memberId    투표 회원 ID
+	 * @param complaintId 대상 민원 ID
+	 * @return 변경된 민원 스냅샷 DTO(상태/카운트 확인용)
+	 */
+	@Transactional
+	public SaveComplaintResponseDto handleResolvedVote(Long memberId, Long complaintId) {
+		Complaint complaint = complaintRepository.findByIdNotDeleted(complaintId)
+			.orElseThrow(ComplaintNotFoundException::new);
+
+		// 이미 RESOLVED면 그대로 반환(멱등)
+		if (complaint.getStatus() == Complaint.Status.RESOLVED) {
+			return complaintMapper.toSaveComplaintResponseDto(complaint);
+		}
+
+		// 중복 투표 방지
+		boolean alreadyVoted = complaintResolvedVoteRepository
+			.existsByComplaintIdAndMemberId(complaintId, memberId);
+
+		if (!alreadyVoted) {
+			Member voter = memberService.getMember(memberId);
+			complaintResolvedVoteRepository.save(ComplaintResolvedVote.of(complaint, voter));
+
+			complaint.incrementResolvedVoteCount();
+			complaint.markResolvedIfThresholdReached(RESOLVE_THRESHOLD);
+		}
+
+		return complaintMapper.toSaveComplaintResponseDto(complaint);
 	}
 }
