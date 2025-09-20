@@ -63,20 +63,25 @@ public class Complaint extends BaseEntity {
 	@Column(name = "is_resolved")
 	private Boolean isResolved;
 
+	@Builder.Default
+	@Column(name = "resolved_vote_count", nullable = false)
+	private Integer resolvedVoteCount = 0;
+
 	public enum Status {
-		REPORTED,
 		IN_PROGRESS,
 		RESOLVED
 	}
 
-	// 초기값
 	@Override
 	protected void onPrePersist() {
 		if (status == null) {
-			status = Status.REPORTED;
+			status = Status.IN_PROGRESS;
 		}
 		if (isResolved == null) {
 			isResolved = false;
+		}
+		if (resolvedVoteCount == null) {
+			resolvedVoteCount = 0;
 		}
 	}
 
@@ -103,5 +108,18 @@ public class Complaint extends BaseEntity {
 	public void changeLatLng(Double lat, Double lng) {
 		this.latitude = lat;
 		this.longitude = lng;
+	}
+
+	/** 투표 카운트 +1 (호출 시점은 서비스에서 중복 투표 검증 후) */
+	public void incrementResolvedVoteCount() {
+		this.resolvedVoteCount = this.resolvedVoteCount + 1;
+	}
+
+	/** threshold 도달 시 상태를 RESOLVED로, isResolved=true */
+	public void markResolvedIfThresholdReached(int threshold) {
+		if (this.resolvedVoteCount != null && this.resolvedVoteCount >= threshold) {
+			this.status = Status.RESOLVED;
+			this.isResolved = true;
+		}
 	}
 }

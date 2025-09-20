@@ -24,4 +24,5 @@ public class SaveComplaintResponseDto {
 	private Double longitude;
 	private Complaint.Status status;
 	private Boolean isResolved;
+	private Integer resolvedVoteCount;
 }

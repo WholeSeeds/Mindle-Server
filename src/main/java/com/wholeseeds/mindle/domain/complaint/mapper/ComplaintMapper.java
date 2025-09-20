@@ -18,6 +18,7 @@ public interface ComplaintMapper {
 	@Mapping(target = "memberId", source = "member.id")
 	@Mapping(target = "subdistrictDto", source = "subdistrict")
 	@Mapping(target = "placeDto", source = "place")
+	@Mapping(target = "resolvedVoteCount", source = "resolvedVoteCount")
 	SaveComplaintResponseDto toSaveComplaintResponseDto(Complaint complaint);
 
 	@BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)

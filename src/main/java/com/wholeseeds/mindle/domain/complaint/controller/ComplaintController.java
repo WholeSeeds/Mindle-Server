@@ -29,6 +29,7 @@ import com.wholeseeds.mindle.domain.complaint.dto.request.UpdateComplaintRequest
 import com.wholeseeds.mindle.domain.complaint.dto.response.ComplaintDetailResponseDto;
 import com.wholeseeds.mindle.domain.complaint.dto.response.ComplaintListResponseDto;
 import com.wholeseeds.mindle.domain.complaint.dto.response.SaveComplaintResponseDto;
+import com.wholeseeds.mindle.domain.complaint.dto.response.VoteResolvedResponseDto;
 import com.wholeseeds.mindle.domain.complaint.service.ComplaintService;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -184,5 +185,27 @@ public class ComplaintController {
 	) {
 		complaintService.handleDeleteComplaint(memberId, complaintId);
 		return responseTemplate.success(null, HttpStatus.OK);
+	}
+
+	/**
+	 * “해결됨” 투표 API
+	 */
+	@Operation(
+		summary = "민원 해결됨 투표",
+		description = "특정 민원에 대해 '해결됨' 투표를 1만큼 추가합니다. 누적 5표 시 자동 RESOLVED로 전환합니다."
+	)
+	@ApiResponse(
+		responseCode = "200",
+		description = "투표 반영 성공",
+		content = @Content(schema = @Schema(implementation = VoteResolvedResponseDto.class))
+	)
+	@PatchMapping("/{complaintId}/resolved-vote")
+	@RequireAuth
+	public ResponseEntity<Map<String, Object>> voteResolved(
+		@PathVariable Long complaintId,
+		@Parameter(hidden = true) @CurrentMemberId Long memberId
+	) {
+		VoteResolvedResponseDto responseDto = complaintService.handleResolvedVote(memberId, complaintId);
+		return responseTemplate.success(responseDto, HttpStatus.OK);
 	}
 }
