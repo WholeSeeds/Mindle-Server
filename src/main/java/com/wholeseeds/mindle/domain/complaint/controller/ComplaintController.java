@@ -22,6 +22,7 @@ import com.wholeseeds.mindle.common.annotation.CurrentMemberId;
 import com.wholeseeds.mindle.common.annotation.RequireAuth;
 import com.wholeseeds.mindle.common.util.ResponseTemplate;
 import com.wholeseeds.mindle.domain.complaint.dto.CommentDto;
+import com.wholeseeds.mindle.domain.complaint.dto.ReactionDto;
 import com.wholeseeds.mindle.domain.complaint.dto.request.CommentRequestDto;
 import com.wholeseeds.mindle.domain.complaint.dto.request.ComplaintListRequestDto;
 import com.wholeseeds.mindle.domain.complaint.dto.request.SaveComplaintRequestDto;
@@ -206,6 +207,50 @@ public class ComplaintController {
 		@Parameter(hidden = true) @CurrentMemberId Long memberId
 	) {
 		VoteResolvedResponseDto responseDto = complaintService.handleResolvedVote(memberId, complaintId);
+		return responseTemplate.success(responseDto, HttpStatus.OK);
+	}
+
+	/**
+	 * 민원 공감 추가 API
+	 */
+	@Operation(
+		summary = "민원 공감 추가",
+		description = "특정 민원에 공감을 추가합니다. 이미 공감한 상태여도 멱등하게 처리됩니다."
+	)
+	@ApiResponse(
+		responseCode = "200",
+		description = "공감 추가 성공",
+		content = @Content(schema = @Schema(implementation = ReactionDto.class))
+	)
+	@PostMapping("/{complaintId}/reaction")
+	@RequireAuth
+	public ResponseEntity<Map<String, Object>> addReaction(
+		@PathVariable Long complaintId,
+		@Parameter(hidden = true) @CurrentMemberId Long memberId
+	) {
+		ReactionDto responseDto = complaintService.addReaction(memberId, complaintId);
+		return responseTemplate.success(responseDto, HttpStatus.OK);
+	}
+
+	/**
+	 * 민원 공감 취소 API
+	 */
+	@Operation(
+		summary = "민원 공감 취소",
+		description = "특정 민원에 대해 추가된 공감을 취소합니다. 이미 취소된 상태여도 멱등하게 처리됩니다."
+	)
+	@ApiResponse(
+		responseCode = "200",
+		description = "공감 취소 성공",
+		content = @Content(schema = @Schema(implementation = ReactionDto.class))
+	)
+	@DeleteMapping("/{complaintId}/reaction")
+	@RequireAuth
+	public ResponseEntity<Map<String, Object>> cancelReaction(
+		@PathVariable Long complaintId,
+		@Parameter(hidden = true) @CurrentMemberId Long memberId
+	) {
+		ReactionDto responseDto = complaintService.cancelReaction(memberId, complaintId);
 		return responseTemplate.success(responseDto, HttpStatus.OK);
 	}
 }

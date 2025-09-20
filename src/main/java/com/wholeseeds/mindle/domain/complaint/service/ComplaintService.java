@@ -1,7 +1,9 @@
 package com.wholeseeds.mindle.domain.complaint.service;
 
 import java.util.List;
+import java.util.Optional;
 
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -19,12 +21,14 @@ import com.wholeseeds.mindle.domain.complaint.dto.response.ComplaintListResponse
 import com.wholeseeds.mindle.domain.complaint.dto.response.SaveComplaintResponseDto;
 import com.wholeseeds.mindle.domain.complaint.dto.response.VoteResolvedResponseDto;
 import com.wholeseeds.mindle.domain.complaint.entity.Complaint;
+import com.wholeseeds.mindle.domain.complaint.entity.ComplaintReaction;
 import com.wholeseeds.mindle.domain.complaint.entity.ComplaintResolvedVote;
 import com.wholeseeds.mindle.domain.complaint.exception.ComplaintNotFoundException;
 import com.wholeseeds.mindle.domain.complaint.exception.ImageUploadLimitExceeded;
 import com.wholeseeds.mindle.domain.complaint.exception.NotComplaintOwnerException;
 import com.wholeseeds.mindle.domain.complaint.mapper.ComplaintMapper;
 import com.wholeseeds.mindle.domain.complaint.mapper.ComplaintRelationMapper;
+import com.wholeseeds.mindle.domain.complaint.repository.ComplaintReactionRepository;
 import com.wholeseeds.mindle.domain.complaint.repository.ComplaintRepository;
 import com.wholeseeds.mindle.domain.complaint.repository.ComplaintResolvedVoteRepository;
 import com.wholeseeds.mindle.domain.member.entity.Member;
@@ -44,6 +48,7 @@ public class ComplaintService {
 	private final MemberService memberService;
 	private final ComplaintImageService complaintImageService;
 	private final ComplaintResolvedVoteRepository complaintResolvedVoteRepository;
+	private final ComplaintReactionRepository complaintReactionRepository;
 
 	private static final int RESOLVE_THRESHOLD = 5;
 
@@ -222,6 +227,86 @@ public class ComplaintService {
 			.transitionedToResolved(transitionedToResolved)
 			.complaint(complaintMapper.toSaveComplaintResponseDto(complaint))
 			.build();
+	}
+
+	/**
+	 * 민원 공감 추가(멱등).
+	 * - 이미 공감 중이면 그대로 성공 처리
+	 * - 과거에 공감했다가 취소(soft delete)한 경우 restore
+	 *
+	 * @param memberId    회원 ID
+	 * @param complaintId 민원 ID
+	 * @return 공감 수/내 공감여부 DTO
+	 */
+	@Transactional
+	public ReactionDto addReaction(Long memberId, Long complaintId) {
+		var complaint = complaintRepository.findByIdNotDeleted(complaintId)
+			.orElseThrow(ComplaintNotFoundException::new);
+
+		// 활성 공감이 있으면 멱등 처리
+		Optional<ComplaintReaction> active = complaintReactionRepository
+			.findByComplaintIdAndMemberIdAndDeletedAtIsNull(complaintId, memberId);
+		if (active.isPresent()) {
+			return latestReaction(complaintId, memberId);
+		}
+
+		// soft-deleted 존재 시 복구, 없으면 신규 생성
+		Optional<ComplaintReaction> any = complaintReactionRepository
+			.findByComplaintIdAndMemberId(complaintId, memberId);
+
+		if (any.isPresent()) {
+			var reaction = any.get();
+			if (reaction.isDeleted()) {
+				reaction.restore();
+				complaintReactionRepository.save(reaction);
+			}
+		} else {
+			var member = memberService.getMember(memberId);
+			try {
+				complaintReactionRepository.save(
+					ComplaintReaction.builder()
+						.complaint(complaint)
+						.member(member)
+						.build()
+				);
+			} catch (DataIntegrityViolationException e) {
+				// 동시성 상황에서 유니크 제약 충돌 → 이미 다른 트랜잭션이 생성함. 멱등 처리.
+				log.warn("Concurrent reaction insert detected. complaintId={}, memberId={}", complaintId, memberId);
+			}
+		}
+
+		return latestReaction(complaintId, memberId);
+	}
+
+	/**
+	 * 민원 공감 취소(멱등).
+	 * - 활성 공감이 있으면 soft delete
+	 * - 없으면 그대로 성공 처리
+	 *
+	 * @param memberId    회원 ID
+	 * @param complaintId 민원 ID
+	 * @return 공감 수/내 공감여부 DTO
+	 */
+	@Transactional
+	public ReactionDto cancelReaction(Long memberId, Long complaintId) {
+		complaintRepository.findByIdNotDeleted(complaintId)
+			.orElseThrow(ComplaintNotFoundException::new);
+
+		Optional<ComplaintReaction> active = complaintReactionRepository
+			.findByComplaintIdAndMemberIdAndDeletedAtIsNull(complaintId, memberId);
+
+		if (active.isPresent()) {
+			var reaction = active.get();
+			reaction.softDelete();
+			complaintReactionRepository.save(reaction);
+		}
+
+		return latestReaction(complaintId, memberId);
+	}
+
+	private ReactionDto latestReaction(Long complaintId, Long memberId) {
+		return complaintRepository.getReaction(complaintId, memberId)
+			.orElseThrow(ComplaintNotFoundException::new);
 	}
 
 	private void validateImageCount(List<MultipartFile> imageList) {
