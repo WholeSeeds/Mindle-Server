@@ -23,4 +23,16 @@ public interface ComplaintRepositoryCustom {
 		String districtCode,
 		Long categoryId
 	);
+
+	List<ComplaintListResponseDto> findMyListWithCursor(
+		Long memberId,
+		Long cursorComplaintId,
+		int pageSize
+	);
+
+	List<ComplaintListResponseDto> findReactedListWithCursor(
+		Long memberId,
+		Long cursorComplaintId,
+		int pageSize
+	);
 }

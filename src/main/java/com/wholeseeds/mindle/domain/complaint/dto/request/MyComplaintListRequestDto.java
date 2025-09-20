@@ -8,12 +8,10 @@ import lombok.NoArgsConstructor;
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-public class ComplaintListRequestDto {
+public class MyComplaintListRequestDto {
 
 	private Long cursorComplaintId;
+
 	@Min(1)
 	private int pageSize = 20;
-	private String cityCode;
-	private String districtCode;
-	private Long categoryId;
 }

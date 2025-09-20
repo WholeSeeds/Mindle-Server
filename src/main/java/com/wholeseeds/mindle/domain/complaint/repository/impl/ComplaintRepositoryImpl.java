@@ -101,7 +101,7 @@ public class ComplaintRepositoryImpl extends JpaBaseRepositoryImpl<Complaint, Lo
 			.content(complaint.getContent())
 			.categoryName(complaint.getCategory().getName())
 			.memberNickname(complaint.getMember().getNickname())
-			.place(null) // 매퍼에서 처리
+			.place(null)
 			.city(cityDto)
 			.district(districtDto)
 			.subdistrict(subdistrictDto)
@@ -240,6 +240,98 @@ public class ComplaintRepositoryImpl extends JpaBaseRepositoryImpl<Complaint, Lo
 				cityCode != null ? C.subdistrict.city.code.eq(cityCode) : null,
 				districtCode != null ? C.subdistrict.district.code.eq(districtCode) : null
 			)
+			.orderBy(C.id.desc())
+			.limit(pageSize)
+			.fetch();
+	}
+
+	@Override
+	public List<ComplaintListResponseDto> findMyListWithCursor(
+		Long memberId,
+		Long cursorComplaintId,
+		int pageSize
+	) {
+		SubQueryExpression<Long> commentCount = JPAExpressions
+			.select(COMMENT.id.count())
+			.from(COMMENT)
+			.where(COMMENT.complaint.id.eq(C.id).and(COMMENT.deletedAt.isNull()));
+
+		SubQueryExpression<Long> reactionCount = JPAExpressions
+			.select(R.id.count())
+			.from(R)
+			.where(R.complaint.id.eq(C.id).and(R.deletedAt.isNull()));
+
+		SubQueryExpression<String> imageUrl = JPAExpressions
+			.select(I.imageUrl)
+			.from(I)
+			.where(I.complaint.id.eq(C.id).and(I.deletedAt.isNull()))
+			.limit(1);
+
+		return queryFactory
+			.select(Projections.constructor(
+				ComplaintListResponseDto.class,
+				C.id,
+				C.title,
+				C.content,
+				C.createdAt,
+				C.isResolved,
+				commentCount,
+				reactionCount,
+				imageUrl
+			))
+			.from(C)
+			.where(
+				C.deletedAt.isNull(),
+				C.member.id.eq(memberId),
+				cursorComplaintId != null ? C.id.lt(cursorComplaintId) : null
+			)
+			.orderBy(C.id.desc())
+			.limit(pageSize)
+			.fetch();
+	}
+
+	@Override
+	public List<ComplaintListResponseDto> findReactedListWithCursor(
+		Long memberId,
+		Long cursorComplaintId,
+		int pageSize
+	) {
+		SubQueryExpression<Long> commentCount = JPAExpressions
+			.select(COMMENT.id.count())
+			.from(COMMENT)
+			.where(COMMENT.complaint.id.eq(C.id).and(COMMENT.deletedAt.isNull()));
+
+		SubQueryExpression<Long> reactionCount = JPAExpressions
+			.select(R.id.count())
+			.from(R)
+			.where(R.complaint.id.eq(C.id).and(R.deletedAt.isNull()));
+
+		SubQueryExpression<String> imageUrl = JPAExpressions
+			.select(I.imageUrl)
+			.from(I)
+			.where(I.complaint.id.eq(C.id).and(I.deletedAt.isNull()))
+			.limit(1);
+
+		return queryFactory
+			.select(Projections.constructor(
+				ComplaintListResponseDto.class,
+				C.id,
+				C.title,
+				C.content,
+				C.createdAt,
+				C.isResolved,
+				commentCount,
+				reactionCount,
+				imageUrl
+			))
+			.from(C)
+			.join(R).on(R.complaint.id.eq(C.id), R.deletedAt.isNull())
+			.where(
+				C.deletedAt.isNull(),
+				R.member.id.eq(memberId),
+				cursorComplaintId != null ? C.id.lt(cursorComplaintId) : null
+			)
+			.distinct()
 			.orderBy(C.id.desc())
 			.limit(pageSize)
 			.fetch();

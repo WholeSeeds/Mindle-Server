@@ -14,6 +14,8 @@ import com.wholeseeds.mindle.domain.complaint.dto.ComplaintDetailWithImagesDto;
 import com.wholeseeds.mindle.domain.complaint.dto.ReactionDto;
 import com.wholeseeds.mindle.domain.complaint.dto.request.CommentRequestDto;
 import com.wholeseeds.mindle.domain.complaint.dto.request.ComplaintListRequestDto;
+import com.wholeseeds.mindle.domain.complaint.dto.request.MyComplaintListRequestDto;
+import com.wholeseeds.mindle.domain.complaint.dto.request.MyReactedComplaintListRequestDto;
 import com.wholeseeds.mindle.domain.complaint.dto.request.SaveComplaintRequestDto;
 import com.wholeseeds.mindle.domain.complaint.dto.request.UpdateComplaintRequestDto;
 import com.wholeseeds.mindle.domain.complaint.dto.response.ComplaintDetailResponseDto;
@@ -126,6 +128,41 @@ public class ComplaintService {
 			dto.getCityCode(),
 			dto.getDistrictCode(),
 			dto.getCategoryId()
+		);
+	}
+
+	/**
+	 * 내가 작성한 민원 목록을 커서 기반으로 조회한다.
+	 *
+	 * @param memberId 조회 회원 ID
+	 * @param dto      목록 조회 요청(커서/사이즈)
+	 * @return 민원 목록 DTO
+	 */
+	@Transactional(readOnly = true)
+	public List<ComplaintListResponseDto> getMyComplaintList(Long memberId, MyComplaintListRequestDto dto) {
+		return complaintRepository.findMyListWithCursor(
+			memberId,
+			dto.getCursorComplaintId(),
+			dto.getPageSize()
+		);
+	}
+
+	/**
+	 * 내가 공감한 민원 목록을 커서 기반으로 조회한다.
+	 *
+	 * @param memberId 조회 회원 ID
+	 * @param dto      목록 조회 요청(커서/사이즈)
+	 * @return 민원 목록 DTO
+	 */
+	@Transactional(readOnly = true)
+	public List<ComplaintListResponseDto> getMyReactedComplaintList(
+		Long memberId,
+		MyReactedComplaintListRequestDto dto
+	) {
+		return complaintRepository.findReactedListWithCursor(
+			memberId,
+			dto.getCursorComplaintId(),
+			dto.getPageSize()
 		);
 	}
 
