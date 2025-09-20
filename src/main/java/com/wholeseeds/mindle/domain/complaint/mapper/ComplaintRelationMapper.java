@@ -26,8 +26,6 @@ public class ComplaintRelationMapper {
 	private final RegionService regionService;
 	private final PlaceService placeService;
 
-	/* --- 단건 ID → 엔티티 해석 --- */
-
 	public Category toCategory(Long id) {
 		return categoryService.findCategory(id);
 	}
@@ -37,11 +35,9 @@ public class ComplaintRelationMapper {
 	}
 
 	public Subdistrict toSubdistrict(String code) {
-		// Save/Update 공통: 유효하지 않으면 서비스에서 예외 발생
 		return regionService.findSubdistrict(code);
 	}
 
-	/* --- Save DTO → Place 해석 (placeId 없으면 null) --- */
 	@Named("toPlaceFromSave")
 	public Place toPlaceFromSave(SaveComplaintRequestDto dto) {
 		if (dto.getPlaceId() == null || dto.getPlaceId().isBlank()) {
@@ -59,8 +55,6 @@ public class ComplaintRelationMapper {
 		return placeService.findOrCreatePlace(cmd);
 	}
 
-	/* --- Update DTO → Place 해석 (placeId 없으면 null) --- */
-
 	@Named("toPlaceFromUpdate")
 	public Place toPlaceFromUpdate(UpdateComplaintRequestDto dto) {
 		if (dto.getPlaceId() == null || dto.getPlaceId().isBlank()) {
@@ -77,10 +71,4 @@ public class ComplaintRelationMapper {
 			.build();
 		return placeService.findOrCreatePlace(cmd);
 	}
-
-	@Named("toSubdistrictFromSave")
-	public Subdistrict toSubdistrictFromSave(SaveComplaintRequestDto dto) {
-		return regionService.findSubdistrict(dto.getSubdistrictCode());
-	}
 }
-

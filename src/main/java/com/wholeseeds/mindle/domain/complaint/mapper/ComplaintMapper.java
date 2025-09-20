@@ -32,7 +32,7 @@ public interface ComplaintMapper {
 
 	@Mapping(target = "category", source = "dto.categoryId")
 	@Mapping(target = "member", source = "memberId")
-	@Mapping(target = "subdistrict", source = "dto", qualifiedByName = "toSubdistrictFromSave")
+	@Mapping(target = "subdistrict", source = "dto.subdistrictCode") // ★ 여기만 변경
 	@Mapping(target = "place", source = "dto", qualifiedByName = "toPlaceFromSave")
 	@Mapping(target = "title", source = "dto.title")
 	@Mapping(target = "content", source = "dto.content")
