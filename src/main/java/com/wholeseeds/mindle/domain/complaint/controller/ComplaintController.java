@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
@@ -22,8 +23,10 @@ import com.wholeseeds.mindle.common.annotation.CurrentMemberId;
 import com.wholeseeds.mindle.common.annotation.RequireAuth;
 import com.wholeseeds.mindle.common.util.ResponseTemplate;
 import com.wholeseeds.mindle.domain.complaint.dto.CommentDto;
+import com.wholeseeds.mindle.domain.complaint.dto.ReactionDto;
 import com.wholeseeds.mindle.domain.complaint.dto.request.CommentRequestDto;
 import com.wholeseeds.mindle.domain.complaint.dto.request.ComplaintListRequestDto;
+import com.wholeseeds.mindle.domain.complaint.dto.request.ReactionUpdateRequestDto;
 import com.wholeseeds.mindle.domain.complaint.dto.request.SaveComplaintRequestDto;
 import com.wholeseeds.mindle.domain.complaint.dto.request.UpdateComplaintRequestDto;
 import com.wholeseeds.mindle.domain.complaint.dto.response.ComplaintDetailResponseDto;
@@ -206,6 +209,36 @@ public class ComplaintController {
 		@Parameter(hidden = true) @CurrentMemberId Long memberId
 	) {
 		VoteResolvedResponseDto responseDto = complaintService.handleResolvedVote(memberId, complaintId);
+		return responseTemplate.success(responseDto, HttpStatus.OK);
+	}
+
+	/**
+	 * 민원 공감 상태 업데이트 API
+	 */
+	@Operation(
+		summary = "민원 공감 상태 업데이트",
+		description = "특정 민원에 대한 내 공감 상태를 설정합니다. reacted=true면 공감 추가, false면 공감 취소(멱등)."
+	)
+	@ApiResponse(
+		responseCode = "200",
+		description = "공감 상태 반영 성공",
+		content = @Content(schema = @Schema(implementation = ReactionDto.class))
+	)
+	@PatchMapping("/{complaintId}/reaction")
+	@RequireAuth
+	public ResponseEntity<Map<String, Object>> updateReaction(
+		@PathVariable Long complaintId,
+		@Parameter(hidden = true) @CurrentMemberId Long memberId,
+		@io.swagger.v3.oas.annotations.parameters.RequestBody(
+			description = "공감 상태",
+			required = true,
+			content = @Content(schema = @Schema(implementation = ReactionUpdateRequestDto.class))
+		)
+		@RequestBody ReactionUpdateRequestDto request
+	) {
+		ReactionDto responseDto = Boolean.TRUE.equals(request.getReacted())
+			? complaintService.addReaction(memberId, complaintId)
+			: complaintService.cancelReaction(memberId, complaintId);
 		return responseTemplate.success(responseDto, HttpStatus.OK);
 	}
 }
