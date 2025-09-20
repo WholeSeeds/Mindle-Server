@@ -26,6 +26,8 @@ import com.wholeseeds.mindle.domain.complaint.dto.CommentDto;
 import com.wholeseeds.mindle.domain.complaint.dto.ReactionDto;
 import com.wholeseeds.mindle.domain.complaint.dto.request.CommentRequestDto;
 import com.wholeseeds.mindle.domain.complaint.dto.request.ComplaintListRequestDto;
+import com.wholeseeds.mindle.domain.complaint.dto.request.MyComplaintListRequestDto;
+import com.wholeseeds.mindle.domain.complaint.dto.request.MyReactedComplaintListRequestDto;
 import com.wholeseeds.mindle.domain.complaint.dto.request.ReactionUpdateRequestDto;
 import com.wholeseeds.mindle.domain.complaint.dto.request.SaveComplaintRequestDto;
 import com.wholeseeds.mindle.domain.complaint.dto.request.UpdateComplaintRequestDto;
@@ -42,6 +44,7 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -141,6 +144,58 @@ public class ComplaintController {
 	@RequireAuth
 	public ResponseEntity<Map<String, Object>> getComplaintList(@ModelAttribute ComplaintListRequestDto requestDto) {
 		List<ComplaintListResponseDto> responseDtos = complaintService.getComplaintListResponse(requestDto);
+		return responseTemplate.success(responseDtos, HttpStatus.OK);
+	}
+
+	/**
+	 * 내가 작성한 민원 목록 조회 API
+	 */
+	@Operation(
+		summary = "내가 작성한 민원 목록 조회",
+		description = "로그인 사용자가 작성한 민원 목록을 커서 기반으로 조회합니다."
+	)
+	@ApiResponse(
+		responseCode = "200",
+		description = "민원 목록 반환",
+		content = @Content(
+			mediaType = "application/json",
+			array = @ArraySchema(schema = @Schema(implementation = ComplaintListResponseDto.class))
+		)
+	)
+	@GetMapping("/my/list")
+	@RequireAuth
+	public ResponseEntity<Map<String, Object>> getMyComplaintList(
+		@Parameter(hidden = true) @CurrentMemberId Long memberId,
+		@Valid @ModelAttribute MyComplaintListRequestDto requestDto
+	) {
+		List<ComplaintListResponseDto> responseDtos =
+			complaintService.getMyComplaintList(memberId, requestDto);
+		return responseTemplate.success(responseDtos, HttpStatus.OK);
+	}
+
+	/**
+	 * 내가 공감한 민원 목록 조회 API
+	 */
+	@Operation(
+		summary = "내가 공감한 민원 목록 조회",
+		description = "로그인 사용자가 공감한 민원 목록을 커서 기반으로 조회합니다."
+	)
+	@ApiResponse(
+		responseCode = "200",
+		description = "민원 목록 반환",
+		content = @Content(
+			mediaType = "application/json",
+			array = @ArraySchema(schema = @Schema(implementation = ComplaintListResponseDto.class))
+		)
+	)
+	@GetMapping("/my/reacted")
+	@RequireAuth
+	public ResponseEntity<Map<String, Object>> getMyReactedComplaintList(
+		@Parameter(hidden = true) @CurrentMemberId Long memberId,
+		@Valid @ModelAttribute MyReactedComplaintListRequestDto requestDto
+	) {
+		List<ComplaintListResponseDto> responseDtos =
+			complaintService.getMyReactedComplaintList(memberId, requestDto);
 		return responseTemplate.success(responseDtos, HttpStatus.OK);
 	}
 
