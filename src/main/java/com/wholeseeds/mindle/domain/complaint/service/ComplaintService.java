@@ -7,8 +7,6 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.wholeseeds.mindle.common.util.ObjectUtils;
-import com.wholeseeds.mindle.domain.category.entity.Category;
-import com.wholeseeds.mindle.domain.category.service.CategoryService;
 import com.wholeseeds.mindle.domain.complaint.dto.CommentDto;
 import com.wholeseeds.mindle.domain.complaint.dto.ComplaintDetailWithImagesDto;
 import com.wholeseeds.mindle.domain.complaint.dto.ReactionDto;
@@ -26,15 +24,11 @@ import com.wholeseeds.mindle.domain.complaint.exception.ComplaintNotFoundExcepti
 import com.wholeseeds.mindle.domain.complaint.exception.ImageUploadLimitExceeded;
 import com.wholeseeds.mindle.domain.complaint.exception.NotComplaintOwnerException;
 import com.wholeseeds.mindle.domain.complaint.mapper.ComplaintMapper;
+import com.wholeseeds.mindle.domain.complaint.mapper.ComplaintRelationMapper;
 import com.wholeseeds.mindle.domain.complaint.repository.ComplaintRepository;
 import com.wholeseeds.mindle.domain.complaint.repository.ComplaintResolvedVoteRepository;
 import com.wholeseeds.mindle.domain.member.entity.Member;
 import com.wholeseeds.mindle.domain.member.service.MemberService;
-import com.wholeseeds.mindle.domain.place.dto.command.PlaceUpsertCmd;
-import com.wholeseeds.mindle.domain.place.entity.Place;
-import com.wholeseeds.mindle.domain.place.service.PlaceService;
-import com.wholeseeds.mindle.domain.region.entity.Subdistrict;
-import com.wholeseeds.mindle.domain.region.service.RegionService;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -45,12 +39,10 @@ import lombok.extern.slf4j.Slf4j;
 public class ComplaintService {
 	private final ComplaintRepository complaintRepository;
 	private final ComplaintMapper complaintMapper;
+	private final ComplaintRelationMapper complaintRelationMapper;
 
 	private final MemberService memberService;
-	private final RegionService regionService;
-	private final PlaceService placeService;
 	private final ComplaintImageService complaintImageService;
-	private final CategoryService categoryService;
 	private final ComplaintResolvedVoteRepository complaintResolvedVoteRepository;
 
 	private static final int RESOLVE_THRESHOLD = 5;
@@ -73,7 +65,8 @@ public class ComplaintService {
 		validateImageCount(imageList);
 		logRequest(requestDto, imageList);
 
-		Complaint complaint = assembleNewComplaint(memberId, requestDto);
+		Complaint complaint =
+			complaintMapper.toNewComplaint(memberId, requestDto, complaintRelationMapper);
 		Complaint saved = complaintRepository.save(complaint);
 
 		handleImagesOnCreate(saved, imageList);
@@ -133,7 +126,7 @@ public class ComplaintService {
 
 	/**
 	 * 민원을 부분 수정한다. 스칼라 필드는 MapStruct로 패치하고,
-	 * 카테고리/행정동/장소는 전용 로직으로 처리한다. 이미지 교체/추가도 지원.
+	 * 카테고리/행정동/장소는 매퍼의 연관 패치로 처리한다. 이미지 교체/추가도 지원.
 	 *
 	 * @param memberId   요청자 회원 ID(소유자 검증)
 	 * @param complaintId 민원 ID
@@ -156,7 +149,7 @@ public class ComplaintService {
 		ensureOwner(complaint, memberId);
 
 		complaintMapper.applyScalarPatch(dto, complaint);
-		applyRelationsPatch(complaint, dto);
+		complaintMapper.applyRelationsPatch(dto, complaint, complaintRelationMapper);
 		handleImagesOnUpdate(complaint, dto, imageList);
 
 		return complaintMapper.toSaveComplaintResponseDto(complaint);
@@ -164,7 +157,7 @@ public class ComplaintService {
 
 	/**
 	 * 민원을 삭제(soft delete)한다.
-	 * <p>작성자 본인만 삭제 가능하며, 연결된 이미지도 함께 soft delete 처리한다.</p>
+	 * - 작성자 본인만 삭제 가능하며, 연결된 이미지도 함께 soft delete 처리한다.
 	 *
 	 * @param memberId   요청자 회원 ID(소유자 검증)
 	 * @param complaintId 민원 ID
@@ -178,244 +171,9 @@ public class ComplaintService {
 
 		ensureOwner(complaint, memberId);
 
-		// 연결 이미지 soft delete
 		complaintImageService.softDeleteAllForComplaint(complaint);
-
-		// 본문 soft delete
 		complaint.softDelete();
 		complaintRepository.save(complaint);
-	}
-
-	/**
-	 * 이미지 개수를 검증한다(최대 3장).
-	 *
-	 * @param imageList 업로드 이미지 목록
-	 * @throws ImageUploadLimitExceeded 제한 초과 시
-	 */
-	private void validateImageCount(List<MultipartFile> imageList) {
-		if (!ObjectUtils.objectIsNullOrEmpty(imageList) && imageList.size() > 3) {
-			throw new ImageUploadLimitExceeded();
-		}
-	}
-
-	/**
-	 * 요청 DTO와 파일명을 로그로 남긴다.
-	 *
-	 * @param requestDto 생성 요청 DTO
-	 * @param imageList  업로드 이미지 목록
-	 */
-	private void logRequest(SaveComplaintRequestDto requestDto, List<MultipartFile> imageList) {
-		log.info("Request : {}", requestDto);
-		if (!ObjectUtils.objectIsNullOrEmpty(imageList)) {
-			imageList.forEach(image -> log.info("파일명 : {}", image.getOriginalFilename()));
-		}
-	}
-
-	/**
-	 * 신규 민원을 조립한다(카테고리/회원/행정동/장소 포함).
-	 *
-	 * @param memberId 작성자 회원 ID
-	 * @param dto      생성 요청 DTO
-	 * @return 미저장 Complaint 엔티티
-	 */
-	private Complaint assembleNewComplaint(Long memberId, SaveComplaintRequestDto dto) {
-		Category category = categoryService.findCategory(dto.getCategoryId());
-		Member member = memberService.getMember(memberId);
-		Subdistrict subdistrict = regionService.findSubdistrict(dto.getSubdistrictCode());
-
-		Place place = createOrResolvePlaceIfPresent(
-			buildCmdFromSave(dto)
-		);
-
-		return Complaint.builder()
-			.category(category)
-			.member(member)
-			.subdistrict(subdistrict)
-			.place(place)
-			.title(dto.getTitle())
-			.content(dto.getContent())
-			.latitude(dto.getLatitude())
-			.longitude(dto.getLongitude())
-			.build();
-	}
-
-	/**
-	 * 민원 소유자(작성자)인지 검증한다.
-	 *
-	 * @param complaint 대상 민원
-	 * @param memberId  요청자 회원 ID
-	 * @throws NotComplaintOwnerException 작성자가 아닌 경우
-	 */
-	private void ensureOwner(Complaint complaint, Long memberId) {
-		if (!complaint.getMember().getId().equals(memberId)) {
-			throw new NotComplaintOwnerException();
-		}
-	}
-
-	/**
-	 * 연관관계(카테고리/행정동/장소) 수정 로직을 적용한다.
-	 * clearPlace=true면 장소 연관을 제거한다.
-	 *
-	 * @param complaint 대상 민원
-	 * @param dto       수정 요청 DTO
-	 */
-	private void applyRelationsPatch(Complaint complaint, UpdateComplaintRequestDto dto) {
-		if (dto.getCategoryId() != null) {
-			complaint.changeCategory(categoryService.findCategory(dto.getCategoryId()));
-		}
-		if (dto.getSubdistrictCode() != null) {
-			complaint.changeSubdistrict(regionService.findSubdistrict(dto.getSubdistrictCode()));
-		}
-
-		if (Boolean.TRUE.equals(dto.getClearPlace())) {
-			complaint.changePlace(null);
-			return;
-		}
-		if (dto.getPlaceId() != null) {
-			Place place = createOrResolvePlaceIfPresent(buildCmdFromUpdate(dto));
-			complaint.changePlace(place);
-		}
-	}
-
-	/**
-	 * 생성 시 이미지 저장을 처리한다.
-	 *
-	 * @param saved     저장된 민원
-	 * @param imageList 업로드 이미지 목록
-	 */
-	private void handleImagesOnCreate(Complaint saved, List<MultipartFile> imageList) {
-		complaintImageService.saveComplaintImages(saved, imageList);
-	}
-
-	/**
-	 * 수정 시 이미지 교체/추가를 처리한다.
-	 *
-	 * @param complaint 대상 민원
-	 * @param dto       수정 요청 DTO(replaceImages 플래그)
-	 * @param imageList 이미지 목록
-	 */
-	private void handleImagesOnUpdate(
-		Complaint complaint,
-		UpdateComplaintRequestDto dto,
-		List<MultipartFile> imageList
-	) {
-		Boolean replace = dto.getReplaceImages();
-		if (Boolean.TRUE.equals(replace)) {
-			complaintImageService.replaceImages(complaint, imageList);
-		} else {
-			complaintImageService.appendImages(complaint, imageList);
-		}
-	}
-
-	/**
-	 * place 관련 필드들로 PlaceUpsertCmd를 생성한다.
-	 * placeId가 비어있으면 null을 반환한다.
-	 *
-	 * @param placeId         외부 place id
-	 * @param placeType       place type 명
-	 * @param placeName       place 명
-	 * @param description     설명
-	 * @param latitude        위도
-	 * @param longitude       경도
-	 * @param subdistrictCode 행정동 코드
-	 * @return PlaceUpsertCmd 또는 null
-	 */
-	private PlaceUpsertCmd buildCmdCore(
-		String placeId,
-		String placeType,
-		String placeName,
-		String description,
-		Double latitude,
-		Double longitude,
-		String subdistrictCode
-	) {
-		if (placeId == null || placeId.isBlank()) {
-			return null;
-		}
-		return PlaceUpsertCmd.builder()
-			.placeId(placeId)
-			.placeTypeName(placeType)
-			.placeName(placeName)
-			.description(description)
-			.latitude(latitude)
-			.longitude(longitude)
-			.subdistrictCode(subdistrictCode)
-			.build();
-	}
-
-	/**
-	 * 생성 요청 DTO를 장소 업서트 커맨드로 변환한다.
-	 * placeId가 비어있으면 null을 반환한다.
-	 *
-	 * @param dto 생성 요청 DTO
-	 * @return PlaceUpsertCmd
-	 */
-	private PlaceUpsertCmd buildCmdFromSave(SaveComplaintRequestDto dto) {
-		return buildCmdCore(
-			dto.getPlaceId(),
-			dto.getPlaceType(),
-			dto.getPlaceName(),
-			dto.getPlaceDescription(),
-			dto.getLatitude(),
-			dto.getLongitude(),
-			dto.getSubdistrictCode()
-		);
-	}
-
-	/**
-	 * 수정 요청 DTO를 장소 업서트 커맨드로 변환한다.
-	 * placeId가 비어있으면 null을 반환한다.
-	 *
-	 * @param dto 수정 요청 DTO
-	 */
-	private PlaceUpsertCmd buildCmdFromUpdate(UpdateComplaintRequestDto dto) {
-		return buildCmdCore(
-			dto.getPlaceId(),
-			dto.getPlaceType(),
-			dto.getPlaceName(),
-			dto.getPlaceDescription(),
-			dto.getLatitude(),
-			dto.getLongitude(),
-			dto.getSubdistrictCode()
-		);
-	}
-
-	/**
-	 * placeId가 있는 경우 장소 업서트를 수행하고, 없으면 null을 반환한다.
-	 *
-	 * @param cmd 업서트 커맨드(또는 null)
-	 * @return 조회/복구/신규 Place, 또는 null
-	 */
-	private Place createOrResolvePlaceIfPresent(PlaceUpsertCmd cmd) {
-		if (cmd == null) {
-			return null;
-		}
-		return placeService.findOrCreatePlace(cmd);
-	}
-
-	/**
-	 * 민원 상세 정보를 조회한다(이미지 목록 포함).
-	 *
-	 * @param complaintId 민원 ID
-	 * @return 상세 DTO
-	 * @throws ComplaintNotFoundException 민원이 없을 때
-	 */
-	private ComplaintDetailWithImagesDto findComplaintDetail(Long complaintId) {
-		return complaintRepository.getComplaintWithImages(complaintId)
-			.orElseThrow(ComplaintNotFoundException::new);
-	}
-
-	/**
-	 * 민원의 공감 수와 회원의 공감 여부를 조회한다.
-	 *
-	 * @param complaintId 민원 ID
-	 * @param memberId    회원 ID
-	 * @return 공감 DTO
-	 * @throws ComplaintNotFoundException 민원이 없을 때
-	 */
-	private ReactionDto findComplaintReaction(Long complaintId, Long memberId) {
-		return complaintRepository.getReaction(complaintId, memberId)
-			.orElseThrow(ComplaintNotFoundException::new);
 	}
 
 	/**
@@ -464,5 +222,51 @@ public class ComplaintService {
 			.transitionedToResolved(transitionedToResolved)
 			.complaint(complaintMapper.toSaveComplaintResponseDto(complaint))
 			.build();
+	}
+
+	private void validateImageCount(List<MultipartFile> imageList) {
+		if (!ObjectUtils.objectIsNullOrEmpty(imageList) && imageList.size() > 3) {
+			throw new ImageUploadLimitExceeded();
+		}
+	}
+
+	private void logRequest(SaveComplaintRequestDto requestDto, List<MultipartFile> imageList) {
+		log.info("Request : {}", requestDto);
+		if (!ObjectUtils.objectIsNullOrEmpty(imageList)) {
+			imageList.forEach(image -> log.info("파일명 : {}", image.getOriginalFilename()));
+		}
+	}
+
+	private void ensureOwner(Complaint complaint, Long memberId) {
+		if (!complaint.getMember().getId().equals(memberId)) {
+			throw new NotComplaintOwnerException();
+		}
+	}
+
+	private void handleImagesOnCreate(Complaint saved, List<MultipartFile> imageList) {
+		complaintImageService.saveComplaintImages(saved, imageList);
+	}
+
+	private void handleImagesOnUpdate(
+		Complaint complaint,
+		UpdateComplaintRequestDto dto,
+		List<MultipartFile> imageList
+	) {
+		Boolean replace = dto.getReplaceImages();
+		if (Boolean.TRUE.equals(replace)) {
+			complaintImageService.replaceImages(complaint, imageList);
+		} else {
+			complaintImageService.appendImages(complaint, imageList);
+		}
+	}
+
+	private ComplaintDetailWithImagesDto findComplaintDetail(Long complaintId) {
+		return complaintRepository.getComplaintWithImages(complaintId)
+			.orElseThrow(ComplaintNotFoundException::new);
+	}
+
+	private ReactionDto findComplaintReaction(Long complaintId, Long memberId) {
+		return complaintRepository.getReaction(complaintId, memberId)
+			.orElseThrow(ComplaintNotFoundException::new);
 	}
 }
