@@ -40,34 +40,51 @@ public class ComplaintRelationMapper {
 
 	@Named("toPlaceFromSave")
 	public Place toPlaceFromSave(SaveComplaintRequestDto dto) {
-		if (dto.getPlaceId() == null || dto.getPlaceId().isBlank()) {
-			return null;
-		}
-		PlaceUpsertCmd cmd = PlaceUpsertCmd.builder()
-			.placeId(dto.getPlaceId())
-			.placeTypeName(dto.getPlaceType())
-			.placeName(dto.getPlaceName())
-			.description(dto.getPlaceDescription())
-			.latitude(dto.getLatitude())
-			.longitude(dto.getLongitude())
-			.subdistrictCode(dto.getSubdistrictCode())
-			.build();
-		return placeService.findOrCreatePlace(cmd);
+		return toPlaceCore(
+			dto.getPlaceId(),
+			dto.getPlaceType(),
+			dto.getPlaceName(),
+			dto.getPlaceDescription(),
+			dto.getLatitude(),
+			dto.getLongitude(),
+			dto.getSubdistrictCode()
+		);
 	}
 
 	@Named("toPlaceFromUpdate")
 	public Place toPlaceFromUpdate(UpdateComplaintRequestDto dto) {
-		if (dto.getPlaceId() == null || dto.getPlaceId().isBlank()) {
+		return toPlaceCore(
+			dto.getPlaceId(),
+			dto.getPlaceType(),
+			dto.getPlaceName(),
+			dto.getPlaceDescription(),
+			dto.getLatitude(),
+			dto.getLongitude(),
+			dto.getSubdistrictCode()
+		);
+	}
+
+	/* 공통 Place 생성/업서트 로직 */
+	private Place toPlaceCore(
+		String placeId,
+		String placeType,
+		String placeName,
+		String description,
+		Double latitude,
+		Double longitude,
+		String subdistrictCode
+	) {
+		if (placeId == null || placeId.isBlank()) {
 			return null;
 		}
 		PlaceUpsertCmd cmd = PlaceUpsertCmd.builder()
-			.placeId(dto.getPlaceId())
-			.placeTypeName(dto.getPlaceType())
-			.placeName(dto.getPlaceName())
-			.description(dto.getPlaceDescription())
-			.latitude(dto.getLatitude())
-			.longitude(dto.getLongitude())
-			.subdistrictCode(dto.getSubdistrictCode())
+			.placeId(placeId)
+			.placeTypeName(placeType)
+			.placeName(placeName)
+			.description(description)
+			.latitude(latitude)
+			.longitude(longitude)
+			.subdistrictCode(subdistrictCode)
 			.build();
 		return placeService.findOrCreatePlace(cmd);
 	}
