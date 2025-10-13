@@ -174,8 +174,14 @@ public class ComplaintRepositoryImpl extends JpaBaseRepositoryImpl<Complaint, Lo
 		LocalDateTime cursorCreatedAt,
 		int pageSize
 	) {
-		// 주어진 시각 이전에 작성된 과거 댓글 조회 (페이지네이션)
-		BooleanExpression beforeCursor = cursorCreatedAt != null ? COMMENT.createdAt.lt(cursorCreatedAt) : null;
+		// 기본 조건: 특정 민원의 삭제되지 않은 댓글
+		BooleanExpression condition = COMMENT.complaint.id.eq(complaintId)
+			.and(COMMENT.deletedAt.isNull());
+
+		// 커서가 있을 때만 추가 조건 적용
+		if (cursorCreatedAt != null) {
+			condition = condition.and(COMMENT.createdAt.lt(cursorCreatedAt));
+		}
 
 		return queryFactory
 			.select(Projections.constructor(
@@ -187,7 +193,7 @@ public class ComplaintRepositoryImpl extends JpaBaseRepositoryImpl<Complaint, Lo
 				COMMENT.member.nickname
 			))
 			.from(COMMENT)
-			.where(COMMENT.complaint.id.eq(complaintId).and(COMMENT.deletedAt.isNull()), beforeCursor)
+			.where(condition)
 			.orderBy(COMMENT.createdAt.desc())
 			.limit(pageSize)
 			.fetch();
