@@ -6,6 +6,15 @@ on:
   push:
     branches:
       - 'main'
+    paths:
+      - 'src/**'
+      - 'build.gradle'
+      - 'settings.gradle'
+      - 'gradlew'
+      - 'gradle/**'
+      - 'dockerfile'
+      - 'Dockerfile'
+      - 'Dockerfile.*'
 
 jobs:
   build-and-deploy:
@@ -42,6 +51,7 @@ jobs:
         run: |
           docker buildx build \
             --platform linux/amd64 \
+            -f dockerfile \
             -t mindle.kr.ncr.ntruss.com/my-spring-app:$IMAGE_TAG \
             --push \
             .
@@ -59,9 +69,6 @@ jobs:
           yq e -i \
             '.spec.template.spec.containers[0].image = "mindle.kr.ncr.ntruss.com/my-spring-app:'"$IMAGE_TAG"'"' \
             deployment.yaml
-          yq e -i \
-            '.spec.template.spec.containers[0].image = "mindle.kr.ncr.ntruss.com/my-spring-app:'"$IMAGE_TAG"'"' \
-            service.yaml
 
       - name: 매니페스트 커밋 및 푸시
         env:
@@ -69,7 +76,7 @@ jobs:
         run: |
           git config user.name "github-actions"
           git config user.email "actions@github.com"
-          git add deployment.yaml service.yaml
-          git commit -m "ci: update image tag to $IMAGE_TAG"
+          git add deployment.yaml
+          git commit -m "ci: update image tag to $IMAGE_TAG [skip ci]" || echo "no changes"
           git pull --rebase origin ${{ github.ref_name }}
           git push
