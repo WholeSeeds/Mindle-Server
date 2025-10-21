@@ -6,15 +6,6 @@ on:
   push:
     branches:
       - 'main'
-    paths:
-      - 'src/**'
-      - 'build.gradle'
-      - 'settings.gradle'
-      - 'gradlew'
-      - 'gradle/**'
-      - 'dockerfile'
-      - 'Dockerfile'
-      - 'Dockerfile.*'
 
 jobs:
   build-and-deploy:
