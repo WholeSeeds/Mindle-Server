@@ -37,15 +37,18 @@ public class WebConfig implements WebMvcConfigurer {
 	@Override
 	public void addInterceptors(InterceptorRegistry registry) {
 		String apiPath = "/api/**";
+		String healthPath = "/api/health/**";
 
 		registry.addInterceptor(loggingInterceptor)
 			.addPathPatterns(apiPath);
 
 		registry.addInterceptor(firebaseAuthInterceptor)
-			.addPathPatterns(apiPath);
+			.addPathPatterns(apiPath)
+			.excludePathPatterns(healthPath);
 
 		registry.addInterceptor(requireAuthInterceptor)
-			.addPathPatterns(apiPath);
+			.addPathPatterns(apiPath)
+			.excludePathPatterns(healthPath);
 	}
 
 	// swagger 이미지 업로드 때 사용됨
