@@ -40,7 +40,7 @@ spring-doc: # swagger 설정
     doc-expansion: none        # 접은 상태로 표시
 
 swagger:
-  server-url: https://api.mindle.site
+  server-url: http://localhost:8080
 
 ncp:
   object:
@@ -64,4 +64,4 @@ firebase:
   config-path: file:/etc/firebase/mindle-secret.json
 
 swagger:
-  server-url: http://default-spring-svc-973a8-106892561-1156db887a39.kr.lb.naverncp.com
+  server-url: https://api.mindle.site
