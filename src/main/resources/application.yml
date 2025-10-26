@@ -40,7 +40,7 @@ spring-doc: # swagger 설정
     doc-expansion: none        # 접은 상태로 표시
 
 swagger:
-  server-url: http://localhost:8080
+  server-url: https://api.mindle.site
 
 ncp:
   object:
