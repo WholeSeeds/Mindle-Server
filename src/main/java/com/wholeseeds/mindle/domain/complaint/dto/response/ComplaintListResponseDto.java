@@ -19,4 +19,6 @@ public class ComplaintListResponseDto {
 	private long commentCount;
 	private long reactionCount;
 	private String imageUrl;
+	private Double latitude;
+	private Double longitude;
 }

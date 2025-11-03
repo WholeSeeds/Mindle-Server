@@ -235,7 +235,9 @@ public class ComplaintRepositoryImpl extends JpaBaseRepositoryImpl<Complaint, Lo
 				C.isResolved,
 				commentCount,
 				reactionCount,
-				imageUrl
+				imageUrl,
+				C.latitude,
+				C.longitude
 			))
 			.from(C)
 			.where(C.deletedAt.isNull(),
@@ -283,7 +285,9 @@ public class ComplaintRepositoryImpl extends JpaBaseRepositoryImpl<Complaint, Lo
 				C.isResolved,
 				commentCount,
 				reactionCount,
-				imageUrl
+				imageUrl,
+				C.latitude,
+				C.longitude
 			))
 			.from(C)
 			.where(
@@ -328,7 +332,9 @@ public class ComplaintRepositoryImpl extends JpaBaseRepositoryImpl<Complaint, Lo
 				C.isResolved,
 				commentCount,
 				reactionCount,
-				imageUrl
+				imageUrl,
+				C.latitude,
+				C.longitude
 			))
 			.from(C)
 			.join(R).on(R.complaint.id.eq(C.id), R.deletedAt.isNull())

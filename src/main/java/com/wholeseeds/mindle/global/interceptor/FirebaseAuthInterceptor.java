@@ -34,7 +34,6 @@ public class FirebaseAuthInterceptor implements HandlerInterceptor {
 		@NonNull HttpServletResponse response,
 		@NonNull Object handler
 	) {
-
 		// Method 요청만 처리
 		if (!(handler instanceof HandlerMethod)) {
 			return true;
